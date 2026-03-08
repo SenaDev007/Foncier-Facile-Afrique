@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── UTILISATEURS & AUTH ──────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  role          Role      @default(AGENT)
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  annonces      Annonce[]
+  leads         Lead[]    @relation("AssignedLeads")
+  blogPosts     BlogPost[]
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  AGENT
+  EDITEUR
+}
+
+// ─── ANNONCES IMMOBILIÈRES ────────────────────────────────────────────────────
+
+model Annonce {
+  id            String        @id @default(cuid())
+  reference     String        @unique
+  slug          String        @unique
+  titre         String
+  description   String
+  type          TypeBien
+  statut        StatutAnnonce @default(BROUILLON)
+  prix          Float
+  surface       Float?
+  localisation  String
+  departement   String?
+  commune       String?
+  quartier      String?
+  latitude      Float?
+  longitude     Float?
+  documents     String[]
+  modalitesPrix String?
+  photos        Photo[]
+  vues          Int           @default(0)
+  auteur        User          @relation(fields: [auteurId], references: [id])
+  auteurId      String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  leads         Lead[]
+}
+
+enum TypeBien {
+  TERRAIN
+  APPARTEMENT
+  MAISON
+  VILLA
+  BUREAU
+  COMMERCE
+}
+
+enum StatutAnnonce {
+  BROUILLON
+  EN_LIGNE
+  RESERVE
+  VENDU
+  ARCHIVE
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String?
+  ordre     Int      @default(0)
+  annonce   Annonce  @relation(fields: [annonceId], references: [id], onDelete: Cascade)
+  annonceId String
+}
+
+// ─── LEADS / CRM ─────────────────────────────────────────────────────────────
+
+model Lead {
+  id             String       @id @default(cuid())
+  nom            String
+  prenom         String
+  telephone      String
+  email          String?
+  canal          CanalLead    @default(FORMULAIRE)
+  budget         String?
+  statut         StatutLead   @default(NOUVEAU)
+  notes          String?
+  prochainRappel DateTime?
+  agent          User?        @relation("AssignedLeads", fields: [agentId], references: [id])
+  agentId        String?
+  annonce        Annonce?     @relation(fields: [annonceId], references: [id])
+  annonceId      String?
+  interactions   Interaction[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+enum CanalLead {
+  FORMULAIRE
+  WHATSAPP
+  APPEL
+  EMAIL
+  REFERENCE
+}
+
+enum StatutLead {
+  NOUVEAU
+  CONTACTE
+  EN_NEGOCIATION
+  GAGNE
+  PERDU
+}
+
+model Interaction {
+  id        String   @id @default(cuid())
+  type      String
+  contenu   String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadId    String
+  createdAt DateTime @default(now())
+}
+
+// ─── MESSAGES CONTACT ─────────────────────────────────────────────────────────
+
+model Message {
+  id        String   @id @default(cuid())
+  nom       String
+  email     String
+  telephone String?
+  sujet     String?
+  contenu   String
+  lu        Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// ─── BLOG ─────────────────────────────────────────────────────────────────────
+
+model BlogPost {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  titre       String
+  resume      String?
+  contenu     String
+  imageUne    String?
+  statut      StatutPost @default(BROUILLON)
+  metaTitle   String?
+  metaDesc    String?
+  tags        String[]
+  auteur      User       @relation(fields: [auteurId], references: [id])
+  auteurId    String
+  publishedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+enum StatutPost {
+  BROUILLON
+  PLANIFIE
+  PUBLIE
+  ARCHIVE
+}
+
+// ─── TÉMOIGNAGES ──────────────────────────────────────────────────────────────
+
+model Temoignage {
+  id        String   @id @default(cuid())
+  nom       String
+  photo     String?
+  texte     String
+  note      Int      @default(5)
+  actif     Boolean  @default(true)
+  ordre     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+// ─── PARAMÈTRES SITE ──────────────────────────────────────────────────────────
+
+model Parametre {
+  id     String @id @default(cuid())
+  cle    String @unique
+  valeur String
+}
+
+// ─── NEWSLETTER ───────────────────────────────────────────────────────────────
+
+model Newsletter {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  actif     Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

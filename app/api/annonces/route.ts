@@ -96,6 +96,7 @@ export async function POST(req: NextRequest) {
     const annonce = await prisma.annonce.create({
       data: {
         ...data,
+        auteurId: session.user.id,
         reference,
         slug,
         photos: {

@@ -1,20 +1,47 @@
+import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { NextResponse } from 'next/server'
 
 export default auth((req) => {
   const { pathname } = req.nextUrl
+  const origin = req.nextUrl.origin
 
+  // Ne pas appliquer le middleware aux routes API et aux assets statiques
+  if (
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/images/') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next()
+  }
+
+  // Protéger toutes les routes admin sauf login
   if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
     if (!req.auth) {
-      return NextResponse.redirect(new URL('/admin/login', req.url))
+      const loginUrl = new URL('/admin/login', origin)
+      loginUrl.searchParams.set('from', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+
+    // Vérifier le rôle pour certaines routes sensibles
+    if (pathname.startsWith('/admin/utilisateurs') || pathname.startsWith('/admin/parametres')) {
+      const userRole = req.auth?.user?.role
+      if (userRole !== 'SUPER_ADMIN' && userRole !== 'ADMIN') {
+        return NextResponse.redirect(new URL('/admin', origin))
+      }
     }
   }
 
+  // Rediriger si déjà connecté vers login
   if (pathname === '/admin/login' && req.auth) {
-    return NextResponse.redirect(new URL('/admin', req.url))
+    return NextResponse.redirect(new URL('/admin', origin))
   }
 
-  return NextResponse.next()
+  const res = NextResponse.next()
+  if (pathname.startsWith('/admin')) {
+    res.headers.set('x-pathname', pathname)
+  }
+  return res
 })
 
 export const config = {

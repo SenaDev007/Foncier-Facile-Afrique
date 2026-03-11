@@ -2,16 +2,21 @@ import { TrendingUp, Home, Users, MessageSquare } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 
 async function getStats() {
-  const [annonces, leads, messages, temoignages] = await Promise.all([
-    prisma.annonce.count({ where: { statut: 'EN_LIGNE' } }),
-    prisma.lead.count(),
-    prisma.message.count({ where: { lu: false } }),
-    prisma.temoignage.count({ where: { actif: true } }),
-  ])
-  const leadsThisMonth = await prisma.lead.count({
-    where: { createdAt: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) } },
-  })
-  return { annonces, leads, messages, temoignages, leadsThisMonth }
+  try {
+    const [annonces, leads, messages, temoignages] = await Promise.all([
+      prisma.annonce.count({ where: { statut: 'EN_LIGNE' } }),
+      prisma.lead.count(),
+      prisma.message.count({ where: { lu: false } }),
+      prisma.temoignage.count({ where: { actif: true } }),
+    ])
+    const leadsThisMonth = await prisma.lead.count({
+      where: { createdAt: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) } },
+    })
+    return { annonces, leads, messages, temoignages, leadsThisMonth }
+  } catch (err) {
+    console.error('[DashboardStats] getStats:', err)
+    return { annonces: 0, leads: 0, messages: 0, temoignages: 0, leadsThisMonth: 0 }
+  }
 }
 
 export default async function DashboardStats() {
@@ -52,13 +57,13 @@ export default async function DashboardStats() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
       {cards.map((card) => (
-        <div key={card.title} className={`bg-white rounded-xl border ${card.border} p-5 flex items-center gap-4`}>
+        <div key={card.title} className={`bg-[#2C2C2E] border ${card.border} rounded-xl p-5 flex items-center gap-4`}>
           <div className={`p-3 rounded-xl ${card.color}`}>
             <card.icon className="h-6 w-6" aria-hidden="true" />
           </div>
           <div>
-            <p className="text-grey text-sm">{card.title}</p>
-            <p className="font-heading font-bold text-dark text-2xl mt-0.5">{card.value}</p>
+            <p className="text-[#8E8E93] text-sm">{card.title}</p>
+            <p className="font-heading font-bold text-[#EFEFEF] text-2xl mt-0.5">{card.value}</p>
             {card.sub && <p className="text-xs text-green-600 mt-0.5">{card.sub}</p>}
           </div>
         </div>

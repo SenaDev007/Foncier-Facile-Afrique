@@ -72,19 +72,19 @@ export function LeadsKanban({ leads: initialLeads }: LeadsKanbanProps) {
                 {colLeads.map((lead) => (
                   <div
                     key={lead.id}
-                    className={`bg-white rounded-xl shadow-sm p-3 border border-gray-100 ${updating === lead.id ? 'opacity-60' : ''}`}
+                    className={`bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-3 ${updating === lead.id ? 'opacity-60' : ''}`}
                   >
-                    <p className="font-semibold text-dark text-sm truncate">
+                    <p className="font-semibold text-[#EFEFEF] text-sm truncate">
                       {lead.prenom} {lead.nom}
                     </p>
-                    <p className="text-xs text-grey">{lead.telephone}</p>
+                    <p className="text-xs text-[#8E8E93]">{lead.telephone}</p>
                     {lead.annonce && (
-                      <p className="text-xs text-primary truncate mt-1">{lead.annonce.titre}</p>
+                      <p className="text-xs text-[#D4A843] truncate mt-1">{lead.annonce.titre}</p>
                     )}
                     {lead.budget && (
-                      <p className="text-xs text-grey mt-0.5">{lead.budget}</p>
+                      <p className="text-xs text-[#8E8E93] mt-0.5">{lead.budget}</p>
                     )}
-                    <p className="text-xs text-grey mt-1">
+                    <p className="text-xs text-[#8E8E93] mt-1">
                       {formatDate(new Date(lead.createdAt).toISOString())}
                     </p>
                     <div className="mt-2 flex flex-wrap gap-1">
@@ -103,7 +103,7 @@ export function LeadsKanban({ leads: initialLeads }: LeadsKanbanProps) {
                   </div>
                 ))}
                 {colLeads.length === 0 && (
-                  <div className="text-center py-6 text-grey text-xs border-2 border-dashed border-gray-200 rounded-xl">
+                  <div className="text-center py-6 text-[#8E8E93] text-xs border-2 border-dashed border-[#3A3A3C] rounded-xl">
                     Aucun lead
                   </div>
                 )}

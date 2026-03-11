@@ -32,11 +32,15 @@ const etapes = [
 
 export default function ExpertisePage() {
   return (
-    <div className="bg-[#F9F9F6] min-h-screen">
-      <section className="bg-primary py-16 relative overflow-hidden">
+    <div className="bg-[#1C1C1E] min-h-screen">
+      <section className="relative py-20 md:py-28 overflow-hidden border-b border-[#2C2C2E]">
+        <div className="absolute inset-0 bg-[#161618]" />
         <div className="container-site relative z-10 text-center">
-          <h1 className="font-heading text-4xl font-bold text-white">Notre expertise</h1>
-          <p className="mt-4 text-gray-200 text-lg max-w-2xl mx-auto">
+          <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
+            Qui sommes-nous
+          </p>
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-[#EFEFEF]">Notre expertise</h1>
+          <p className="mt-4 text-[#8E8E93] text-lg max-w-2xl mx-auto">
             Plus de 10 ans d&apos;expérience dans le foncier et l&apos;immobilier en Afrique de l&apos;Ouest,
             au service de votre patrimoine.
           </p>
@@ -46,64 +50,65 @@ export default function ExpertisePage() {
       <section className="container-site py-14">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
           {chiffres.map((c) => (
-            <div key={c.label} className="bg-white rounded-2xl p-6 text-center shadow-card">
-              <p className="font-heading text-4xl font-bold text-primary">{c.value}</p>
-              <p className="text-grey text-sm mt-1">{c.label}</p>
+            <div key={c.label} className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-6 text-center">
+              <p className="font-heading text-4xl font-bold text-[#D4A843]">{c.value}</p>
+              <p className="text-[#8E8E93] text-sm mt-1">{c.label}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="bg-white section-padding">
-        <div className="container-site">
-          <div className="text-center mb-12">
-            <h2 className="section-title">Nos valeurs</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {valeurs.map((v) => (
-              <div key={v.title} className="text-center p-6">
-                <div className="p-3 rounded-xl bg-primary-light w-fit mx-auto mb-4">
-                  <v.icon className="h-7 w-7 text-primary" aria-hidden="true" />
-                </div>
-                <h3 className="font-heading font-semibold text-dark text-base mb-2">{v.title}</h3>
-                <p className="text-grey text-sm">{v.description}</p>
+      <section className="container-site py-14 md:py-16">
+        <div className="text-center mb-12">
+          <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">Nos valeurs</p>
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-[#EFEFEF]">Ce qui nous guide</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {valeurs.map((v) => (
+            <div key={v.title} className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl text-center p-6">
+              <div className="p-3 rounded-xl bg-[rgba(212,168,67,0.12)] w-fit mx-auto mb-4">
+                <v.icon className="h-7 w-7 text-[#D4A843]" aria-hidden="true" />
               </div>
-            ))}
-          </div>
+              <h3 className="font-heading font-semibold text-[#EFEFEF] text-base mb-2">{v.title}</h3>
+              <p className="text-[#8E8E93] text-sm">{v.description}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      <section className="section-padding">
+      <section className="py-14 md:py-16 bg-[#161618] border-y border-[#2C2C2E]">
         <div className="container-site max-w-3xl">
           <div className="text-center mb-12">
-            <h2 className="section-title">Notre méthode</h2>
-            <p className="section-subtitle mt-3 mx-auto">Un processus éprouvé pour sécuriser votre acquisition de A à Z.</p>
+            <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">Notre méthode</p>
+            <h2 className="font-heading text-2xl md:text-3xl font-bold text-[#EFEFEF] mb-3">Un processus éprouvé</h2>
+            <p className="text-[#8E8E93] text-lg max-w-xl mx-auto">Sécuriser votre acquisition de A à Z.</p>
           </div>
           <div className="space-y-6">
             {etapes.map((e) => (
-              <div key={e.num} className="bg-white rounded-xl p-6 shadow-sm flex gap-5 items-start">
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
-                  <span className="text-white font-heading font-bold text-sm">{e.num}</span>
+              <div key={e.num} className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-6 flex gap-5 items-start">
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#D4A843] flex items-center justify-center">
+                  <span className="text-[#EFEFEF] font-heading font-bold text-sm">{e.num}</span>
                 </div>
                 <div>
-                  <h3 className="font-heading font-semibold text-dark text-base mb-1">{e.title}</h3>
-                  <p className="text-grey text-sm">{e.description}</p>
+                  <h3 className="font-heading font-semibold text-[#EFEFEF] text-base mb-1">{e.title}</h3>
+                  <p className="text-[#8E8E93] text-sm">{e.description}</p>
                 </div>
-                <CheckCircle className="h-5 w-5 text-primary ml-auto flex-shrink-0 mt-0.5" aria-hidden="true" />
+                <CheckCircle className="h-5 w-5 text-[#D4A843] ml-auto flex-shrink-0 mt-0.5" aria-hidden="true" />
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-primary-light py-12">
+      <section className="bg-[#2C2C2E] py-16 md:py-20 border-t border-[#3A3A3C]">
         <div className="container-site text-center">
-          <h2 className="section-title">Commencez votre projet dès aujourd&apos;hui</h2>
-          <div className="flex flex-wrap justify-center gap-4 mt-6">
-            <Link href="/annonces" className="inline-flex items-center gap-2 bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:bg-primary-dark transition-colors">
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-[#EFEFEF] mb-3">Commencez votre projet dès aujourd&apos;hui</h2>
+          <p className="text-[#8E8E93] text-lg max-w-xl mx-auto">Un conseiller vous accompagne gratuitement.</p>
+          <div className="flex flex-wrap justify-center gap-4 mt-8">
+            <Link href="/annonces" className="inline-flex items-center gap-2 bg-[#D4A843] text-[#1C1C1E] font-semibold px-6 py-3 rounded-xl hover:bg-[#B8912E] transition-colors">
               Voir les annonces <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-            <Link href="/contact" className="inline-flex items-center gap-2 border border-primary text-primary font-semibold px-6 py-3 rounded-xl hover:bg-primary hover:text-white transition-colors">
+            <Link href="/contact" className="inline-flex items-center gap-2 border border-[#D4A843] text-[#D4A843] font-semibold px-6 py-3 rounded-xl hover:bg-[#D4A843] hover:text-[#1C1C1E] transition-colors">
               Parler à un expert
             </Link>
           </div>

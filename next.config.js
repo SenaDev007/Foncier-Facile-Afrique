@@ -5,6 +5,7 @@ const nextConfig = {
     unoptimized: false,
     remotePatterns: [
       { protocol: 'https', hostname: 'www.foncierfacileafrique.fr' },
+      { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
     ],
   },
   experimental: {

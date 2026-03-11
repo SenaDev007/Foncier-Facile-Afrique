@@ -42,18 +42,22 @@ export default async function BlogPage({ searchParams }: PageProps) {
   const { posts, total, page, totalPages } = await getBlogPosts(searchParams)
 
   return (
-    <div className="bg-[#F9F9F6] min-h-screen">
-      <section className="bg-primary py-14">
-        <div className="container-site text-center">
-          <h1 className="font-heading text-4xl font-bold text-white">Blog & Conseils</h1>
-          <p className="mt-3 text-gray-200 text-lg max-w-xl mx-auto">
+    <div className="bg-[#1C1C1E] min-h-screen">
+      <section className="relative py-20 md:py-28 overflow-hidden border-b border-[#2C2C2E]">
+        <div className="absolute inset-0 bg-[#161618]" />
+        <div className="container-site relative z-10 text-center">
+          <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
+            Ressources
+          </p>
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-[#EFEFEF]">Blog & Conseils</h1>
+          <p className="mt-4 text-[#8E8E93] text-lg max-w-xl mx-auto">
             Expertise foncière, guides d&apos;achat et actualités immobilières en Afrique de l&apos;Ouest.
           </p>
         </div>
       </section>
 
       <div className="container-site py-12">
-        <p className="text-grey text-sm mb-8">{total} article{total > 1 ? 's' : ''}</p>
+        <p className="text-[#8E8E93] text-sm mb-8">{total} article{total > 1 ? 's' : ''}</p>
 
         {posts.length > 0 ? (
           <>
@@ -69,7 +73,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
                   <a
                     key={p}
                     href={`/blog?${new URLSearchParams({ ...searchParams, page: String(p) })}`}
-                    className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-primary text-white' : 'bg-white text-grey hover:bg-primary-light'}`}
+                    className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[#3A3A3C] hover:text-[#EFEFEF] border border-[#3A3A3C]'}`}
                     aria-current={p === page ? 'page' : undefined}
                   >
                     {p}
@@ -79,8 +83,8 @@ export default async function BlogPage({ searchParams }: PageProps) {
             )}
           </>
         ) : (
-          <div className="text-center py-20 bg-white rounded-2xl">
-            <p className="text-grey text-lg">Aucun article publié pour le moment.</p>
+          <div className="text-center py-20 bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl">
+            <p className="text-[#8E8E93] text-lg">Aucun article publié pour le moment.</p>
           </div>
         )}
       </div>

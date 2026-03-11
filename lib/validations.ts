@@ -40,7 +40,7 @@ export const AnnonceSchema = z.object({
   description: z.string().min(20, 'Description requise (min 20 caractères)'),
   documents: z.array(z.string()).default([]),
   modalitesPrix: z.string().optional(),
-  auteurId: z.string().min(1, 'Agent requis'),
+  auteurId: z.string().min(1, 'Agent requis').optional(),
 })
 
 export const BlogPostSchema = z.object({

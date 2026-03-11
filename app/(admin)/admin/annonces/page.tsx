@@ -39,10 +39,10 @@ export default async function AdminAnnoncesPage({ searchParams }: PageProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading text-2xl font-bold text-dark">Annonces</h1>
-          <p className="text-grey text-sm mt-1">{total} annonce{total > 1 ? 's' : ''}</p>
+          <h1 className="font-heading text-2xl font-bold text-[#EFEFEF]">Annonces</h1>
+          <p className="text-[#8E8E93] text-sm mt-1">{total} annonce{total > 1 ? 's' : ''}</p>
         </div>
-        <Link href="/admin/annonces/new" className="inline-flex items-center gap-2 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-primary-dark transition-colors">
+        <Link href="/admin/annonces/new" className="inline-flex items-center gap-2 bg-[#D4A843] text-[#1C1C1E] text-sm font-semibold px-4 py-2 rounded-xl hover:bg-[#B8912E] transition-colors">
           <Plus className="h-4 w-4" aria-hidden="true" /> Nouvelle annonce
         </Link>
       </div>
@@ -52,47 +52,47 @@ export default async function AdminAnnoncesPage({ searchParams }: PageProps) {
           <Link
             key={s ?? 'all'}
             href={s ? `/admin/annonces?statut=${s}` : '/admin/annonces'}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${(searchParams.statut ?? undefined) === s ? 'bg-primary text-white' : 'bg-white text-grey hover:bg-primary-light hover:text-primary'}`}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${(searchParams.statut ?? undefined) === s ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[rgba(212,168,67,0.12)] hover:text-[#D4A843]'}`}
           >
             {s ?? 'Toutes'}
           </Link>
         ))}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-100">
-              <th className="text-left px-4 py-3 text-grey font-medium">Titre</th>
-              <th className="text-left px-4 py-3 text-grey font-medium hidden md:table-cell">Type</th>
-              <th className="text-left px-4 py-3 text-grey font-medium hidden lg:table-cell">Prix</th>
-              <th className="text-left px-4 py-3 text-grey font-medium">Statut</th>
-              <th className="text-left px-4 py-3 text-grey font-medium hidden lg:table-cell">Vues</th>
-              <th className="text-left px-4 py-3 text-grey font-medium hidden md:table-cell">Date</th>
+            <tr className="border-b border-[#3A3A3C]">
+              <th className="text-left px-4 py-3 text-[#8E8E93] font-medium">Titre</th>
+              <th className="text-left px-4 py-3 text-[#8E8E93] font-medium hidden md:table-cell">Type</th>
+              <th className="text-left px-4 py-3 text-[#8E8E93] font-medium hidden lg:table-cell">Prix</th>
+              <th className="text-left px-4 py-3 text-[#8E8E93] font-medium">Statut</th>
+              <th className="text-left px-4 py-3 text-[#8E8E93] font-medium hidden lg:table-cell">Vues</th>
+              <th className="text-left px-4 py-3 text-[#8E8E93] font-medium hidden md:table-cell">Date</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>
           <tbody>
             {annonces.length === 0 && (
-              <tr><td colSpan={7} className="text-center py-12 text-grey">Aucune annonce trouvée.</td></tr>
+              <tr><td colSpan={7} className="text-center py-12 text-[#8E8E93]">Aucune annonce trouvée.</td></tr>
             )}
             {annonces.map((a) => (
-              <tr key={a.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <tr key={a.id} className="border-b border-[#3A3A3C] hover:bg-[#3A3A3C] transition-colors">
                 <td className="px-4 py-3">
-                  <p className="font-medium text-dark truncate max-w-[200px]">{a.titre}</p>
-                  <p className="text-xs text-grey">{a.reference}</p>
+                  <p className="font-medium text-[#EFEFEF] truncate max-w-[200px]">{a.titre}</p>
+                  <p className="text-xs text-[#8E8E93]">{a.reference}</p>
                 </td>
-                <td className="px-4 py-3 text-grey hidden md:table-cell">{a.type}</td>
-                <td className="px-4 py-3 text-grey hidden lg:table-cell">{formatPrice(a.prix)}</td>
+                <td className="px-4 py-3 text-[#8E8E93] hidden md:table-cell">{a.type}</td>
+                <td className="px-4 py-3 text-[#8E8E93] hidden lg:table-cell">{formatPrice(a.prix)}</td>
                 <td className="px-4 py-3">
                   <Badge className={getStatutColor(a.statut)}>{getStatutLabel(a.statut)}</Badge>
                 </td>
-                <td className="px-4 py-3 text-grey hidden lg:table-cell">
+                <td className="px-4 py-3 text-[#8E8E93] hidden lg:table-cell">
                   <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" aria-hidden="true" />{a.vues}</span>
                 </td>
-                <td className="px-4 py-3 text-grey hidden md:table-cell">{formatDate(a.createdAt.toISOString())}</td>
+                <td className="px-4 py-3 text-[#8E8E93] hidden md:table-cell">{formatDate(a.createdAt.toISOString())}</td>
                 <td className="px-4 py-3">
-                  <Link href={`/admin/annonces/${a.id}`} className="text-xs text-primary font-medium hover:underline">Modifier</Link>
+                  <Link href={`/admin/annonces/${a.id}/edit`} className="text-xs text-[#D4A843] font-medium hover:underline">Modifier</Link>
                 </td>
               </tr>
             ))}
@@ -106,7 +106,7 @@ export default async function AdminAnnoncesPage({ searchParams }: PageProps) {
             <Link
               key={p}
               href={`/admin/annonces?${new URLSearchParams({ ...searchParams, page: String(p) })}`}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-colors ${p === page ? 'bg-primary text-white' : 'bg-white text-grey hover:bg-primary-light'}`}
+              className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-colors ${p === page ? 'bg-[#D4A843] text-[#EFEFEF]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[rgba(212,168,67,0.12)]'}`}
               aria-current={p === page ? 'page' : undefined}
             >
               {p}

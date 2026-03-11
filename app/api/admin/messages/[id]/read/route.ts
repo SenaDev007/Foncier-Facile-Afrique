@@ -1,0 +1,19 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+
+// PATCH - Marquer un message comme lu
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const { id } = params
+
+    const message = await prisma.message.update({
+      where: { id },
+      data: { lu: true }
+    })
+
+    return NextResponse.json(message)
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du message:', error)
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+  }
+}

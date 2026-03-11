@@ -23,6 +23,8 @@ const PARAM_LABELS: Record<string, { label: string; type: 'text' | 'textarea' | 
   facebook_url: { label: 'URL Facebook', type: 'url' },
   linkedin_url: { label: 'URL LinkedIn', type: 'url' },
   whatsapp_numero: { label: 'Numéro WhatsApp', type: 'tel' },
+  hero_image: { label: 'Image hero (accueil, desktop)', type: 'url' },
+  hero_image_mobile: { label: 'Image hero mobile (accueil)', type: 'url' },
 }
 
 export default function AdminParametresPage() {
@@ -64,34 +66,34 @@ export default function AdminParametresPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden="true" />
+        <Loader2 className="h-6 w-6 animate-spin text-[#D4A843]" aria-hidden="true" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="w-full max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading text-2xl font-bold text-dark">Paramètres</h1>
-          <p className="text-grey text-sm mt-1">Configuration générale du site</p>
+          <h1 className="font-heading text-2xl font-bold text-[#EFEFEF]">Paramètres</h1>
+          <p className="text-[#8E8E93] text-sm mt-1">Configuration générale du site</p>
         </div>
-        <Button onClick={handleSave} disabled={saving} className="gap-2">
+        <Button onClick={handleSave} disabled={saving} className="gap-2 bg-[#D4A843] hover:bg-[#B8912E] text-[#1C1C1E]">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="h-4 w-4" aria-hidden="true" />}
           Enregistrer
         </Button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-6 space-y-5">
+      <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-6 space-y-5">
         {Object.entries(PARAM_LABELS).map(([cle, { label, type }]) => (
           <div key={cle}>
-            <Label htmlFor={cle}>{label}</Label>
+            <Label htmlFor={cle} className="text-[#EFEFEF]">{label}</Label>
             {type === 'textarea' ? (
               <Textarea
                 id={cle}
                 value={params[cle] ?? ''}
                 onChange={(e) => setParams((p) => ({ ...p, [cle]: e.target.value }))}
-                className="mt-1.5"
+                className="mt-1.5 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#8E8E93]"
                 rows={3}
               />
             ) : (
@@ -100,7 +102,7 @@ export default function AdminParametresPage() {
                 type={type}
                 value={params[cle] ?? ''}
                 onChange={(e) => setParams((p) => ({ ...p, [cle]: e.target.value }))}
-                className="mt-1.5"
+                className="mt-1.5 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#8E8E93]"
               />
             )}
           </div>

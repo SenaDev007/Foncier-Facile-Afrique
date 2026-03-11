@@ -33,19 +33,19 @@ export default function LeadMagnetBanner() {
   }
 
   return (
-    <section className="bg-primary py-14 relative overflow-hidden" aria-labelledby="newsletter-title">
+    <section className="bg-[#1C1C1E] py-16 md:py-20 relative overflow-hidden border-t border-[#2C2C2E]" aria-labelledby="newsletter-title">
       <div className="absolute inset-0 bg-[url('/images/hero-pattern.svg')] opacity-5" aria-hidden="true" />
       <div className="container-site relative z-10">
         <div className="max-w-2xl mx-auto text-center">
           <div className="flex items-center justify-center mb-4">
-            <div className="p-3 rounded-full bg-white/10">
-              <Mail className="h-7 w-7 text-white" aria-hidden="true" />
+            <div className="p-3 rounded-full bg-[rgba(212,168,67,0.12)] border border-[rgba(212,168,67,0.2)]">
+              <Mail className="h-7 w-7 text-[#D4A843]" aria-hidden="true" />
             </div>
           </div>
-          <h2 id="newsletter-title" className="font-heading text-2xl sm:text-3xl font-bold text-white">
+          <h2 id="newsletter-title" className="font-heading text-2xl sm:text-3xl font-bold text-[#EFEFEF] text-center mx-auto">
             Recevez nos meilleures offres en avant-première
           </h2>
-          <p className="mt-3 text-gray-200 text-base">
+          <p className="mt-3 text-[#8E8E93] text-base">
             Inscrivez-vous à notre newsletter et soyez le premier informé des nouveaux terrains et biens disponibles.
           </p>
           <form onSubmit={handleSubmit} className="mt-8 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
@@ -57,19 +57,19 @@ export default function LeadMagnetBanner() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Votre adresse email"
               required
-              className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/30 text-white placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/20 transition-colors"
+              className="flex-1 px-4 py-3 rounded-xl bg-[#2C2C2E] border border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#636366] focus:outline-none focus:ring-2 focus:ring-[#D4A843] focus:border-[#D4A843] transition-colors"
               aria-required="true"
             />
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center justify-center gap-2 bg-gold text-white font-semibold px-6 py-3 rounded-xl hover:bg-yellow-600 transition-colors disabled:opacity-70 whitespace-nowrap"
+              className="flex items-center justify-center gap-2 bg-[#D4A843] text-[#1C1C1E] font-semibold px-6 py-3 rounded-xl hover:bg-[#B8912E] transition-colors disabled:opacity-70 whitespace-nowrap"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
               Je m&apos;inscris
             </button>
           </form>
-          <p className="mt-3 text-gray-300 text-xs">
+          <p className="mt-3 text-[#8E8E93] text-xs">
             Pas de spam. Désinscription possible à tout moment.
           </p>
         </div>

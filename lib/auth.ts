@@ -55,6 +55,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    authorized({ auth, request }) {
+      const pathname = request.nextUrl.pathname
+      if (!pathname.startsWith('/admin')) return true
+      if (pathname === '/admin/login') return true
+      return !!auth
+    },
     jwt({ token, user }) {
       if (user) {
         token.id = user.id as string
@@ -73,6 +79,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   pages: {
     signIn: '/admin/login',
   },
+  trustHost: true,
   session: { strategy: 'jwt' },
   secret: process.env.NEXTAUTH_SECRET,
 })

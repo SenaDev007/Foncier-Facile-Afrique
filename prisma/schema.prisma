@@ -137,6 +137,7 @@ model Interaction {
 model Message {
   id        String   @id @default(cuid())
   nom       String
+  prenom    String?
   email     String
   telephone String?
   sujet     String?

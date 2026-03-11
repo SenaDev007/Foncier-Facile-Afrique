@@ -49,20 +49,20 @@ export function DataTable<T>({
   })
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-x-auto">
+    <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-100">
+          <tr className="border-b border-[#3A3A3C]">
             {columns.map((col) => (
               <th
                 key={String(col.key)}
-                className={`text-left px-4 py-3 text-grey font-medium whitespace-nowrap ${col.className ?? ''}`}
+                className={`text-left px-4 py-3 text-[#8E8E93] font-medium whitespace-nowrap ${col.className ?? ''}`}
               >
                 {col.sortable ? (
                   <button
                     type="button"
                     onClick={() => handleSort(String(col.key))}
-                    className="inline-flex items-center gap-1 hover:text-dark transition-colors"
+                    className="inline-flex items-center gap-1 hover:text-[#EFEFEF] transition-colors"
                   >
                     {col.header}
                     {sortKey === String(col.key) ? (
@@ -87,7 +87,7 @@ export function DataTable<T>({
         <tbody>
           {sorted.length === 0 && (
             <tr>
-              <td colSpan={columns.length} className="text-center py-12 text-grey">
+              <td colSpan={columns.length} className="text-center py-12 text-[#8E8E93]">
                 {emptyMessage}
               </td>
             </tr>
@@ -95,7 +95,7 @@ export function DataTable<T>({
           {sorted.map((row) => (
             <tr
               key={keyExtractor(row)}
-              className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
+              className="border-b border-[#3A3A3C] hover:bg-[#3A3A3C] transition-colors"
             >
               {columns.map((col) => (
                 <td

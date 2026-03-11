@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Search, SlidersHorizontal, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 
 const TYPES = [
   { value: 'ALL', label: 'Tous les types' },
@@ -35,12 +36,23 @@ const SURFACE_MIN = [
   { value: '5000', label: '5 000 m²' },
 ]
 
+const DOCUMENTS = [
+  { value: 'TF', label: 'Titre foncier' },
+  { value: 'ACD', label: 'ACD' },
+  { value: 'PERMIS_HABITER', label: 'Permis d\'habiter' },
+]
+
 const SORT = [
   { value: 'createdAt_desc', label: 'Plus récent' },
   { value: 'prix_asc', label: 'Prix croissant' },
   { value: 'prix_desc', label: 'Prix décroissant' },
   { value: 'surface_desc', label: 'Surface décroissante' },
 ]
+
+function parseDocuments(param: string | null): string[] {
+  if (!param) return []
+  return param.split(',').filter(Boolean)
+}
 
 export default function AnnonceFilters() {
   const router = useRouter()
@@ -51,6 +63,14 @@ export default function AnnonceFilters() {
   const [prixMax, setPrixMax] = useState(searchParams.get('prixMax') ?? '')
   const [surfaceMin, setSurfaceMin] = useState(searchParams.get('surfaceMin') ?? '')
   const [sort, setSort] = useState(searchParams.get('sort') ?? 'createdAt_desc')
+  const documentsParam = searchParams.get('documents') ?? ''
+  const [documents, setDocuments] = useState<string[]>(() => parseDocuments(documentsParam))
+
+  const toggleDocument = useCallback((doc: string) => {
+    setDocuments((prev) =>
+      prev.includes(doc) ? prev.filter((d) => d !== doc) : [...prev, doc]
+    )
+  }, [])
 
   const applyFilters = useCallback(() => {
     const params = new URLSearchParams()
@@ -59,9 +79,10 @@ export default function AnnonceFilters() {
     if (prixMax) params.set('prixMax', prixMax)
     if (surfaceMin) params.set('surfaceMin', surfaceMin)
     if (sort) params.set('sort', sort)
+    if (documents.length > 0) params.set('documents', documents.join(','))
     params.set('page', '1')
     router.push(`/annonces?${params.toString()}`)
-  }, [localisation, type, prixMax, surfaceMin, sort, router])
+  }, [localisation, type, prixMax, surfaceMin, sort, documents, router])
 
   const resetFilters = useCallback(() => {
     setLocalisation('')
@@ -69,20 +90,21 @@ export default function AnnonceFilters() {
     setPrixMax('')
     setSurfaceMin('')
     setSort('createdAt_desc')
+    setDocuments([])
     router.push('/annonces')
   }, [router])
 
-  const hasActiveFilters = localisation || type !== 'ALL' || prixMax || surfaceMin
+  const hasActiveFilters = localisation || type !== 'ALL' || prixMax || surfaceMin || documents.length > 0
 
   return (
-    <div className="bg-white rounded-2xl shadow-card p-5">
+    <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-5">
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2 text-dark font-semibold text-sm">
-          <SlidersHorizontal className="h-4 w-4 text-primary" aria-hidden="true" />
+        <div className="flex items-center gap-2 text-[#EFEFEF] font-semibold text-sm">
+          <SlidersHorizontal className="h-4 w-4 text-[#D4A843]" aria-hidden="true" />
           Filtres
         </div>
         {hasActiveFilters && (
-          <button onClick={resetFilters} className="flex items-center gap-1 text-xs text-grey hover:text-red-500 transition-colors">
+          <button onClick={resetFilters} className="flex items-center gap-1 text-xs text-[#8E8E93] hover:text-red-400 transition-colors">
             <X className="h-3.5 w-3.5" aria-hidden="true" />
             Réinitialiser
           </button>
@@ -91,19 +113,19 @@ export default function AnnonceFilters() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <div className="relative sm:col-span-2 lg:col-span-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-grey" aria-hidden="true" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8E8E93]" aria-hidden="true" />
           <Input
             placeholder="Localisation..."
             value={localisation}
             onChange={(e) => setLocalisation(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-            className="pl-9"
+            className="pl-9 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#8E8E93]"
             aria-label="Filtrer par localisation"
           />
         </div>
 
         <Select value={type} onValueChange={setType}>
-          <SelectTrigger aria-label="Type de bien">
+          <SelectTrigger aria-label="Type de bien" className="bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#8E8E93] [&>svg]:text-[#8E8E93]">
             <SelectValue placeholder="Type de bien" />
           </SelectTrigger>
           <SelectContent>
@@ -114,7 +136,7 @@ export default function AnnonceFilters() {
         </Select>
 
         <Select value={prixMax} onValueChange={setPrixMax}>
-          <SelectTrigger aria-label="Prix maximum">
+          <SelectTrigger aria-label="Prix maximum" className="bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#8E8E93] [&>svg]:text-[#8E8E93]">
             <SelectValue placeholder="Prix max" />
           </SelectTrigger>
           <SelectContent>
@@ -125,7 +147,7 @@ export default function AnnonceFilters() {
         </Select>
 
         <Select value={surfaceMin} onValueChange={setSurfaceMin}>
-          <SelectTrigger aria-label="Surface minimum">
+          <SelectTrigger aria-label="Surface minimum" className="bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#8E8E93] [&>svg]:text-[#8E8E93]">
             <SelectValue placeholder="Surface min" />
           </SelectTrigger>
           <SelectContent>
@@ -136,7 +158,7 @@ export default function AnnonceFilters() {
         </Select>
 
         <Select value={sort} onValueChange={setSort}>
-          <SelectTrigger aria-label="Tri">
+          <SelectTrigger aria-label="Tri" className="bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#8E8E93] [&>svg]:text-[#8E8E93]">
             <SelectValue placeholder="Trier par" />
           </SelectTrigger>
           <SelectContent>
@@ -145,6 +167,23 @@ export default function AnnonceFilters() {
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-center gap-4">
+        <span className="text-xs text-[#8E8E93]">Documents :</span>
+        {DOCUMENTS.map((d) => (
+          <label
+            key={d.value}
+            className="flex items-center gap-2 text-sm text-[#EFEFEF] cursor-pointer"
+          >
+            <Checkbox
+              checked={documents.includes(d.value)}
+              onCheckedChange={() => toggleDocument(d.value)}
+              className="border-[#3A3A3C] data-[state=checked]:bg-[#D4A843] data-[state=checked]:border-[#D4A843]"
+            />
+            {d.label}
+          </label>
+        ))}
       </div>
 
       <Button onClick={applyFilters} className="mt-4 w-full sm:w-auto" aria-label="Appliquer les filtres">

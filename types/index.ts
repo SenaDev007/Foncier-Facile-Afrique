@@ -7,7 +7,7 @@ export type AnnonceWithPhotos = Annonce & {
 
 export type AnnonceCard = Pick<
   Annonce,
-  'id' | 'reference' | 'slug' | 'titre' | 'type' | 'statut' | 'prix' | 'surface' | 'localisation' | 'documents' | 'vues' | 'createdAt'
+  'id' | 'reference' | 'slug' | 'titre' | 'type' | 'statut' | 'prix' | 'surface' | 'localisation' | 'documents' | 'vues' | 'createdAt' | 'latitude' | 'longitude'
 > & {
   photos: Pick<Photo, 'id' | 'url' | 'alt' | 'ordre'>[]
 }

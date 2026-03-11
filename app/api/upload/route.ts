@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
     const url = `/uploads/${year}/${month}/${filename}`
 
-    return NextResponse.json({ success: true, data: { url, filename } }, { status: 201 })
+    return NextResponse.json({ success: true, url, data: { url, filename } }, { status: 201 })
   } catch (error) {
     console.error('POST /api/upload error:', error)
     return NextResponse.json({ success: false, error: 'Erreur lors de l\'upload' }, { status: 500 })

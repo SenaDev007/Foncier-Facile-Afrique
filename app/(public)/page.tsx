@@ -1,14 +1,30 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Suspense } from 'react'
+import { readFile } from 'fs/promises'
+import { join } from 'path'
+import { existsSync } from 'fs'
 import { prisma } from '@/lib/prisma'
 import HeroSection from '@/components/public/HeroSection'
 import AnnonceCard from '@/components/public/AnnonceCard'
 import BlogCard from '@/components/public/BlogCard'
 import TestimonialsCarousel from '@/components/public/TestimonialsCarousel'
 import LeadMagnetBanner from '@/components/public/LeadMagnetBanner'
+import { AnimateOnScroll } from '@/components/ui/AnimateOnScroll'
+import { AnimatedCounter } from '@/components/ui/AnimatedCounter'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ArrowRight, Shield, MapPin, FileCheck, Users } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
+import ServiceCard from '@/components/public/ServiceCard'
+
+// Type pour les services
+interface ServiceItem {
+  id: string
+  title: string
+  description: string
+  image: string
+  icon: 'Shield' | 'FileCheck' | 'Search' | 'Users'
+}
 
 export const metadata: Metadata = {
   title: 'Foncier Facile Afrique — Achetez un terrain sécurisé au Bénin',
@@ -23,96 +39,178 @@ export const metadata: Metadata = {
 }
 
 async function getHomeData() {
-  const [annonces, temoignages, blogPosts] = await Promise.all([
-    prisma.annonce.findMany({
-      where: { statut: 'EN_LIGNE' },
-      include: { photos: true },
-      orderBy: { createdAt: 'desc' },
-      take: 6,
-    }),
-    prisma.temoignage.findMany({
-      where: { actif: true },
-      orderBy: { ordre: 'asc' },
-      take: 6,
-    }),
-    prisma.blogPost.findMany({
-      where: { statut: 'PUBLIE' },
-      include: { auteur: { select: { name: true } } },
-      orderBy: { publishedAt: 'desc' },
-      take: 3,
-    }),
-  ])
-  return { annonces, temoignages, blogPosts }
+  try {
+    const [annonces, temoignages, blogPosts, params] = await Promise.all([
+      prisma.annonce.findMany({
+        where: { statut: 'EN_LIGNE' },
+        include: { photos: true },
+        orderBy: { createdAt: 'desc' },
+        take: 6,
+      }),
+      prisma.temoignage.findMany({
+        where: { actif: true },
+        orderBy: { ordre: 'asc' },
+        take: 6,
+      }),
+      prisma.blogPost.findMany({
+        where: { statut: 'PUBLIE' },
+        include: { auteur: { select: { name: true } } },
+        orderBy: { publishedAt: 'desc' },
+        take: 3,
+      }),
+      prisma.parametre.findMany({ where: { cle: { in: ['hero_image', 'hero_image_mobile'] } } }),
+    ])
+    const paramMap: Record<string, string> = {}
+    params.forEach((p) => { paramMap[p.cle] = p.valeur })
+    return { annonces, temoignages, blogPosts, heroImage: paramMap.hero_image, heroImageMobile: paramMap.hero_image_mobile }
+  } catch (err) {
+    console.error('[Accueil] Erreur chargement données:', err)
+    return {
+      annonces: [],
+      temoignages: [],
+      blogPosts: [],
+      heroImage: undefined,
+      heroImageMobile: undefined,
+    }
+  }
 }
 
-const services = [
-  { icon: Shield, title: 'Conseil foncier', description: 'Accompagnement expert pour sécuriser vos acquisitions avec titre foncier officiel.' },
-  { icon: FileCheck, title: 'Vérification documentaire', description: 'Contrôle rigoureux de tous les documents légaux avant toute transaction.' },
-  { icon: MapPin, title: 'Courtage immobilier', description: 'Accès aux meilleures propriétés grâce à notre réseau sur tout le territoire.' },
-  { icon: Users, title: 'Accompagnement diaspora', description: 'Service dédié aux acheteurs de la diaspora africaine pour investir en toute confiance.' },
+// Services : chargés depuis data/services.json (éditable dans le backoffice) ou valeurs par défaut
+const DEFAULT_SERVICES: ServiceItem[] = [
+  { id: 'conseil-foncier', title: 'Conseil foncier', description: 'Accompagnement expert pour sécuriser vos acquisitions avec titre foncier officiel.', image: '/images/services/conseil-foncier.jpg', icon: 'Shield' },
+  { id: 'verification-docs', title: 'Vérification documentaire', description: 'Contrôle rigoureux de tous les documents légaux avant toute transaction.', image: '/images/services/verification-docs.jpg', icon: 'FileCheck' },
+  { id: 'recherche-terrain', title: 'Recherche terrain', description: 'Identification des meilleurs terrains selon vos critères et budget.', image: '/images/services/recherche-terrain.jpg', icon: 'Search' },
+  { id: 'diaspora', title: 'Accompagnement diaspora', description: 'Service dédié aux acheteurs de la diaspora africaine pour investir en toute confiance.', image: '/images/services/diaspora.jpg', icon: 'Users' },
 ]
 
+const getServices = async (): Promise<ServiceItem[]> => {
+  try {
+    const path = join(process.cwd(), 'data', 'services.json')
+    if (existsSync(path)) {
+      const raw = await readFile(path, 'utf-8')
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed as ServiceItem[]
+    }
+  } catch {
+    // ignore
+  }
+  return DEFAULT_SERVICES
+}
+
 export default async function AccueilPage() {
-  const { annonces, temoignages, blogPosts } = await getHomeData()
+  const { annonces, temoignages, blogPosts, heroImage, heroImageMobile } = await getHomeData()
+  const services = await getServices()
 
   return (
     <>
-      <HeroSection />
+      <HeroSection heroImageUrl={heroImage} heroImageMobileUrl={heroImageMobile} />
 
-      <section className="section-padding bg-white" aria-labelledby="services-title">
+      {/* Section Chiffres Clés avec compteurs animés */}
+      <section className="bg-[#161618] py-24 border-y border-[#2C2C2E]">
         <div className="container-site">
-          <div className="text-center mb-12">
-            <h2 id="services-title" className="section-title">Nos services</h2>
-            <p className="section-subtitle mx-auto mt-3">
-              Une gamme complète de services pour sécuriser votre patrimoine immobilier.
+          <AnimateOnScroll delay={0}>
+            <p className="text-center text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
+              Chiffres clés
             </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {services.map((service) => (
-              <div key={service.title} className="bg-primary-light rounded-xl p-6 hover:shadow-card transition-shadow">
-                <div className="p-3 rounded-xl bg-white w-fit mb-4">
-                  <service.icon className="h-6 w-6 text-primary" aria-hidden="true" />
-                </div>
-                <h3 className="font-heading font-semibold text-dark text-base mb-2">{service.title}</h3>
-                <p className="text-grey text-sm leading-relaxed">{service.description}</p>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <Link href="/services" className="inline-flex items-center gap-1.5 text-primary font-medium hover:underline text-sm">
-              Découvrir tous nos services <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
+            <h2 className="text-center font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-4">
+              Notre impact en quelques chiffres
+            </h2>
+            <p className="text-center text-[#8E8E93] text-lg max-w-2xl mx-auto">
+              Plus de 5 ans d&apos;expertise au service de votre patrimoine immobilier
+            </p>
+          </AnimateOnScroll>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mt-16">
+            <AnimatedCounter target={500} suffix="+" label="Clients accompagnés" duration={2000} />
+            <AnimatedCounter target={98} suffix="%" label="Taux de satisfaction" duration={1800} />
+            <AnimatedCounter target={10} suffix="+" label="Années d'expérience" duration={1500} />
+            <AnimatedCounter target={1000} suffix="+" label="Transactions sécurisées" duration={2200} />
           </div>
         </div>
       </section>
 
-      {annonces.length > 0 && (
-        <section className="section-padding bg-[#F9F9F6]" aria-labelledby="annonces-title">
-          <div className="container-site">
-            <div className="flex items-center justify-between mb-10">
-              <div>
-                <h2 id="annonces-title" className="section-title">Dernières annonces</h2>
-                <p className="text-grey text-sm mt-1">Terrains et biens immobiliers sécurisés disponibles</p>
-              </div>
-              <Link href="/annonces" className="hidden sm:flex items-center gap-1.5 text-primary font-medium text-sm hover:underline">
-                Voir tout <ArrowRight className="h-4 w-4" aria-hidden="true" />
+      <section className="py-20 bg-[#1C1C1E]" aria-labelledby="services-title">
+        <div className="container-site">
+          <AnimateOnScroll delay={0}>
+            <div className="text-center mb-14">
+              <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
+                Ce que nous proposons
+              </p>
+              <h2 id="services-title" className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-4">
+                Nos services
+              </h2>
+              <p className="text-[#8E8E93] text-lg max-w-2xl mx-auto">
+                Une gamme complète de services pour sécuriser votre patrimoine immobilier.
+              </p>
+            </div>
+          </AnimateOnScroll>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {services.map((service: ServiceItem, index: number) => (
+              <ServiceCard
+                key={service.id}
+                id={service.id}
+                title={service.title}
+                description={service.description}
+                image={service.image}
+                index={index}
+              />
+            ))}
+          </div>
+          
+          <AnimateOnScroll delay={0.8}>
+            <div className="text-center mt-8">
+              <Link href="/services" className="inline-flex items-center gap-1.5 text-[#D4A843] font-medium hover:text-[#B8912E] text-sm">
+                Découvrir tous nos services <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
+          </AnimateOnScroll>
+        </div>
+      </section>
+
+      {/* Espacement avant annonces */}
+      <div className="h-16"></div>
+
+      {annonces.length > 0 && (
+        <section className="py-20 bg-[#161618] border-t border-[#2C2C2E]" aria-labelledby="annonces-title">
+          <div className="container-site">
+            <AnimateOnScroll delay={0}>
+              <div className="text-center mb-14">
+                <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
+                  À la une
+                </p>
+                <h2 id="annonces-title" className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-4">
+                  Dernières annonces
+                </h2>
+                <p className="text-[#8E8E93] text-lg max-w-2xl mx-auto">
+                  Terrains et biens immobiliers sécurisés disponibles
+                </p>
+              </div>
+            </AnimateOnScroll>
+            
             <Suspense fallback={<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{Array.from({length:6}).map((_,i)=><Skeleton key={i} className="h-72 rounded-xl"/>)}</div>}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {annonces.map((annonce) => (
-                  <AnnonceCard key={annonce.id} annonce={annonce as Parameters<typeof AnnonceCard>[0]['annonce']} />
+                {annonces.map((annonce, index) => (
+                  <AnimateOnScroll key={annonce.id} delay={index * 0.1} direction="up">
+                    <AnnonceCard annonce={annonce as Parameters<typeof AnnonceCard>[0]['annonce']} />
+                  </AnimateOnScroll>
                 ))}
               </div>
             </Suspense>
-            <div className="text-center mt-8 sm:hidden">
-              <Link href="/annonces" className="inline-flex items-center gap-1.5 text-primary font-medium text-sm hover:underline">
-                Voir toutes les annonces <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            </div>
+            
+            <AnimateOnScroll delay={0.6}>
+              <div className="text-center mt-8 sm:hidden">
+                <Link href="/annonces" className="inline-flex items-center gap-1.5 text-[#D4A843] font-medium text-sm hover:text-[#B8912E]">
+                  Voir toutes les annonces <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </div>
+            </AnimateOnScroll>
           </div>
         </section>
       )}
+
+      {/* Espacement avant témoignages */}
+      <div className="h-16"></div>
 
       {temoignages.length > 0 && (
         <TestimonialsCarousel temoignages={temoignages as Parameters<typeof TestimonialsCarousel>[0]['temoignages']} />
@@ -120,22 +218,40 @@ export default async function AccueilPage() {
 
       <LeadMagnetBanner />
 
+      {/* Espacement avant blog */}
+      <div className="h-16"></div>
+
       {blogPosts.length > 0 && (
-        <section className="section-padding bg-white" aria-labelledby="blog-title">
+        <section className="py-20 bg-[#161618] border-t border-[#2C2C2E] blog-section" aria-labelledby="blog-title">
           <div className="container-site">
-            <div className="flex items-center justify-between mb-10">
-              <div>
-                <h2 id="blog-title" className="section-title">Blog & Conseils</h2>
-                <p className="text-grey text-sm mt-1">Expertise foncière et immobilière en Afrique</p>
-              </div>
-              <Link href="/blog" className="hidden sm:flex items-center gap-1.5 text-primary font-medium text-sm hover:underline">
-                Voir tout <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
+            <div className="text-center mb-14">
+              <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
+                Ressources
+              </p>
+              <h2 id="blog-title" className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-4">
+                Blog & Conseils
+              </h2>
+              <p className="text-[#8E8E93] text-lg max-w-2xl mx-auto">
+                Expertise foncière et immobilière en Afrique
+              </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {blogPosts.map((post) => (
-                <BlogCard key={post.id} post={post as Parameters<typeof BlogCard>[0]['post']} />
-              ))}
+            
+            {/* Conteneur de défilement horizontal */}
+            <div className="relative overflow-hidden">
+              <div className="flex gap-6 animate-scroll">
+                {/* Dupliquer les cartes pour un défilement infini */}
+                {[...blogPosts, ...blogPosts].map((post, index) => (
+                  <div key={`${post.id}-${index}`} className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3">
+                    <BlogCard post={post as Parameters<typeof BlogCard>[0]['post']} index={index} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="text-center mt-8">
+              <Link href="/blog" className="inline-flex items-center gap-1.5 text-[#D4A843] font-medium text-sm hover:text-[#B8912E]">
+                Voir tous les articles <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
             </div>
           </div>
         </section>

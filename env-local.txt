@@ -1,0 +1,26 @@
+# Base de données
+DATABASE_URL=postgresql://postgres:Captain.Yehioracadhub2021@localhost:5432/FoncierFacileAfrique
+
+# NextAuth
+NEXTAUTH_SECRET="+SAQCm3S1lfAR9iR2X+L2r+DnIZQdR2vK8c1gs6bmrk="
+NEXTAUTH_URL=http://localhost:3001
+
+# Email (SMTP OVH ou Brevo)
+SMTP_HOST="ssl0.ovh.net"
+SMTP_PORT="465"
+SMTP_SECURE="true"
+SMTP_USER="contact@foncierfacileafrique.fr"
+SMTP_PASS="your-email-password"
+EMAIL_FROM="Foncier Facile Afrique <contact@foncierfacileafrique.fr>"
+EMAIL_ADMIN="isdineidisoule@gmail.com"
+
+# Upload
+UPLOAD_DIR="./public/uploads"
+MAX_FILE_SIZE="5242880"
+
+# WhatsApp
+WHATSAPP_NUMBER="22996901204"
+
+# App
+NEXT_PUBLIC_SITE_URL="http://localhost:3001"
+NEXT_PUBLIC_WHATSAPP_NUMBER="22996901204"

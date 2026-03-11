@@ -177,6 +177,16 @@ body.light-mode {
 .prose-ffa ol { @apply list-decimal pl-5 mb-4 space-y-1; }
 .prose-ffa a  { @apply text-primary underline; }
 
+/* Prose dark (anthracite pages) */
+.prose-ffa-dark { @apply text-[#E5E5E7] leading-relaxed; }
+.prose-ffa-dark h2 { @apply text-xl font-bold font-heading mb-3 mt-6 text-[#D4A843]; }
+.prose-ffa-dark h3 { @apply text-lg font-semibold font-heading mb-2 mt-4 text-[#EFEFEF]; }
+.prose-ffa-dark p  { @apply mb-4 text-[#8E8E93]; }
+.prose-ffa-dark ul { @apply list-disc pl-5 mb-4 space-y-1 text-[#8E8E93]; }
+.prose-ffa-dark ol { @apply list-decimal pl-5 mb-4 space-y-1 text-[#8E8E93]; }
+.prose-ffa-dark a  { @apply text-[#D4A843] underline hover:text-[#B8912E]; }
+.prose-ffa-dark strong { @apply text-[#EFEFEF]; }
+
 /* Skeleton loader */
 @keyframes shimmer {
   0%   { background-position: -200% center; }
@@ -190,6 +200,35 @@ body.light-mode {
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #f1f1f1; }
-::-webkit-scrollbar-thumb { background: #C8A435; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #1A6B3A; }
+::-webkit-scrollbar-track { background: #1C1C1E; }
+::-webkit-scrollbar-thumb { background: #3A3A3C; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #D4A843; }
+
+/* Animation de défilement horizontal pour Blog */
+@keyframes scroll-horizontal {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll-horizontal 30s linear infinite;
+}
+
+/* Pause au survol */
+.animate-scroll:hover {
+  animation-play-state: paused;
+}
+
+/* Espacement optimisé pour le footer */
+section:last-of-type {
+  margin-bottom: 4rem;
+}
+
+/* Espacement entre la dernière section et le footer */
+.blog-section {
+  margin-bottom: 6rem;
+}

@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const { nom, prenom, email, telephone, sujet, contenu } = parsed.data
 
     await prisma.message.create({
-      data: { nom, email, telephone, sujet, contenu },
+      data: { nom, prenom, email, telephone, sujet, contenu },
     })
 
     try {

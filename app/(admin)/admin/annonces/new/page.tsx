@@ -7,12 +7,12 @@ export const metadata: Metadata = { title: 'Nouvelle annonce — Admin FFA' }
 
 export default function NewAnnoncePage() {
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-4xl mx-auto space-y-6">
       <div>
-        <Link href="/admin/annonces" className="inline-flex items-center gap-1 text-sm text-grey hover:text-primary transition-colors mb-3">
+        <Link href="/admin/annonces" className="inline-flex items-center gap-1 text-sm text-[#8E8E93] hover:text-[#D4A843] transition-colors mb-3">
           <ChevronLeft className="h-4 w-4" aria-hidden="true" /> Retour aux annonces
         </Link>
-        <h1 className="font-heading text-2xl font-bold text-dark">Nouvelle annonce</h1>
+        <h1 className="font-heading text-2xl font-bold text-[#EFEFEF]">Nouvelle annonce</h1>
       </div>
       <AnnonceForm />
     </div>

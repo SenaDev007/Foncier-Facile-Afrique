@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
-import AnnonceCard from '@/components/public/AnnonceCard'
-import AnnonceFilters from '@/components/public/AnnonceFilters'
+import AnnoncesView from '@/components/public/AnnoncesView'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { AnnonceCard as AnnonceCardType } from '@/types'
 
@@ -13,7 +12,7 @@ export const metadata: Metadata = {
 }
 
 interface PageProps {
-  searchParams: { type?: string; localisation?: string; prixMax?: string; surfaceMin?: string; sort?: string; page?: string }
+  searchParams: { type?: string; localisation?: string; prixMax?: string; surfaceMin?: string; sort?: string; page?: string; documents?: string }
 }
 
 const ITEMS_PER_PAGE = 12
@@ -31,12 +30,15 @@ async function getAnnonces(params: PageProps['searchParams']) {
   }
   const orderBy = sortMap[params.sort ?? 'createdAt_desc'] ?? { createdAt: 'desc' }
 
+  const docList = params.documents ? params.documents.split(',').filter(Boolean) : []
+
   const where = {
     statut: 'EN_LIGNE' as const,
     ...(params.type && params.type !== 'ALL' ? { type: params.type as 'TERRAIN' | 'APPARTEMENT' | 'MAISON' | 'VILLA' | 'BUREAU' | 'COMMERCE' } : {}),
     ...(params.localisation ? { localisation: { contains: params.localisation, mode: 'insensitive' as const } } : {}),
     ...(params.prixMax ? { prix: { lte: parseInt(params.prixMax) } } : {}),
     ...(params.surfaceMin ? { surface: { gte: parseInt(params.surfaceMin) } } : {}),
+    ...(docList.length > 0 ? { documents: { hasEvery: docList } } : {}),
   }
 
   const [annonces, total] = await Promise.all([
@@ -57,51 +59,14 @@ export default async function AnnoncesPage({ searchParams }: PageProps) {
   const { annonces, total, page, totalPages } = await getAnnonces(searchParams)
 
   return (
-    <div className="bg-bg min-h-screen">
-      <div className="container-site py-10">
-        <div className="mb-8">
-          <h1 className="font-heading text-3xl font-bold text-text-primary">Annonces immobilières</h1>
-          <p className="text-text-secondary mt-1 text-sm">{total} bien{total > 1 ? 's' : ''} disponible{total > 1 ? 's' : ''}</p>
-        </div>
-
-        <Suspense fallback={<Skeleton className="h-24 rounded-2xl" />}>
-          <AnnonceFilters />
-        </Suspense>
-
-        <div className="mt-8">
-          {annonces.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {annonces.map((annonce) => (
-                  <AnnonceCard key={annonce.id} annonce={annonce as AnnonceCardType} />
-                ))}
-              </div>
-
-              {totalPages > 1 && (
-                <nav className="flex justify-center items-center gap-2 mt-10" aria-label="Pagination">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                    <a
-                      key={p}
-                      href={`/annonces?${new URLSearchParams({ ...searchParams, page: String(p) })}`}
-                      className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-gold text-text-inverse' : 'bg-bg-surface text-text-secondary hover:bg-gold-light hover:text-gold'}`}
-                      aria-current={p === page ? 'page' : undefined}
-                    >
-                      {p}
-                    </a>
-                  ))}
-                </nav>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-20 bg-bg-surface rounded-2xl border border-bg-border">
-              <p className="text-text-secondary text-lg mb-4">Aucune annonce ne correspond à vos critères.</p>
-              <Link href="/annonces" className="text-gold hover:text-gold-dark font-medium">
-                Réinitialiser les filtres
-              </Link>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    <Suspense fallback={<Skeleton className="h-24 rounded-2xl w-full max-w-4xl" />}>
+      <AnnoncesView
+        annonces={annonces as AnnonceCardType[]}
+        total={total}
+        page={page}
+        totalPages={totalPages}
+        searchParams={searchParams}
+      />
+    </Suspense>
   )
 }

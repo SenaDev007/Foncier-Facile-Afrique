@@ -84,7 +84,7 @@ export default function ImageUploader({ images, onImagesChange, maxImages = 10 }
         onDragLeave={() => setDragOver(false)}
         className={cn(
           'border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer',
-          dragOver ? 'border-primary bg-primary-light' : 'border-gray-200 hover:border-primary hover:bg-primary-light/50'
+          dragOver ? 'border-[#D4A843] bg-[rgba(212,168,67,0.12)]' : 'border-[#3A3A3C] hover:border-[#D4A843] hover:bg-[rgba(212,168,67,0.06)]'
         )}
         onClick={() => document.getElementById('file-upload')?.click()}
         role="button"
@@ -102,14 +102,14 @@ export default function ImageUploader({ images, onImagesChange, maxImages = 10 }
           aria-label="Uploader des images"
         />
         {uploading ? (
-          <div className="flex flex-col items-center gap-2 text-grey">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="flex flex-col items-center gap-2 text-[#8E8E93]">
+            <Loader2 className="h-8 w-8 animate-spin text-[#D4A843]" />
             <p className="text-sm">Upload en cours...</p>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-2 text-grey">
-            <Upload className="h-8 w-8 text-primary" aria-hidden="true" />
-            <p className="text-sm font-medium">Glissez vos images ici ou <span className="text-primary">cliquez pour parcourir</span></p>
+          <div className="flex flex-col items-center gap-2 text-[#8E8E93]">
+            <Upload className="h-8 w-8 text-[#D4A843]" aria-hidden="true" />
+            <p className="text-sm font-medium">Glissez vos images ici ou <span className="text-[#D4A843]">cliquez pour parcourir</span></p>
             <p className="text-xs">PNG, JPG, WebP — max 5 Mo par image</p>
           </div>
         )}
@@ -140,7 +140,7 @@ export default function ImageUploader({ images, onImagesChange, maxImages = 10 }
                 <X className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
               {index === 0 && (
-                <span className="absolute top-1.5 left-1.5 text-xs bg-primary text-white px-1.5 py-0.5 rounded-full">
+                <span className="absolute top-1.5 left-1.5 text-xs bg-[#D4A843] text-[#EFEFEF] px-1.5 py-0.5 rounded-full">
                   Principale
                 </span>
               )}

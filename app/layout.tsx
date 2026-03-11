@@ -24,6 +24,11 @@ export const metadata: Metadata = {
   description:
     'Foncier Facile Afrique vous accompagne dans l\'acquisition de terrains et biens immobiliers juridiquement sécurisés en Afrique de l\'Ouest. Conseil, vérification documentaire et courtage foncier à Parakou, Bénin.',
   keywords: ['immobilier Bénin', 'terrain Parakou', 'foncier Afrique', 'achat terrain Bénin', 'titre foncier', 'immobilier Afrique Ouest'],
+  icons: {
+    icon: '/images/logo/logo-FFA-0.ico',
+    shortcut: '/images/logo/logo-FFA-0.ico',
+    apple: '/images/logo/logo FFA 0.png',
+  },
   openGraph: {
     type: 'website',
     locale: 'fr_FR',

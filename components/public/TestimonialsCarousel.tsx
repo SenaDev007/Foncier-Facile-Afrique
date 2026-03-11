@@ -25,13 +25,13 @@ export default function TestimonialsCarousel({ temoignages }: TestimonialsCarous
   const t = temoignages[current]
 
   return (
-    <section className="py-20 bg-[#2C2C2E] border-y border-[#3A3A3C]" aria-label="Témoignages clients">
+    <section className="py-14 md:py-16 bg-[#2C2C2E] border-y border-[#3A3A3C]" aria-label="Témoignages clients">
       <div className="container-site">
-        <div className="text-center mb-12">
-          <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
+        <div className="text-center mb-8">
+          <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-2">
             Témoignages
           </p>
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-4">
+          <h2 className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-3">
             Ce que disent nos clients
           </h2>
           <p className="text-[#8E8E93] text-lg max-w-2xl mx-auto">
@@ -49,7 +49,7 @@ export default function TestimonialsCarousel({ temoignages }: TestimonialsCarous
               transition={{ duration: 0.35 }}
               className="bg-[#1C1C1E] border border-[#3A3A3C] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:border-[#D4A843]/30 transition-all duration-300"
             >
-              <div className="p-8 md:p-10 flex flex-col md:flex-row gap-8 items-center">
+              <div className="p-6 md:p-8 flex flex-col md:flex-row gap-6 md:gap-8 items-center">
                 {t.photo ? (
                   <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden flex-shrink-0 border-2 border-[#D4A843]/40">
                     <Image
@@ -94,7 +94,7 @@ export default function TestimonialsCarousel({ temoignages }: TestimonialsCarous
         </div>
 
         {temoignages.length > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-8">
+          <div className="flex items-center justify-center gap-2 mt-6">
             {temoignages.map((_, i) => (
               <button
                 key={i}

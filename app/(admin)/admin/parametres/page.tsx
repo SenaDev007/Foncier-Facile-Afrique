@@ -25,6 +25,12 @@ const PARAM_LABELS: Record<string, { label: string; type: 'text' | 'textarea' | 
   whatsapp_numero: { label: 'Numéro WhatsApp', type: 'tel' },
   hero_image: { label: 'Image hero (accueil, desktop)', type: 'url' },
   hero_image_mobile: { label: 'Image hero mobile (accueil)', type: 'url' },
+  // Chiffres clés — page d'accueil
+  chiffre_clients: { label: 'Chiffres clés — Clients accompagnés (ex: 500)', type: 'text' },
+  chiffre_satisfaction: { label: 'Chiffres clés — Taux de satisfaction % (ex: 98)', type: 'text' },
+  chiffre_annees: { label: 'Chiffres clés — Années d\'expérience (ex: 10)', type: 'text' },
+  chiffre_transactions: { label: 'Chiffres clés — Transactions sécurisées (ex: 1000)', type: 'text' },
+  chiffre_annees_texte: { label: 'Chiffres clés — Nombre d\'années dans le sous-titre (ex: 5)', type: 'text' },
 }
 
 export default function AdminParametresPage() {

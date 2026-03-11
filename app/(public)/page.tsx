@@ -58,11 +58,42 @@ async function getHomeData() {
         orderBy: { publishedAt: 'desc' },
         take: 3,
       }),
-      prisma.parametre.findMany({ where: { cle: { in: ['hero_image', 'hero_image_mobile'] } } }),
+      prisma.parametre.findMany({
+        where: {
+          cle: {
+            in: [
+              'hero_image',
+              'hero_image_mobile',
+              'chiffre_clients',
+              'chiffre_satisfaction',
+              'chiffre_annees',
+              'chiffre_transactions',
+              'chiffre_annees_texte',
+            ],
+          },
+        },
+      }),
     ])
     const paramMap: Record<string, string> = {}
     params.forEach((p) => { paramMap[p.cle] = p.valeur })
-    return { annonces, temoignages, blogPosts, heroImage: paramMap.hero_image, heroImageMobile: paramMap.hero_image_mobile }
+    const getNum = (key: string, def: number) => {
+      const v = paramMap[key]
+      if (v === undefined || v === '') return def
+      const n = parseInt(v, 10)
+      return Number.isNaN(n) ? def : n
+    }
+    return {
+      annonces,
+      temoignages,
+      blogPosts,
+      heroImage: paramMap.hero_image,
+      heroImageMobile: paramMap.hero_image_mobile,
+      chiffreClients: getNum('chiffre_clients', 500),
+      chiffreSatisfaction: getNum('chiffre_satisfaction', 98),
+      chiffreAnnees: getNum('chiffre_annees', 10),
+      chiffreTransactions: getNum('chiffre_transactions', 1000),
+      chiffreAnneesTexte: getNum('chiffre_annees_texte', 5),
+    }
   } catch (err) {
     console.error('[Accueil] Erreur chargement données:', err)
     return {
@@ -71,6 +102,11 @@ async function getHomeData() {
       blogPosts: [],
       heroImage: undefined,
       heroImageMobile: undefined,
+      chiffreClients: 500,
+      chiffreSatisfaction: 98,
+      chiffreAnnees: 10,
+      chiffreTransactions: 1000,
+      chiffreAnneesTexte: 5,
     }
   }
 }
@@ -98,7 +134,18 @@ const getServices = async (): Promise<ServiceItem[]> => {
 }
 
 export default async function AccueilPage() {
-  const { annonces, temoignages, blogPosts, heroImage, heroImageMobile } = await getHomeData()
+  const {
+    annonces,
+    temoignages,
+    blogPosts,
+    heroImage,
+    heroImageMobile,
+    chiffreClients,
+    chiffreSatisfaction,
+    chiffreAnnees,
+    chiffreTransactions,
+    chiffreAnneesTexte,
+  } = await getHomeData()
   const services = await getServices()
 
   return (
@@ -106,37 +153,37 @@ export default async function AccueilPage() {
       <HeroSection heroImageUrl={heroImage} heroImageMobileUrl={heroImageMobile} />
 
       {/* Section Chiffres Clés avec compteurs animés */}
-      <section className="bg-[#161618] py-24 border-y border-[#2C2C2E]">
+      <section className="bg-[#161618] py-14 md:py-16 border-y border-[#2C2C2E]">
         <div className="container-site">
           <AnimateOnScroll delay={0}>
-            <p className="text-center text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
+            <p className="text-center text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-2">
               Chiffres clés
             </p>
-            <h2 className="text-center font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-4">
+            <h2 className="text-center font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-3">
               Notre impact en quelques chiffres
             </h2>
             <p className="text-center text-[#8E8E93] text-lg max-w-2xl mx-auto">
-              Plus de 5 ans d&apos;expertise au service de votre patrimoine immobilier
+              Plus de {chiffreAnneesTexte} ans d&apos;expertise au service de votre patrimoine immobilier
             </p>
           </AnimateOnScroll>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mt-16">
-            <AnimatedCounter target={500} suffix="+" label="Clients accompagnés" duration={2000} />
-            <AnimatedCounter target={98} suffix="%" label="Taux de satisfaction" duration={1800} />
-            <AnimatedCounter target={10} suffix="+" label="Années d'expérience" duration={1500} />
-            <AnimatedCounter target={1000} suffix="+" label="Transactions sécurisées" duration={2200} />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mt-10 md:mt-12">
+            <AnimatedCounter target={chiffreClients} suffix="+" label="Clients accompagnés" duration={2000} />
+            <AnimatedCounter target={chiffreSatisfaction} suffix="%" label="Taux de satisfaction" duration={1800} />
+            <AnimatedCounter target={chiffreAnnees} suffix="+" label="Années d'expérience" duration={1500} />
+            <AnimatedCounter target={chiffreTransactions} suffix="+" label="Transactions sécurisées" duration={2200} />
           </div>
         </div>
       </section>
 
-      <section className="py-20 bg-[#1C1C1E]" aria-labelledby="services-title">
+      <section className="py-14 md:py-16 bg-[#1C1C1E]" aria-labelledby="services-title">
         <div className="container-site">
           <AnimateOnScroll delay={0}>
-            <div className="text-center mb-14">
-              <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
+            <div className="text-center mb-10">
+              <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-2">
                 Ce que nous proposons
               </p>
-              <h2 id="services-title" className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-4">
+              <h2 id="services-title" className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-3">
                 Nos services
               </h2>
               <p className="text-[#8E8E93] text-lg max-w-2xl mx-auto">
@@ -145,7 +192,7 @@ export default async function AccueilPage() {
             </div>
           </AnimateOnScroll>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
             {services.map((service: ServiceItem, index: number) => (
               <ServiceCard
                 key={service.id}
@@ -159,7 +206,7 @@ export default async function AccueilPage() {
           </div>
           
           <AnimateOnScroll delay={0.8}>
-            <div className="text-center mt-8">
+            <div className="text-center mt-6">
               <Link href="/services" className="inline-flex items-center gap-1.5 text-[#D4A843] font-medium hover:text-[#B8912E] text-sm">
                 Découvrir tous nos services <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
@@ -169,17 +216,17 @@ export default async function AccueilPage() {
       </section>
 
       {/* Espacement avant annonces */}
-      <div className="h-16"></div>
+      <div className="h-8 md:h-10" />
 
       {annonces.length > 0 && (
-        <section className="py-20 bg-[#161618] border-t border-[#2C2C2E]" aria-labelledby="annonces-title">
+        <section className="py-14 md:py-16 bg-[#161618] border-t border-[#2C2C2E]" aria-labelledby="annonces-title">
           <div className="container-site">
             <AnimateOnScroll delay={0}>
-              <div className="text-center mb-14">
-                <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
+              <div className="text-center mb-10">
+                <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-2">
                   À la une
                 </p>
-                <h2 id="annonces-title" className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-4">
+                <h2 id="annonces-title" className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-3">
                   Dernières annonces
                 </h2>
                 <p className="text-[#8E8E93] text-lg max-w-2xl mx-auto">
@@ -189,7 +236,7 @@ export default async function AccueilPage() {
             </AnimateOnScroll>
             
             <Suspense fallback={<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{Array.from({length:6}).map((_,i)=><Skeleton key={i} className="h-72 rounded-xl"/>)}</div>}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
                 {annonces.map((annonce, index) => (
                   <AnimateOnScroll key={annonce.id} delay={index * 0.1} direction="up">
                     <AnnonceCard annonce={annonce as Parameters<typeof AnnonceCard>[0]['annonce']} />
@@ -199,7 +246,7 @@ export default async function AccueilPage() {
             </Suspense>
             
             <AnimateOnScroll delay={0.6}>
-              <div className="text-center mt-8 sm:hidden">
+              <div className="text-center mt-6 sm:hidden">
                 <Link href="/annonces" className="inline-flex items-center gap-1.5 text-[#D4A843] font-medium text-sm hover:text-[#B8912E]">
                   Voir toutes les annonces <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
@@ -210,7 +257,7 @@ export default async function AccueilPage() {
       )}
 
       {/* Espacement avant témoignages */}
-      <div className="h-16"></div>
+      <div className="h-8 md:h-10" />
 
       {temoignages.length > 0 && (
         <TestimonialsCarousel temoignages={temoignages as Parameters<typeof TestimonialsCarousel>[0]['temoignages']} />
@@ -219,16 +266,16 @@ export default async function AccueilPage() {
       <LeadMagnetBanner />
 
       {/* Espacement avant blog */}
-      <div className="h-16"></div>
+      <div className="h-8 md:h-10" />
 
       {blogPosts.length > 0 && (
-        <section className="py-20 bg-[#161618] border-t border-[#2C2C2E] blog-section" aria-labelledby="blog-title">
+        <section className="py-14 md:py-16 bg-[#161618] border-t border-[#2C2C2E] blog-section" aria-labelledby="blog-title">
           <div className="container-site">
-            <div className="text-center mb-14">
-              <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
+            <div className="text-center mb-10">
+              <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-2">
                 Ressources
               </p>
-              <h2 id="blog-title" className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-4">
+              <h2 id="blog-title" className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-3">
                 Blog & Conseils
               </h2>
               <p className="text-[#8E8E93] text-lg max-w-2xl mx-auto">
@@ -248,7 +295,7 @@ export default async function AccueilPage() {
               </div>
             </div>
             
-            <div className="text-center mt-8">
+            <div className="text-center mt-6">
               <Link href="/blog" className="inline-flex items-center gap-1.5 text-[#D4A843] font-medium text-sm hover:text-[#B8912E]">
                 Voir tous les articles <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>

@@ -33,7 +33,7 @@ export default function LeadMagnetBanner() {
   }
 
   return (
-    <section className="bg-[#1C1C1E] py-16 md:py-20 relative overflow-hidden border-t border-[#2C2C2E]" aria-labelledby="newsletter-title">
+    <section className="bg-[#1C1C1E] py-12 md:py-14 relative overflow-hidden border-t border-[#2C2C2E]" aria-labelledby="newsletter-title">
       <div className="absolute inset-0 bg-[url('/images/hero-pattern.svg')] opacity-5" aria-hidden="true" />
       <div className="container-site relative z-10">
         <div className="max-w-2xl mx-auto text-center">
@@ -48,7 +48,7 @@ export default function LeadMagnetBanner() {
           <p className="mt-3 text-[#8E8E93] text-base">
             Inscrivez-vous à notre newsletter et soyez le premier informé des nouveaux terrains et biens disponibles.
           </p>
-          <form onSubmit={handleSubmit} className="mt-8 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+          <form onSubmit={handleSubmit} className="mt-6 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
             <label htmlFor="newsletter-email" className="sr-only">Adresse email</label>
             <input
               id="newsletter-email"

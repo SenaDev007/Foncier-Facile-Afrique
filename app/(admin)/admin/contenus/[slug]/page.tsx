@@ -245,7 +245,7 @@ export default function AdminContenusSlugPage() {
 
             {(section.key === 'links_services' || section.key === 'links_utiles') && (
               <div>
-                <Label className="text-[#EFEFEF]">Liens (JSON : [{'"'}href{'"'}: string, {'"'}label{'"'}: string}])</Label>
+                <Label className="text-[#EFEFEF]">{'Liens (JSON : [{"href": string, "label": string}])'}</Label>
                 <Textarea
                   value={section.contenuJson ?? ''}
                   onChange={(e) => updateSection(index, 'contenuJson', e.target.value || null)}

@@ -11,7 +11,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       where: { id },
       data: { statut },
       include: {
-        auteur: { select: { name: true } },
+        agent: { select: { name: true } },
         annonce: { select: { titre: true } }
       }
     })

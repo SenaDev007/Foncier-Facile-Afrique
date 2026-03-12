@@ -21,10 +21,10 @@ export default async function PublicLayout({ children }: { children: React.React
       <Navbar />
       <main id="main-content">{children}</main>
       <Footer
-        tagline={tagline}
-        sousTagline={sousTagline}
-        description={description}
-        newsletterIntro={newsletterIntro}
+        tagline={tagline ?? undefined}
+        sousTagline={sousTagline ?? undefined}
+        description={description ?? undefined}
+        newsletterIntro={newsletterIntro ?? undefined}
         linksServices={linksServices.length > 0 ? linksServices : undefined}
         linksUtiles={linksUtiles.length > 0 ? linksUtiles : undefined}
       />

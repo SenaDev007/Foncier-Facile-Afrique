@@ -48,7 +48,7 @@ export default async function AdminLayout({
             
             <div className="flex items-center gap-4">
               <span className="text-[#8E8E93] text-sm">
-                {session.user?.name}
+                {session?.user?.name ?? ''}
               </span>
               <a
                 href="/"

@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const leads = await prisma.lead.findMany({
       include: {
-        auteur: { select: { name: true } },
+        agent: { select: { name: true } },
         annonce: { select: { titre: true } }
       },
       orderBy: { createdAt: 'desc' }
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
         agentId: data.agentId,
       },
       include: {
-        auteur: { select: { name: true } },
+        agent: { select: { name: true } },
         annonce: { select: { titre: true } }
       }
     })

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import ServicePageCard from '@/components/public/ServicePageCard'
+import { getPageSections } from '@/lib/pages'
 
 export const metadata: Metadata = {
   title: 'Nos services — Foncier Facile Afrique',
@@ -48,27 +49,31 @@ const services = [
   },
 ]
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const sections = await getPageSections('services')
+  const hero = sections.hero
+  const ctaBas = sections.cta_bas
+
   return (
     <div className="bg-[#1C1C1E] min-h-screen">
       <section className="relative py-20 md:py-28 overflow-hidden border-b border-[#2C2C2E] bg-[#161618]">
         <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#1C1C1E] via-[#161618] to-[#1C1C1E]" />
         <div className="container-site relative z-10 text-center">
           <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
-            Nos expertises
+            {hero?.sousTitre ?? 'Nos expertises'}
           </p>
-          <h1 className="font-heading text-4xl md:text-5xl font-bold text-[#EFEFEF]">Nos services</h1>
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-[#EFEFEF]">{hero?.titre ?? 'Nos services'}</h1>
           <p className="mt-4 text-[#8E8E93] text-lg max-w-2xl mx-auto">
-            Des solutions complètes pour sécuriser et développer votre patrimoine immobilier en Afrique de l&apos;Ouest.
+            {hero?.bodyHtml ?? 'Des solutions complètes pour sécuriser et développer votre patrimoine immobilier en Afrique de l\'Ouest.'}
           </p>
-          <Link href="/contact" className="mt-8 inline-flex items-center gap-2 bg-[#D4A843] text-[#1C1C1E] font-semibold px-6 py-3 rounded-xl hover:bg-[#B8912E] transition-colors shadow-lg shadow-[#D4A843]/20">
-            Prendre rendez-vous <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          <Link href={hero?.boutonUrl ?? '/contact'} className="mt-8 inline-flex items-center gap-2 bg-[#D4A843] text-[#1C1C1E] font-semibold px-6 py-3 rounded-xl hover:bg-[#B8912E] transition-colors shadow-lg shadow-[#D4A843]/20">
+            {hero?.boutonTexte ?? 'Prendre rendez-vous'} <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
       </section>
 
       <section className="container-site py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid justify-center gap-8 [grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),360px))]">
           {services.map((service, index) => (
             <ServicePageCard
               key={service.id}
@@ -84,11 +89,11 @@ export default function ServicesPage() {
 
       <section className="bg-[#2C2C2E] py-16 md:py-20 border-t border-[#3A3A3C]">
         <div className="container-site text-center max-w-2xl mx-auto">
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-[#EFEFEF] mb-3">Prêt à investir en toute sécurité ?</h2>
-          <p className="text-[#8E8E93] text-lg mt-3">Contactez nos experts pour une consultation gratuite et sans engagement.</p>
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-[#EFEFEF] mb-3">{ctaBas?.titre ?? 'Prêt à investir en toute sécurité ?'}</h2>
+          <p className="text-[#8E8E93] text-lg mt-3">{ctaBas?.sousTitre ?? 'Contactez nos experts pour une consultation gratuite et sans engagement.'}</p>
           <div className="flex flex-wrap justify-center gap-4 mt-8">
-            <Link href="/contact" className="inline-flex items-center gap-2 bg-[#D4A843] text-[#1C1C1E] font-semibold px-6 py-3 rounded-xl hover:bg-[#B8912E] transition-colors">
-              Nous contacter <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            <Link href={ctaBas?.boutonUrl ?? '/contact'} className="inline-flex items-center gap-2 bg-[#D4A843] text-[#1C1C1E] font-semibold px-6 py-3 rounded-xl hover:bg-[#B8912E] transition-colors">
+              {ctaBas?.boutonTexte ?? 'Nous contacter'} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <Link href="/simulateur" className="inline-flex items-center gap-2 border border-[#D4A843] text-[#D4A843] font-semibold px-6 py-3 rounded-xl hover:bg-[#D4A843] hover:text-[#1C1C1E] transition-colors">
               Simuler mon budget

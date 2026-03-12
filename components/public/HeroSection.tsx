@@ -13,9 +13,24 @@ const DEFAULT_HERO_MOBILE = '/images/hero/hero-bg-mobile.jpg'
 interface HeroSectionProps {
   heroImageUrl?: string
   heroImageMobileUrl?: string
+  heroBadge?: string
+  heroSousTitre?: string
+  heroTitre?: string
+  heroTexte?: string
+  heroCtaAnnonces?: { texte: string; url: string }
+  heroCtaContact?: { texte: string; url: string }
 }
 
-export default function HeroSection({ heroImageUrl, heroImageMobileUrl }: HeroSectionProps = {}) {
+export default function HeroSection({
+  heroImageUrl,
+  heroImageMobileUrl,
+  heroBadge,
+  heroSousTitre,
+  heroTitre,
+  heroTexte,
+  heroCtaAnnonces,
+  heroCtaContact,
+}: HeroSectionProps = {}) {
   const router = useRouter()
   const [quickType, setQuickType] = useState('ALL')
   const [quickLocalisation, setQuickLocalisation] = useState('')
@@ -83,10 +98,10 @@ export default function HeroSection({ heroImageUrl, heroImageMobileUrl }: HeroSe
             className="inline-flex items-center gap-2 bg-[rgba(212,168,67,0.15)] border border-[rgba(212,168,67,0.3)] text-[#D4A843] text-sm font-medium px-4 py-2 rounded-full mb-6 backdrop-blur-sm"
           >
             <Shield className="h-4 w-4" aria-hidden="true" />
-            Votre partenaire immobilier sécurisé en Afrique de l&apos;Ouest
+            {heroBadge ?? "Votre partenaire immobilier sécurisé en Afrique de l'Ouest"}
           </motion.div>
           <p className="text-[#8E8E93] text-xs mt-2 mb-4">
-            200+ clients satisfaits · Documents vérifiés · 5 ans d&apos;expérience
+            {heroSousTitre ?? "200+ clients satisfaits · Documents vérifiés · 5 ans d'expérience"}
           </p>
 
           <motion.h1 
@@ -95,9 +110,13 @@ export default function HeroSection({ heroImageUrl, heroImageMobileUrl }: HeroSe
             transition={{ duration: 0.8, delay: 0.4 }}
             className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-[#EFEFEF] leading-tight"
           >
-            Achetez un terrain{' '}
-            <span className="text-[#D4A843]">en toute sécurité</span>{' '}
-            au Bénin
+            {heroTitre ?? (
+              <>
+                Achetez un terrain{' '}
+                <span className="text-[#D4A843]">en toute sécurité</span>{' '}
+                au Bénin
+              </>
+            )}
           </motion.h1>
 
           <motion.p 
@@ -106,8 +125,7 @@ export default function HeroSection({ heroImageUrl, heroImageMobileUrl }: HeroSe
             transition={{ duration: 0.8, delay: 0.6 }}
             className="mt-6 text-[#8E8E93] text-lg sm:text-xl max-w-2xl leading-relaxed"
           >
-            Foncier Facile Afrique vous accompagne dans l&apos;acquisition de terrains
-            et biens immobiliers avec titre foncier vérifié, de Parakou à tout le Bénin.
+            {heroTexte ?? "Foncier Facile Afrique vous accompagne dans l'acquisition de terrains et biens immobiliers avec titre foncier vérifié, de Parakou à tout le Bénin."}
           </motion.p>
 
           <motion.div 
@@ -122,18 +140,18 @@ export default function HeroSection({ heroImageUrl, heroImageMobileUrl }: HeroSe
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             >
               <Link
-                href="/annonces"
+                href={heroCtaAnnonces?.url ?? '/annonces'}
                 className="inline-flex items-center gap-2 bg-[#D4A843] text-[#EFEFEF] font-semibold px-6 py-4 rounded-xl hover:bg-[#B8912E] transition-all duration-200 shadow-lg hover:shadow-xl text-base"
               >
-                Voir les annonces
+                {heroCtaAnnonces?.texte ?? 'Voir les annonces'}
                 <ArrowRight className="h-5 w-5" aria-hidden="true" />
               </Link>
             </motion.div>
             <Link
-              href="/contact"
+              href={heroCtaContact?.url ?? '/contact'}
               className="inline-flex items-center gap-2 border border-[#3A3A3C] text-[#EFEFEF] font-semibold px-6 py-4 rounded-xl hover:bg-[#2C2C2E] transition-all duration-200 backdrop-blur-sm text-base"
             >
-              Nous contacter
+              {heroCtaContact?.texte ?? 'Nous contacter'}
             </Link>
           </motion.div>
 

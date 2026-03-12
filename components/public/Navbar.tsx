@@ -13,6 +13,7 @@ const navLinks = [
   { href: '/annonces', label: 'Annonces' },
   { href: '/notre-expertise', label: 'Notre expertise' },
   { href: '/blog', label: 'Blog' },
+  { href: '/ebooks', label: 'Boutique' },
   { href: '/contact', label: 'Contact' },
 ]
 
@@ -47,20 +48,20 @@ export default function Navbar() {
             className="flex items-center gap-3 flex-shrink-0"
             aria-label="Foncier Facile Afrique — Accueil"
           >
-            <div className="relative w-11 h-11 flex items-center justify-center">
+            <div className="relative w-14 h-14 flex items-center justify-center flex-shrink-0">
               <Image
-                src="/images/logo/logo FFA.png"
+                src="/images/logo/logo FFA 1.png"
                 alt=""
-                width={44}
-                height={44}
+                width={56}
+                height={56}
                 className="object-contain"
               />
             </div>
-            <div className="hidden sm:block">
-              <span className="font-heading font-bold text-[#EFEFEF] text-base tracking-tight block">
+            <div className="hidden sm:flex flex-col justify-center gap-0 leading-tight">
+              <span className="font-heading font-bold text-[#EFEFEF] text-lg tracking-tight block">
                 Foncier Facile
               </span>
-              <span className="text-[#D4A843] text-[11px] font-semibold tracking-widest uppercase">
+              <span className="text-[#D4A843] text-xs font-semibold tracking-widest uppercase">
                 Afrique
               </span>
             </div>

@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import {
   LayoutDashboard, Home, FileText, Users, MessageSquare,
-  Star, Settings, LogOut, ChevronRight, Briefcase,
+  Star, Settings, LogOut, ChevronRight, Briefcase, BookOpen, ShoppingCart, BarChart3, FileCode,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -15,11 +15,15 @@ const navItems = [
   { href: '/admin/annonces', label: 'Annonces', icon: Home },
   { href: '/admin/blog', label: 'Blog', icon: FileText },
   { href: '/admin/services', label: 'Services', icon: Briefcase },
+  { href: '/admin/ebooks', label: 'Ebooks', icon: BookOpen, exact: true },
+  { href: '/admin/ebooks/commandes', label: 'Commandes ebooks', icon: ShoppingCart },
+  { href: '/admin/ebooks/stats', label: 'Stats ebooks', icon: BarChart3 },
   { href: '/admin/leads', label: 'Leads', icon: Users },
   { href: '/admin/messages', label: 'Messages', icon: MessageSquare },
   { href: '/admin/temoignages', label: 'Témoignages', icon: Star },
   { href: '/admin/utilisateurs', label: 'Utilisateurs', icon: Users },
   { href: '/admin/parametres', label: 'Paramètres', icon: Settings },
+  { href: '/admin/contenus', label: 'Contenus des pages', icon: FileCode },
 ]
 
 export default function Sidebar() {
@@ -34,19 +38,20 @@ export default function Sidebar() {
     <aside className="w-64 flex-shrink-0 bg-[#1C1C1E] border-r border-[#3A3A3C] flex flex-col h-screen sticky top-0 overflow-y-auto">
       <div className="p-5 border-b border-[#3A3A3C]">
         <Link href="/" className="flex items-center gap-3" aria-label="Retour au site">
-          <div className="relative w-10 h-10 flex-shrink-0">
+          <div className="relative w-12 h-12 flex-shrink-0">
             <Image
-              src="/images/logo/logo FFA.png"
+              src="/images/logo/logo FFA 1.png"
               alt="Logo FFA"
-              fill
+              width={48}
+              height={48}
               className="object-contain"
-              sizes="40px"
+              sizes="48px"
               priority
             />
           </div>
-          <div>
-            <p className="font-heading font-bold text-[#EFEFEF] text-sm leading-tight">Foncier Facile Afrique</p>
-            <p className="text-[#D4A843] text-xs font-medium leading-tight">Back-office</p>
+          <div className="flex flex-col justify-center min-w-0">
+            <p className="font-heading font-bold text-[#EFEFEF] text-sm leading-tight">Foncier Facile</p>
+            <p className="text-[#D4A843] text-xs font-medium leading-tight">Afrique · Back-office</p>
           </div>
         </Link>
       </div>

@@ -194,6 +194,38 @@ model Parametre {
   valeur String
 }
 
+// ─── PAGES & SECTIONS (contenus pilotés par le backoffice) ─────────────────────
+
+model Page {
+  id        String        @id @default(cuid())
+  slug      String        @unique
+  titre     String
+  sections  PageSection[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model PageSection {
+  id          String   @id @default(cuid())
+  page        Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  pageId      String
+  key         String
+  ordre       Int      @default(0)
+  actif       Boolean  @default(true)
+  titre       String?
+  sousTitre   String?   @db.Text
+  bodyHtml    String?   @db.Text
+  imageUrl    String?
+  boutonTexte String?
+  boutonUrl   String?
+  contenuJson String?   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([pageId, key])
+  @@index([pageId])
+}
+
 // ─── NEWSLETTER ───────────────────────────────────────────────────────────────
 
 model Newsletter {
@@ -201,4 +233,59 @@ model Newsletter {
   email     String   @unique
   actif     Boolean  @default(true)
   createdAt DateTime @default(now())
+}
+
+// ─── BOUTIQUE EBOOKS & PRODUITS DIGITAUX ───────────────────────────────────────
+
+model Ebook {
+  id                String          @id @default(cuid())
+  titre             String
+  slug              String          @unique
+  description       String          @db.Text
+  contenu           String?         @db.Text
+  prixCFA           Int
+  prixPromo         Int?
+  codePromo         String?
+  codePromoType     String?
+  codePromoValeur   Int?
+  codePromoExpire   DateTime?
+  codePromoUsages   Int             @default(0)
+  codePromoMax      Int?
+  couverture        String
+  fichierPdf        String
+  apercuPdf         String?
+  pages             Int?
+  categorie         String          @default("Guide foncier")
+  auteur            String          @default("Foncier Facile Afrique")
+  publie            Boolean         @default(false)
+  vedette           Boolean         @default(false)
+  telechargements   Int             @default(0)
+  commandes         CommandeEbook[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+model CommandeEbook {
+  id             String         @id @default(cuid())
+  ebook          Ebook          @relation(fields: [ebookId], references: [id])
+  ebookId        String
+  acheteurNom    String
+  acheteurEmail  String
+  acheteurTel    String
+  montantPaye    Int
+  codePromoUsed  String?
+  fedapayTxId    String         @unique
+  statut         StatutCommande @default(EN_ATTENTE)
+  tokenDownload  String         @unique @default(cuid())
+  tokenExpire    DateTime
+  downloadCount  Int            @default(0)
+  maxDownloads   Int            @default(3)
+  createdAt      DateTime       @default(now())
+}
+
+enum StatutCommande {
+  EN_ATTENTE
+  PAYEE
+  EXPIREE
+  REMBOURSEE
 }

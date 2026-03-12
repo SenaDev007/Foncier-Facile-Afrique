@@ -160,10 +160,41 @@ body.light-mode {
 .tiptap-editor a  { @apply text-primary underline; }
 .tiptap-editor strong { @apply font-semibold; }
 .tiptap-editor em { @apply italic; }
+.tiptap-editor u { @apply underline; }
 .tiptap-editor p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
   color: #9CA3AF;
+  pointer-events: none;
+  height: 0;
+}
+
+/* Tiptap editor — admin (dark) */
+.tiptap-admin .ProseMirror,
+.tiptap-admin .tiptap { @apply min-h-[200px] p-4 text-[#EFEFEF] focus:outline-none; }
+.tiptap-admin .ProseMirror h2,
+.tiptap-admin .tiptap h2 { @apply text-xl font-bold font-heading mb-2 mt-4 text-[#EFEFEF]; }
+.tiptap-admin .ProseMirror h3,
+.tiptap-admin .tiptap h3 { @apply text-lg font-semibold font-heading mb-2 mt-3 text-[#E5E5E7]; }
+.tiptap-admin .ProseMirror p,
+.tiptap-admin .tiptap p { @apply mb-3 text-[#EFEFEF] leading-relaxed; }
+.tiptap-admin .ProseMirror ul,
+.tiptap-admin .tiptap ul { @apply list-disc pl-5 mb-3 space-y-1 text-[#EFEFEF]; }
+.tiptap-admin .ProseMirror ol,
+.tiptap-admin .tiptap ol { @apply list-decimal pl-5 mb-3 space-y-1 text-[#EFEFEF]; }
+.tiptap-admin .ProseMirror a,
+.tiptap-admin .tiptap a { @apply text-[#D4A843] underline hover:text-[#B8912E]; }
+.tiptap-admin .ProseMirror strong,
+.tiptap-admin .tiptap strong { @apply font-semibold text-[#EFEFEF]; }
+.tiptap-admin .ProseMirror em,
+.tiptap-admin .tiptap em { @apply italic; }
+.tiptap-admin .ProseMirror u,
+.tiptap-admin .tiptap u { @apply underline; }
+.tiptap-admin .ProseMirror p.is-editor-empty:first-child::before,
+.tiptap-admin .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #8E8E93;
   pointer-events: none;
   height: 0;
 }
@@ -186,6 +217,7 @@ body.light-mode {
 .prose-ffa-dark ol { @apply list-decimal pl-5 mb-4 space-y-1 text-[#8E8E93]; }
 .prose-ffa-dark a  { @apply text-[#D4A843] underline hover:text-[#B8912E]; }
 .prose-ffa-dark strong { @apply text-[#EFEFEF]; }
+.prose-ffa-dark u { @apply underline; }
 
 /* Skeleton loader */
 @keyframes shimmer {

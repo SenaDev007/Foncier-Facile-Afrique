@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
+import { Suspense } from 'react'
 import { LayoutGrid, List, MapPin } from 'lucide-react'
 import AnnonceCard from '@/components/public/AnnonceCard'
 import AnnonceFilters from '@/components/public/AnnonceFilters'
@@ -82,7 +83,9 @@ export default function AnnoncesView({
           </div>
         </div>
 
-        <AnnonceFilters />
+        <Suspense fallback={<div className="h-24 rounded-xl bg-[#2C2C2E] border border-[#3A3A3C] animate-pulse" />}>
+          <AnnonceFilters />
+        </Suspense>
 
         <div className="mt-8">
           {annonces.length > 0 ? (
@@ -94,7 +97,7 @@ export default function AnnoncesView({
               )}
 
               {viewMode === 'grid' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid justify-center gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),320px))]">
                   {annonces.map((annonce) => (
                     <AnnonceCard key={annonce.id} annonce={annonce} />
                   ))}

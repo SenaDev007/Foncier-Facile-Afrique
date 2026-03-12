@@ -61,7 +61,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
 
         {posts.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid justify-center gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),320px))]">
               {posts.map((post) => (
                 <BlogCard key={post.id} post={post as BlogPostWithAuthor} />
               ))}

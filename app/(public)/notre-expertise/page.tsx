@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Shield, Award, Clock, Users, CheckCircle, ArrowRight } from 'lucide-react'
+import { getPageSections } from '@/lib/pages'
 
 export const metadata: Metadata = {
   title: 'Notre expertise — Foncier Facile Afrique',
@@ -30,19 +31,24 @@ const etapes = [
   { num: '05', title: 'Formalités notariales', description: 'Accompagnement jusqu\'à la signature finale et transfert de propriété sécurisé.' },
 ]
 
-export default function ExpertisePage() {
+export default async function ExpertisePage() {
+  const sections = await getPageSections('notre-expertise')
+  const hero = sections.hero
+  const valeursIntro = sections.valeurs_intro
+  const methodeIntro = sections.methode_intro
+  const cta = sections.cta
+
   return (
     <div className="bg-[#1C1C1E] min-h-screen">
       <section className="relative py-20 md:py-28 overflow-hidden border-b border-[#2C2C2E]">
         <div className="absolute inset-0 bg-[#161618]" />
         <div className="container-site relative z-10 text-center">
           <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
-            Qui sommes-nous
+            {hero?.sousTitre ?? 'Qui sommes-nous'}
           </p>
-          <h1 className="font-heading text-4xl md:text-5xl font-bold text-[#EFEFEF]">Notre expertise</h1>
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-[#EFEFEF]">{hero?.titre ?? 'Notre expertise'}</h1>
           <p className="mt-4 text-[#8E8E93] text-lg max-w-2xl mx-auto">
-            Plus de 10 ans d&apos;expérience dans le foncier et l&apos;immobilier en Afrique de l&apos;Ouest,
-            au service de votre patrimoine.
+            {hero?.bodyHtml ?? "Plus de 10 ans d'expérience dans le foncier et l'immobilier en Afrique de l'Ouest, au service de votre patrimoine."}
           </p>
         </div>
       </section>
@@ -60,8 +66,8 @@ export default function ExpertisePage() {
 
       <section className="container-site py-14 md:py-16">
         <div className="text-center mb-12">
-          <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">Nos valeurs</p>
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-[#EFEFEF]">Ce qui nous guide</h2>
+          <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">{valeursIntro?.sousTitre ?? 'Nos valeurs'}</p>
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-[#EFEFEF]">{valeursIntro?.titre ?? 'Ce qui nous guide'}</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {valeurs.map((v) => (
@@ -79,9 +85,9 @@ export default function ExpertisePage() {
       <section className="py-14 md:py-16 bg-[#161618] border-y border-[#2C2C2E]">
         <div className="container-site max-w-3xl">
           <div className="text-center mb-12">
-            <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">Notre méthode</p>
-            <h2 className="font-heading text-2xl md:text-3xl font-bold text-[#EFEFEF] mb-3">Un processus éprouvé</h2>
-            <p className="text-[#8E8E93] text-lg max-w-xl mx-auto">Sécuriser votre acquisition de A à Z.</p>
+            <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">{methodeIntro?.sousTitre ?? 'Notre méthode'}</p>
+            <h2 className="font-heading text-2xl md:text-3xl font-bold text-[#EFEFEF] mb-3">{methodeIntro?.titre ?? 'Un processus éprouvé'}</h2>
+            <p className="text-[#8E8E93] text-lg max-w-xl mx-auto">{methodeIntro?.bodyHtml ?? 'Sécuriser votre acquisition de A à Z.'}</p>
           </div>
           <div className="space-y-6">
             {etapes.map((e) => (

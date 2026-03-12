@@ -3,7 +3,7 @@
 set -e
 BASE="d:/Projet YEHI OR Tech/Site web- Foncier Facile Afrique"
 cd "$BASE"
-mkdir -p public/images/hero public/images/services public/images/annonces public/images/blog public/images/team
+mkdir -p public/images/hero public/images/services public/images/annonces public/images/blog public/images/team public/images/ebooks
 
 # Hero
 curl -sL "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1920&q=85" -o public/images/hero/hero-bg.jpg
@@ -28,6 +28,11 @@ curl -sL "https://images.unsplash.com/photo-1555529771-7888783a18d3?w=600&q=80" 
 curl -sL "https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=600&q=80" -o public/images/blog/investissement.jpg
 curl -sL "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80" -o public/images/blog/titre-foncier.jpg
 curl -sL "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80" -o public/images/blog/marche-immobilier.jpg
+
+# Ebooks (couvertures démo)
+curl -sL "https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=400&q=85" -o public/images/ebooks/guide-securiser-terrain.jpg
+curl -sL "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&q=85" -o public/images/ebooks/pack-contrats-fonciers.jpg
+curl -sL "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&q=85" -o public/images/ebooks/investir-diaspora.jpg
 
 # Team / témoignages (avatars)
 curl -sL "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80" -o public/images/team/avatar-homme.jpg

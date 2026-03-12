@@ -71,8 +71,8 @@ const AnnonceCard = React.memo(function AnnonceCard({ annonce }: AnnonceCardProp
   const imageSrc = mainPhoto?.url ?? imageParType[annonce.type] ?? '/images/annonces/maison.jpg'
 
   return (
-    <Link href={`/annonces/${annonce.slug}`} className="group block">
-      <motion.div
+    <Link href={`/annonces/${annonce.slug}`} className="group block h-full">
+        <motion.div
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
         style={{
@@ -84,7 +84,7 @@ const AnnonceCard = React.memo(function AnnonceCard({ annonce }: AnnonceCardProp
         whileHover={{ scale: 1.02 }}
         transition={{ duration: 0.2 }}
         className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:shadow-[#D4A843]/10
-                   cursor-pointer relative h-full flex flex-col"
+                   cursor-pointer relative h-full flex flex-col min-h-[400px]"
       >
         {/* Reflet glare dynamique */}
         <motion.div
@@ -120,9 +120,9 @@ const AnnonceCard = React.memo(function AnnonceCard({ annonce }: AnnonceCardProp
           )}
         </div>
 
-        <div className="p-5 flex flex-col flex-1">
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <div className="flex-1">
+        <div className="p-5 flex flex-col flex-1 min-h-0">
+          <div className="flex items-start justify-between gap-3 mb-3 flex-shrink-0">
+            <div className="flex-1 min-w-0">
               <h3 className="font-heading font-semibold text-[#EFEFEF] text-lg leading-tight line-clamp-2">{annonce.titre}</h3>
               <p className="text-[#8E8E93] text-sm mt-1 flex items-center gap-1">
                 <MapPin className="h-3.5 w-3.5" aria-hidden="true" />

@@ -8,6 +8,10 @@ async function main() {
 
   // ─── CLEANUP ───────────────────────────────────────────────────────────────
   // Supprimer les données existantes dans le bon ordre (respect des clés étrangères)
+  await prisma.commandeEbook.deleteMany()
+  await prisma.ebook.deleteMany()
+  await prisma.pageSection.deleteMany()
+  await prisma.page.deleteMany()
   await prisma.interaction.deleteMany()
   await prisma.lead.deleteMany()
   await prisma.message.deleteMany()
@@ -70,6 +74,83 @@ async function main() {
   }
 
   console.log('✅ Paramètres created')
+
+  // ─── Pages & Sections (contenus pilotés par le backoffice) ─────────────────
+  const pagesData: Array<{ slug: string; titre: string; sections: Array<Record<string, unknown>> }> = [
+    {
+      slug: 'home',
+      titre: 'Page d\'accueil',
+      sections: [
+        { key: 'hero_badge', ordre: 0, actif: true, titre: 'Votre partenaire immobilier sécurisé en Afrique de l\'Ouest' },
+        { key: 'hero_sous_titre', ordre: 1, actif: true, sousTitre: '200+ clients satisfaits · Documents vérifiés · 5 ans d\'expérience' },
+        { key: 'hero_titre', ordre: 2, actif: true, titre: 'Achetez un terrain en toute sécurité au Bénin' },
+        { key: 'hero_texte', ordre: 3, actif: true, bodyHtml: 'Foncier Facile Afrique vous accompagne dans l\'acquisition de terrains et biens immobiliers avec titre foncier vérifié, de Parakou à tout le Bénin.' },
+        { key: 'hero_cta_annonces', ordre: 4, actif: true, boutonTexte: 'Voir les annonces', boutonUrl: '/annonces' },
+        { key: 'hero_cta_contact', ordre: 5, actif: true, boutonTexte: 'Nous contacter', boutonUrl: '/contact' },
+        { key: 'chiffres_intro', ordre: 10, actif: true, titre: 'Notre impact en quelques chiffres', sousTitre: 'Plus de 5 ans d\'expertise au service de votre patrimoine immobilier' },
+        { key: 'services_intro', ordre: 20, actif: true, titre: 'Nos services', sousTitre: 'Ce que nous proposons', bodyHtml: 'Une gamme complète de services pour sécuriser votre patrimoine immobilier.' },
+        { key: 'annonces_intro', ordre: 30, actif: true, titre: 'Dernières annonces', sousTitre: 'À la une', bodyHtml: 'Terrains et biens immobiliers sécurisés disponibles' },
+        { key: 'blog_intro', ordre: 40, actif: true, titre: 'Blog & Conseils', sousTitre: 'Ressources', bodyHtml: 'Expertise foncière et immobilière en Afrique' },
+      ],
+    },
+    {
+      slug: 'services',
+      titre: 'Page Services',
+      sections: [
+        { key: 'hero', ordre: 0, actif: true, titre: 'Nos services', sousTitre: 'Nos expertises', bodyHtml: 'Des solutions complètes pour sécuriser et développer votre patrimoine immobilier en Afrique de l\'Ouest.', boutonTexte: 'Prendre rendez-vous', boutonUrl: '/contact' },
+        { key: 'cta_bas', ordre: 100, actif: true, titre: 'Prêt à investir en toute sécurité ?', sousTitre: 'Contactez nos experts pour une consultation gratuite et sans engagement.', boutonTexte: 'Nous contacter', boutonUrl: '/contact' },
+      ],
+    },
+    {
+      slug: 'notre-expertise',
+      titre: 'Notre expertise',
+      sections: [
+        { key: 'hero', ordre: 0, actif: true, titre: 'Notre expertise', sousTitre: 'Qui sommes-nous', bodyHtml: 'Plus de 10 ans d\'expérience dans le foncier et l\'immobilier en Afrique de l\'Ouest, au service de votre patrimoine.' },
+        { key: 'valeurs_intro', ordre: 10, actif: true, titre: 'Ce qui nous guide', sousTitre: 'Nos valeurs' },
+        { key: 'methode_intro', ordre: 20, actif: true, titre: 'Un processus éprouvé', sousTitre: 'Notre méthode', bodyHtml: 'Sécuriser votre acquisition de A à Z.' },
+        { key: 'cta', ordre: 100, actif: true, titre: 'Commencez votre projet dès aujourd\'hui', sousTitre: 'Un conseiller vous accompagne gratuitement.', boutonTexte: 'Voir les annonces', boutonUrl: '/annonces' },
+      ],
+    },
+    {
+      slug: 'footer',
+      titre: 'Pied de page',
+      sections: [
+        { key: 'tagline', ordre: 0, actif: true, titre: 'Foncier Facile Afrique · Expertise foncière & immobilière premium' },
+        { key: 'sous_tagline', ordre: 1, actif: true, sousTitre: 'Sécurisation juridique · Vérification documentaire · Accompagnement clé en main' },
+        { key: 'description', ordre: 2, actif: true, bodyHtml: 'Votre partenaire de confiance pour l\'acquisition de terrains et biens immobiliers juridiquement sécurisés en Afrique de l\'Ouest.' },
+        { key: 'newsletter_intro', ordre: 3, actif: true, bodyHtml: 'Recevez nos nouvelles annonces, conseils fonciers et opportunités d\'investissement en Afrique de l\'Ouest.' },
+        { key: 'links_services', ordre: 10, actif: true, contenuJson: JSON.stringify([{ href: '/services#conseil', label: 'Conseil en achat foncier' }, { href: '/services#verification', label: 'Vérification documentaire' }, { href: '/services#courtage', label: 'Courtage immobilier' }, { href: '/services#investissement', label: 'Investissement locatif' }, { href: '/simulateur', label: 'Simulateur de budget' }]) },
+        { key: 'links_utiles', ordre: 11, actif: true, contenuJson: JSON.stringify([{ href: '/annonces', label: 'Nos annonces' }, { href: '/notre-expertise', label: 'Notre expertise' }, { href: '/blog', label: 'Blog' }, { href: '/contact', label: 'Contact' }, { href: '/mentions-legales', label: 'Mentions légales' }]) },
+      ],
+    },
+  ]
+
+  for (const p of pagesData) {
+    const page = await prisma.page.create({
+      data: {
+        slug: p.slug,
+        titre: p.titre,
+      },
+    })
+    for (const s of p.sections) {
+      await prisma.pageSection.create({
+        data: {
+          pageId: page.id,
+          key: s.key as string,
+          ordre: (s.ordre as number) ?? 0,
+          actif: (s.actif as boolean) ?? true,
+          titre: s.titre as string | undefined,
+          sousTitre: s.sousTitre as string | undefined,
+          bodyHtml: s.bodyHtml as string | undefined,
+          boutonTexte: s.boutonTexte as string | undefined,
+          boutonUrl: s.boutonUrl as string | undefined,
+          contenuJson: s.contenuJson as string | undefined,
+        },
+      })
+    }
+  }
+
+  console.log('✅ Pages & sections created')
 
   // ─── Témoignages ───────────────────────────────────────────────────────────
   const temoignages = [
@@ -236,6 +317,76 @@ async function main() {
   }
 
   console.log('✅ Blog posts created')
+
+  // ─── Ebooks ───────────────────────────────────────────────────────────────────
+  const ebooks = [
+    {
+      titre: 'Guide complet pour sécuriser un terrain au Bénin',
+      slug: 'guide-securiser-terrain-benin',
+      description:
+        'Un guide pas-à-pas pour vérifier un terrain, éviter les arnaques et sécuriser vos investissements fonciers au Bénin.',
+      contenu: null,
+      prixCFA: 15000,
+      prixPromo: 9900,
+      codePromo: 'LANCEMENT10',
+      codePromoType: 'POURCENTAGE',
+      codePromoValeur: 10,
+      couverture: '/images/ebooks/guide-securiser-terrain.jpg',
+      fichierPdf: '/ebooks/pdf/guide-securiser-terrain-benins.pdf',
+      apercuPdf: '/ebooks/apercus/guide-securiser-terrain-apercu.pdf',
+      pages: 72,
+      categorie: 'Guide foncier',
+      auteur: 'Foncier Facile Afrique',
+      publie: true,
+      vedette: true,
+    },
+    {
+      titre: 'Pack de modèles de contrats fonciers (Bénin)',
+      slug: 'pack-modeles-contrats-fonciers-benin',
+      description:
+        'Un pack de modèles prêts à l’emploi : promesse de vente, contrat de vente, bail, reconnaissance de dette, adaptés au contexte béninois.',
+      contenu: null,
+      prixCFA: 25000,
+      prixPromo: 19900,
+      codePromo: null,
+      codePromoType: null,
+      codePromoValeur: null,
+      couverture: '/images/ebooks/pack-contrats-fonciers.jpg',
+      fichierPdf: '/ebooks/pdf/pack-contrats-fonciers-benin.pdf',
+      apercuPdf: '/ebooks/apercus/pack-contrats-fonciers-apercu.pdf',
+      pages: 110,
+      categorie: 'Modèles & contrats',
+      auteur: 'Foncier Facile Afrique',
+      publie: true,
+      vedette: false,
+    },
+    {
+      titre: 'Investir dans la pierre depuis la diaspora',
+      slug: 'investir-immobilier-diaspora-benin',
+      description:
+        'Stratégies, check-lists et erreurs à éviter pour investir dans l’immobilier au Bénin quand on vit en Europe ou en Amérique.',
+      contenu: null,
+      prixCFA: 18000,
+      prixPromo: null,
+      codePromo: null,
+      codePromoType: null,
+      codePromoValeur: null,
+      couverture: '/images/ebooks/investir-diaspora.jpg',
+      fichierPdf: '/ebooks/pdf/investir-immobilier-diaspora-benin.pdf',
+      apercuPdf: '/ebooks/apercus/investir-diaspora-apercu.pdf',
+      pages: 88,
+      categorie: 'Diaspora & investissement',
+      auteur: 'Foncier Facile Afrique',
+      publie: true,
+      vedette: true,
+    },
+  ]
+
+  for (const ebook of ebooks) {
+    await prisma.ebook.create({ data: ebook })
+  }
+
+  console.log('✅ Ebooks created')
 
   // ─── Messages ──────────────────────────────────────────────────────────────
   await prisma.message.createMany({

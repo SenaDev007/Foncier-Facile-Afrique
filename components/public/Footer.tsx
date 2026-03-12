@@ -8,7 +8,42 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 
-export default function Footer() {
+const DEFAULT_TAGLINE = 'Foncier Facile Afrique · Expertise foncière & immobilière premium'
+const DEFAULT_SOUS_TAGLINE = 'Sécurisation juridique · Vérification documentaire · Accompagnement clé en main'
+const DEFAULT_DESCRIPTION = "Votre partenaire de confiance pour l'acquisition de terrains et biens immobiliers juridiquement sécurisés en Afrique de l'Ouest."
+const DEFAULT_NEWSLETTER_INTRO = "Recevez nos nouvelles annonces, conseils fonciers et opportunités d'investissement en Afrique de l'Ouest."
+const DEFAULT_LINKS_SERVICES = [
+  { href: '/services#conseil', label: 'Conseil en achat foncier' },
+  { href: '/services#verification', label: 'Vérification documentaire' },
+  { href: '/services#courtage', label: 'Courtage immobilier' },
+  { href: '/services#investissement', label: 'Investissement locatif' },
+  { href: '/simulateur', label: 'Simulateur de budget' },
+]
+const DEFAULT_LINKS_UTILES = [
+  { href: '/annonces', label: 'Nos annonces' },
+  { href: '/notre-expertise', label: 'Notre expertise' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/contact', label: 'Contact' },
+  { href: '/mentions-legales', label: 'Mentions légales' },
+]
+
+interface FooterProps {
+  tagline?: string
+  sousTagline?: string
+  description?: string
+  newsletterIntro?: string
+  linksServices?: Array<{ href: string; label: string }>
+  linksUtiles?: Array<{ href: string; label: string }>
+}
+
+export default function Footer({
+  tagline,
+  sousTagline,
+  description,
+  newsletterIntro,
+  linksServices,
+  linksUtiles,
+}: FooterProps = {}) {
   const currentYear = new Date().getFullYear()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
@@ -42,10 +77,10 @@ export default function Footer() {
       <div className="w-full border-b border-[rgba(212,168,67,0.4)] bg-[rgba(212,168,67,0.08)]">
         <div className="container-site py-3 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-[#EFEFEF]">
           <span className="uppercase tracking-[0.2em] text-[10px] text-[#D4A843]">
-            Foncier Facile Afrique · Expertise foncière & immobilière premium
+            {tagline ?? DEFAULT_TAGLINE}
           </span>
           <span className="text-[#8E8E93]">
-            Sécurisation juridique · Vérification documentaire · Accompagnement clé en main
+            {sousTagline ?? DEFAULT_SOUS_TAGLINE}
           </span>
         </div>
       </div>
@@ -53,24 +88,30 @@ export default function Footer() {
       <div className="container-site py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-14 h-14">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-16 h-16 flex-shrink-0">
                 <Image
-                  src="/images/logo/logo FFA.png"
+                  src="/images/logo/logo FFA 1.png"
                   alt="Foncier Facile Afrique"
-                  width={56}
-                  height={56}
+                  width={64}
+                  height={64}
                   className="object-contain"
                 />
               </div>
-              <div>
-                <p className="font-heading font-bold text-[#EFEFEF] text-sm leading-tight">Foncier Facile</p>
-                <p className="text-[#D4A843] text-xs leading-tight">Afrique</p>
+              <div className="flex flex-col justify-center gap-0 leading-tight">
+                <p className="font-heading font-bold text-[#EFEFEF] text-base leading-tight">Foncier Facile</p>
+                <p className="text-[#D4A843] text-sm font-semibold leading-tight">Afrique</p>
               </div>
             </div>
             <p className="text-sm leading-relaxed text-[#8E8E93] mt-4">
-              Votre partenaire de confiance pour l&apos;acquisition de terrains et biens immobiliers
-              juridiquement sécurisés en Afrique de l&apos;Ouest.
+              {description ? (
+                <span dangerouslySetInnerHTML={{ __html: description }} />
+              ) : (
+                <>
+                  Votre partenaire de confiance pour l&apos;acquisition de terrains et biens immobiliers
+                  juridiquement sécurisés en Afrique de l&apos;Ouest.
+                </>
+              )}
             </p>
             <div className="flex gap-3 mt-5">
               <a
@@ -106,13 +147,7 @@ export default function Footer() {
           <div>
             <h3 className="font-heading font-bold text-[#D4A843] uppercase tracking-widest text-sm mb-4">Services</h3>
             <ul className="space-y-2 text-sm">
-              {[
-                { href: '/services#conseil', label: 'Conseil en achat foncier' },
-                { href: '/services#verification', label: 'Vérification documentaire' },
-                { href: '/services#courtage', label: 'Courtage immobilier' },
-                { href: '/services#investissement', label: 'Investissement locatif' },
-                { href: '/simulateur', label: 'Simulateur de budget' },
-              ].map((item) => (
+              {(linksServices ?? DEFAULT_LINKS_SERVICES).map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
@@ -129,13 +164,7 @@ export default function Footer() {
           <div>
             <h3 className="font-heading font-bold text-[#D4A843] uppercase tracking-widest text-sm mb-4">Liens utiles</h3>
             <ul className="space-y-2 text-sm">
-              {[
-                { href: '/annonces', label: 'Nos annonces' },
-                { href: '/notre-expertise', label: 'Notre expertise' },
-                { href: '/blog', label: 'Blog' },
-                { href: '/contact', label: 'Contact' },
-                { href: '/mentions-legales', label: 'Mentions légales' },
-              ].map((item) => (
+              {(linksUtiles ?? DEFAULT_LINKS_UTILES).map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
@@ -181,8 +210,7 @@ export default function Footer() {
               Newsletter
             </h3>
             <p className="text-sm text-[#8E8E93] mb-4">
-              Recevez nos nouvelles annonces, conseils fonciers et opportunités d’investissement
-              en Afrique de l’Ouest.
+              {newsletterIntro ?? DEFAULT_NEWSLETTER_INTRO}
             </p>
             <form onSubmit={handleSubscribe} className="space-y-3">
               <div className="flex flex-col sm:flex-row gap-2">

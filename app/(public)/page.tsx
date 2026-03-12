@@ -6,6 +6,7 @@ import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
 import { prisma } from '@/lib/prisma'
+import { getPageSections } from '@/lib/pages'
 import HeroSection from '@/components/public/HeroSection'
 import AnnonceCard from '@/components/public/AnnonceCard'
 import BlogCard from '@/components/public/BlogCard'
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
 
 async function getHomeData() {
   try {
-    const [annonces, temoignages, blogPosts, params] = await Promise.all([
+    const [annonces, temoignages, blogPosts, params, homeSections] = await Promise.all([
       prisma.annonce.findMany({
         where: { statut: 'EN_LIGNE' },
         include: { photos: true },
@@ -73,6 +74,7 @@ async function getHomeData() {
           },
         },
       }),
+      getPageSections('home'),
     ])
     const paramMap: Record<string, string> = {}
     params.forEach((p) => { paramMap[p.cle] = p.valeur })
@@ -93,6 +95,7 @@ async function getHomeData() {
       chiffreAnnees: getNum('chiffre_annees', 10),
       chiffreTransactions: getNum('chiffre_transactions', 1000),
       chiffreAnneesTexte: getNum('chiffre_annees_texte', 5),
+      homeSections: homeSections ?? {},
     }
   } catch (err) {
     console.error('[Accueil] Erreur chargement données:', err)
@@ -107,6 +110,7 @@ async function getHomeData() {
       chiffreAnnees: 10,
       chiffreTransactions: 1000,
       chiffreAnneesTexte: 5,
+      homeSections: {},
     }
   }
 }
@@ -145,12 +149,36 @@ export default async function AccueilPage() {
     chiffreAnnees,
     chiffreTransactions,
     chiffreAnneesTexte,
+    homeSections,
   } = await getHomeData()
   const services = await getServices()
 
+  const s = (key: string) => homeSections[key]
+  const hero = {
+    badge: s('hero_badge')?.titre,
+    sousTitre: s('hero_sous_titre')?.sousTitre,
+    titre: s('hero_titre')?.titre,
+    texte: s('hero_texte')?.bodyHtml,
+    ctaAnnonces: s('hero_cta_annonces'),
+    ctaContact: s('hero_cta_contact'),
+  }
+  const chiffresIntro = { titre: s('chiffres_intro')?.titre, sousTitre: s('chiffres_intro')?.sousTitre }
+  const servicesIntro = { titre: s('services_intro')?.titre, sousTitre: s('services_intro')?.sousTitre, body: s('services_intro')?.bodyHtml }
+  const annoncesIntro = { titre: s('annonces_intro')?.titre, sousTitre: s('annonces_intro')?.sousTitre, body: s('annonces_intro')?.bodyHtml }
+  const blogIntro = { titre: s('blog_intro')?.titre, sousTitre: s('blog_intro')?.sousTitre, body: s('blog_intro')?.bodyHtml }
+
   return (
     <>
-      <HeroSection heroImageUrl={heroImage} heroImageMobileUrl={heroImageMobile} />
+      <HeroSection
+        heroImageUrl={heroImage}
+        heroImageMobileUrl={heroImageMobile}
+        heroBadge={hero.badge}
+        heroSousTitre={hero.sousTitre}
+        heroTitre={hero.titre}
+        heroTexte={hero.texte}
+        heroCtaAnnonces={hero.ctaAnnonces?.boutonTexte ? { texte: hero.ctaAnnonces.boutonTexte, url: hero.ctaAnnonces.boutonUrl ?? '/annonces' } : undefined}
+        heroCtaContact={hero.ctaContact?.boutonTexte ? { texte: hero.ctaContact.boutonTexte, url: hero.ctaContact.boutonUrl ?? '/contact' } : undefined}
+      />
 
       {/* Section Chiffres Clés avec compteurs animés */}
       <section className="bg-[#161618] py-14 md:py-16 border-y border-[#2C2C2E]">
@@ -160,10 +188,10 @@ export default async function AccueilPage() {
               Chiffres clés
             </p>
             <h2 className="text-center font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-3">
-              Notre impact en quelques chiffres
+              {chiffresIntro.titre ?? 'Notre impact en quelques chiffres'}
             </h2>
             <p className="text-center text-[#8E8E93] text-lg max-w-2xl mx-auto">
-              Plus de {chiffreAnneesTexte} ans d&apos;expertise au service de votre patrimoine immobilier
+              {chiffresIntro.sousTitre ?? `Plus de ${chiffreAnneesTexte} ans d'expertise au service de votre patrimoine immobilier`}
             </p>
           </AnimateOnScroll>
 
@@ -181,18 +209,18 @@ export default async function AccueilPage() {
           <AnimateOnScroll delay={0}>
             <div className="text-center mb-10">
               <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-2">
-                Ce que nous proposons
+                {servicesIntro.sousTitre ?? 'Ce que nous proposons'}
               </p>
               <h2 id="services-title" className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-3">
-                Nos services
+                {servicesIntro.titre ?? 'Nos services'}
               </h2>
               <p className="text-[#8E8E93] text-lg max-w-2xl mx-auto">
-                Une gamme complète de services pour sécuriser votre patrimoine immobilier.
+                {servicesIntro.body ?? 'Une gamme complète de services pour sécuriser votre patrimoine immobilier.'}
               </p>
             </div>
           </AnimateOnScroll>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+          <div className="grid justify-center gap-5 md:gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),280px))]">
             {services.map((service: ServiceItem, index: number) => (
               <ServiceCard
                 key={service.id}
@@ -224,21 +252,21 @@ export default async function AccueilPage() {
             <AnimateOnScroll delay={0}>
               <div className="text-center mb-10">
                 <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-2">
-                  À la une
+                  {annoncesIntro.sousTitre ?? 'À la une'}
                 </p>
                 <h2 id="annonces-title" className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-3">
-                  Dernières annonces
+                  {annoncesIntro.titre ?? 'Dernières annonces'}
                 </h2>
                 <p className="text-[#8E8E93] text-lg max-w-2xl mx-auto">
-                  Terrains et biens immobiliers sécurisés disponibles
+                  {annoncesIntro.body ?? 'Terrains et biens immobiliers sécurisés disponibles'}
                 </p>
               </div>
             </AnimateOnScroll>
             
-            <Suspense fallback={<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{Array.from({length:6}).map((_,i)=><Skeleton key={i} className="h-72 rounded-xl"/>)}</div>}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+            <Suspense fallback={<div className="grid justify-center gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),320px))]">{Array.from({length:6}).map((_,i)=><Skeleton key={i} className="h-72 rounded-xl"/>)}</div>}>
+              <div className="grid justify-center gap-5 md:gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),320px))] items-stretch">
                 {annonces.map((annonce, index) => (
-                  <AnimateOnScroll key={annonce.id} delay={index * 0.1} direction="up">
+                  <AnimateOnScroll key={annonce.id} delay={index * 0.1} direction="up" className="h-full">
                     <AnnonceCard annonce={annonce as Parameters<typeof AnnonceCard>[0]['annonce']} />
                   </AnimateOnScroll>
                 ))}
@@ -273,13 +301,13 @@ export default async function AccueilPage() {
           <div className="container-site">
             <div className="text-center mb-10">
               <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-2">
-                Ressources
+                {blogIntro.sousTitre ?? 'Ressources'}
               </p>
               <h2 id="blog-title" className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-3">
-                Blog & Conseils
+                {blogIntro.titre ?? 'Blog & Conseils'}
               </h2>
               <p className="text-[#8E8E93] text-lg max-w-2xl mx-auto">
-                Expertise foncière et immobilière en Afrique
+                {blogIntro.body ?? 'Expertise foncière et immobilière en Afrique'}
               </p>
             </div>
             

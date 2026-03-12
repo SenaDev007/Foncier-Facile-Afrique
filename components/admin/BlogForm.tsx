@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { RichTextEditor } from '@/components/admin/RichTextEditor'
 
 type StatutPost = 'BROUILLON' | 'PLANIFIE' | 'PUBLIE' | 'ARCHIVE'
 
@@ -78,6 +79,8 @@ export function BlogForm({ initialData }: BlogFormProps) {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => setForm((f) => ({ ...f, [field]: e.target.value }))
 
+  const setContenu = (html: string) => setForm((f) => ({ ...f, contenu: html }))
+
   const addTag = () => {
     const tag = tagInput.trim().toLowerCase()
     if (tag && !form.tags.includes(tag)) {
@@ -143,8 +146,14 @@ export function BlogForm({ initialData }: BlogFormProps) {
         </div>
 
         <div>
-          <Label htmlFor="contenu" className="text-[#EFEFEF]">Contenu * (Markdown supporté)</Label>
-          <Textarea id="contenu" value={form.contenu} onChange={set('contenu')} required className="mt-1.5 font-mono text-xs bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#8E8E93]" rows={16} placeholder="# Titre&#10;&#10;Votre contenu en Markdown..." />
+          <Label htmlFor="contenu" className="text-[#EFEFEF]">Contenu * (éditeur riche)</Label>
+          <RichTextEditor
+            value={form.contenu}
+            onChange={setContenu}
+            placeholder="Rédigez votre article : titres, listes, liens, mise en forme..."
+            minHeight="360px"
+            className="mt-1.5"
+          />
         </div>
 
         <div>

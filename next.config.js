@@ -1,15 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-
-  basePath: '/Foncier-Facile-Afrique',
-
+  output: 'standalone',
   images: {
-    unoptimized: true,
+    unoptimized: false,
     remotePatterns: [
       { protocol: 'https', hostname: 'www.foncierfacileafrique.fr' },
       { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
     ],
+  },
+  experimental: {
+    serverActions: { allowedOrigins: ['www.foncierfacileafrique.fr', 'localhost:3000'] },
   },
 }
 

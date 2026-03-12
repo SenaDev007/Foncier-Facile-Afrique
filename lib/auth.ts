@@ -5,27 +5,6 @@ import bcrypt from 'bcryptjs'
 import { LoginSchema } from '@/lib/validations'
 import type { Role } from '@prisma/client'
 
-declare module 'next-auth' {
-  interface Session {
-    user: {
-      id: string
-      name: string
-      email: string
-      role: Role
-    }
-  }
-  interface User {
-    role: Role
-  }
-}
-
-declare module 'next-auth/jwt' {
-  interface JWT {
-    id: string
-    role: Role
-  }
-}
-
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
@@ -70,8 +49,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     },
     session({ session, token }) {
       if (token) {
-        session.user.id = token.id
-        session.user.role = token.role
+        session.user.id = token.id as string
+        session.user.role = token.role as Role
       }
       return session
     },

@@ -13,7 +13,7 @@ export async function getPageSections(slug: string): Promise<SectionMap> {
       },
     },
   })
-  if (!page) return {}
+  if (!page) return {} as SectionMap
   const map: SectionMap = {}
   for (const s of page.sections) {
     map[s.key] = {

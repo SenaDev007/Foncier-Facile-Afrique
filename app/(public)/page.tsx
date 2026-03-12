@@ -6,7 +6,7 @@ import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
 import { prisma } from '@/lib/prisma'
-import { getPageSections } from '@/lib/pages'
+import { getPageSections, type SectionMap } from '@/lib/pages'
 import HeroSection from '@/components/public/HeroSection'
 import AnnonceCard from '@/components/public/AnnonceCard'
 import BlogCard from '@/components/public/BlogCard'
@@ -153,7 +153,7 @@ export default async function AccueilPage() {
   } = await getHomeData()
   const services = await getServices()
 
-  const s = (key: string) => homeSections[key]
+  const s = (key: string) => (homeSections as SectionMap)[key]
   const hero = {
     badge: s('hero_badge')?.titre,
     sousTitre: s('hero_sous_titre')?.sousTitre,
@@ -170,12 +170,12 @@ export default async function AccueilPage() {
   return (
     <>
       <HeroSection
-        heroImageUrl={heroImage}
-        heroImageMobileUrl={heroImageMobile}
-        heroBadge={hero.badge}
-        heroSousTitre={hero.sousTitre}
-        heroTitre={hero.titre}
-        heroTexte={hero.texte}
+        heroImageUrl={heroImage ?? undefined}
+        heroImageMobileUrl={heroImageMobile ?? undefined}
+        heroBadge={hero.badge ?? undefined}
+        heroSousTitre={hero.sousTitre ?? undefined}
+        heroTitre={hero.titre ?? undefined}
+        heroTexte={hero.texte ?? undefined}
         heroCtaAnnonces={hero.ctaAnnonces?.boutonTexte ? { texte: hero.ctaAnnonces.boutonTexte, url: hero.ctaAnnonces.boutonUrl ?? '/annonces' } : undefined}
         heroCtaContact={hero.ctaContact?.boutonTexte ? { texte: hero.ctaContact.boutonTexte, url: hero.ctaContact.boutonUrl ?? '/contact' } : undefined}
       />

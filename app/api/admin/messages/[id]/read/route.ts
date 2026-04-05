@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, ROLES_CRM } from '@/lib/api-admin-auth'
 
 // PATCH - Marquer un message comme lu
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+  const gate = await requireAdmin(ROLES_CRM)
+  if (!gate.ok) return gate.response
   try {
     const { id } = params
 

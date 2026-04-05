@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatPrice, formatDate, getStatutLabel, getStatutColor } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Eye } from 'lucide-react'
+import { Plus, Eye, ExternalLink } from 'lucide-react'
 
 export const metadata: Metadata = { title: 'Annonces — Admin FFA' }
 
@@ -92,7 +92,20 @@ export default async function AdminAnnoncesPage({ searchParams }: PageProps) {
                 </td>
                 <td className="px-4 py-3 text-[#8E8E93] hidden md:table-cell">{formatDate(a.createdAt.toISOString())}</td>
                 <td className="px-4 py-3">
-                  <Link href={`/admin/annonces/${a.id}/edit`} className="text-xs text-[#D4A843] font-medium hover:underline">Modifier</Link>
+                  <div className="flex flex-col gap-1 items-start">
+                    <Link href={`/admin/annonces/${a.id}/edit`} className="text-xs text-[#D4A843] font-medium hover:underline">Modifier</Link>
+                    {a.statut === 'EN_LIGNE' && (
+                      <a
+                        href={`/annonces/${a.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-[#8E8E93] hover:text-[#D4A843] inline-flex items-center gap-1"
+                      >
+                        <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                        Site public
+                      </a>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

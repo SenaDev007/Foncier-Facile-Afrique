@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, ROLES_CONTENT } from '@/lib/api-admin-auth'
 
 // GET - Récupérer tous les articles de blog
 export async function GET() {
+  const gate = await requireAdmin(ROLES_CONTENT)
+  if (!gate.ok) return gate.response
   try {
     const posts = await prisma.blogPost.findMany({
       include: {
@@ -20,6 +23,8 @@ export async function GET() {
 
 // POST - Créer un nouvel article
 export async function POST(request: NextRequest) {
+  const gate = await requireAdmin(ROLES_CONTENT)
+  if (!gate.ok) return gate.response
   try {
     const data = await request.json()
     

@@ -1,23 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/lib/auth'
+import { requireAdmin, ROLES_CRM, ROLES_MANAGERS } from '@/lib/api-admin-auth'
+import { executeAdminLeadPatch, adminLeadDetailInclude } from '@/lib/execute-admin-lead-patch'
+import { AdminInteractionCreateSchema } from '@/lib/validations'
 
 interface RouteParams {
   params: { id: string }
 }
 
 export async function GET(_req: NextRequest, { params }: RouteParams) {
+  const gate = await requireAdmin(ROLES_CRM)
+  if (!gate.ok) return gate.response
   try {
-    const session = await auth()
-    if (!session) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
-
     const lead = await prisma.lead.findUnique({
       where: { id: params.id },
-      include: {
-        annonce: { select: { id: true, reference: true, titre: true } },
-        agent: { select: { id: true, name: true } },
-        interactions: { orderBy: { createdAt: 'desc' } },
-      },
+      include: adminLeadDetailInclude,
     })
 
     if (!lead) return NextResponse.json({ error: 'Lead introuvable' }, { status: 404 })
@@ -29,43 +26,49 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
 }
 
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
+  const gate = await requireAdmin(ROLES_CRM)
+  if (!gate.ok) return gate.response
   try {
-    const session = await auth()
-    if (!session) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    let body: Record<string, unknown>
+    try {
+      body = await req.json()
+    } catch {
+      return NextResponse.json({ error: 'JSON invalide' }, { status: 400 })
+    }
+    const { interaction, ...patchBody } = body
+    const hasPatch = Object.keys(patchBody).length > 0
 
-    const body = await req.json()
-    const { statut, agentId, notes, prochainRappel, interaction } = body
-
-    const updates: Record<string, unknown> = {}
-    if (statut !== undefined) updates.statut = statut
-    if (agentId !== undefined) updates.agentId = agentId
-    if (notes !== undefined) updates.notes = notes
-    if (prochainRappel !== undefined) {
-      updates.prochainRappel = prochainRappel ? new Date(prochainRappel) : null
+    if (hasPatch) {
+      const r = await executeAdminLeadPatch(params.id, patchBody, gate.session.user.role)
+      if (r instanceof NextResponse) return r
     }
 
-    const lead = await prisma.lead.update({
-      where: { id: params.id },
-      data: {
-        ...updates,
-        ...(interaction
-          ? {
-              interactions: {
-                create: {
-                  type: interaction.type,
-                  contenu: interaction.contenu,
-                },
-              },
-            }
-          : {}),
-      },
-      include: {
-        annonce: { select: { id: true, reference: true, titre: true } },
-        agent: { select: { id: true, name: true } },
-        interactions: { orderBy: { createdAt: 'desc' } },
-      },
-    })
+    if (interaction && typeof interaction === 'object') {
+      const p = AdminInteractionCreateSchema.safeParse(interaction)
+      if (!p.success) {
+        return NextResponse.json(
+          { error: p.error.errors[0]?.message ?? 'Interaction invalide' },
+          { status: 400 }
+        )
+      }
+      await prisma.interaction.create({
+        data: {
+          leadId: params.id,
+          type: p.data.type,
+          contenu: p.data.contenu,
+        },
+      })
+    }
 
+    if (!hasPatch && !interaction) {
+      return NextResponse.json({ error: 'Aucune modification' }, { status: 400 })
+    }
+
+    const lead = await prisma.lead.findUnique({
+      where: { id: params.id },
+      include: adminLeadDetailInclude,
+    })
+    if (!lead) return NextResponse.json({ error: 'Lead introuvable' }, { status: 404 })
     return NextResponse.json({ success: true, data: lead })
   } catch (error) {
     console.error('PATCH /api/leads/[id] error:', error)
@@ -74,14 +77,13 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 }
 
 export async function DELETE(_req: NextRequest, { params }: RouteParams) {
+  const gate = await requireAdmin(ROLES_MANAGERS)
+  if (!gate.ok) return gate.response
   try {
-    const session = await auth()
-    if (!session) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
-
     await prisma.lead.delete({ where: { id: params.id } })
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('DELETE /api/leads/[id] error:', error)
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse.json({ error: 'Lead introuvable ou erreur serveur' }, { status: 404 })
   }
 }

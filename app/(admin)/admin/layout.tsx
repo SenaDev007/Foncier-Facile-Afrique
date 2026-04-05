@@ -1,4 +1,5 @@
 import Sidebar from '@/components/admin/Sidebar'
+import { PageTransition } from '@/components/ui/PageTransition'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
@@ -19,7 +20,7 @@ export default async function AdminLayout({
 
   // Page login : afficher uniquement le contenu (pas de sidebar)
   if (!session && pathname === '/admin/login') {
-    return <>{children}</>
+    return <PageTransition>{children}</PageTransition>
   }
 
   return (
@@ -72,7 +73,7 @@ export default async function AdminLayout({
         
         {/* Page content */}
         <main className="flex-1 p-6 overflow-auto">
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
       </div>
     </div>

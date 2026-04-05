@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendMail } from '@/lib/mail'
+import { requireAdmin, ROLES_CRM } from '@/lib/api-admin-auth'
 
 // POST - Envoyer une réponse par email
 export async function POST(request: NextRequest) {
+  const gate = await requireAdmin(ROLES_CRM)
+  if (!gate.ok) return gate.response
   try {
     const { to, subject, content, originalMessage } = await request.json()
 

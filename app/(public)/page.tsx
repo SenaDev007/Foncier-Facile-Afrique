@@ -17,6 +17,7 @@ import { AnimatedCounter } from '@/components/ui/AnimatedCounter'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ArrowRight } from 'lucide-react'
 import ServiceCard from '@/components/public/ServiceCard'
+import { FourPolesSection } from '@/components/public/FourPolesSection'
 
 // Type pour les services
 interface ServiceItem {
@@ -203,6 +204,8 @@ export default async function AccueilPage() {
           </div>
         </div>
       </section>
+
+      <FourPolesSection />
 
       <section className="py-14 md:py-16 bg-[#1C1C1E]" aria-labelledby="services-title">
         <div className="container-site">

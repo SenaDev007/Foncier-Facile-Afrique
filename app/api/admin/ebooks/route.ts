@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, ROLES_STAFF } from '@/lib/api-admin-auth'
 
 function slugify(titre: string): string {
   return titre
@@ -12,9 +12,9 @@ function slugify(titre: string): string {
 }
 
 export async function GET() {
+  const gate = await requireAdmin(ROLES_STAFF)
+  if (!gate.ok) return gate.response
   try {
-    const session = await auth()
-    if (!session?.user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     const ebooks = await prisma.ebook.findMany({
       include: { _count: { select: { commandes: true } } },
       orderBy: { createdAt: 'desc' },
@@ -27,10 +27,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const gate = await requireAdmin(ROLES_STAFF)
+  if (!gate.ok) return gate.response
   try {
-    const session = await auth()
-    if (!session?.user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
-
     const body = await req.json()
     const slug = body.slug || slugify(body.titre) + '-' + Date.now().toString(36)
     const existing = await prisma.ebook.findUnique({ where: { slug } })

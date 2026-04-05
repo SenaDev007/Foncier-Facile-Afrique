@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useCallback, useMemo } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { Search, SlidersHorizontal, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
+import { ANNONCE_DOCUMENT_OPTIONS } from '@/lib/annonce-constants'
 
 const TYPES = [
   { value: 'ALL', label: 'Tous les types' },
@@ -36,12 +37,6 @@ const SURFACE_MIN = [
   { value: '5000', label: '5 000 m²' },
 ]
 
-const DOCUMENTS = [
-  { value: 'TF', label: 'Titre foncier' },
-  { value: 'ACD', label: 'ACD' },
-  { value: 'PERMIS_HABITER', label: 'Permis d\'habiter' },
-]
-
 const SORT = [
   { value: 'createdAt_desc', label: 'Plus récent' },
   { value: 'prix_asc', label: 'Prix croissant' },
@@ -56,7 +51,9 @@ function parseDocuments(param: string | null): string[] {
 
 export default function AnnonceFilters() {
   const router = useRouter()
+  const pathname = usePathname()
   const searchParams = useSearchParams()
+  const listingBase = pathname.startsWith('/catalogue') ? '/catalogue' : '/annonces'
 
   const [localisation, setLocalisation] = useState(searchParams.get('localisation') ?? '')
   const [type, setType] = useState(searchParams.get('type') ?? 'ALL')
@@ -81,8 +78,8 @@ export default function AnnonceFilters() {
     if (sort) params.set('sort', sort)
     if (documents.length > 0) params.set('documents', documents.join(','))
     params.set('page', '1')
-    router.push(`/annonces?${params.toString()}`)
-  }, [localisation, type, prixMax, surfaceMin, sort, documents, router])
+    router.push(`${listingBase}?${params.toString()}`)
+  }, [localisation, type, prixMax, surfaceMin, sort, documents, router, listingBase])
 
   const resetFilters = useCallback(() => {
     setLocalisation('')
@@ -91,8 +88,8 @@ export default function AnnonceFilters() {
     setSurfaceMin('')
     setSort('createdAt_desc')
     setDocuments([])
-    router.push('/annonces')
-  }, [router])
+    router.push(listingBase)
+  }, [router, listingBase])
 
   const hasActiveFilters = localisation || type !== 'ALL' || prixMax || surfaceMin || documents.length > 0
 
@@ -171,7 +168,7 @@ export default function AnnonceFilters() {
 
       <div className="mt-3 flex flex-wrap items-center gap-4">
         <span className="text-xs text-[#8E8E93]">Documents :</span>
-        {DOCUMENTS.map((d) => (
+        {ANNONCE_DOCUMENT_OPTIONS.map((d) => (
           <label
             key={d.value}
             className="flex items-center gap-2 text-sm text-[#EFEFEF] cursor-pointer"

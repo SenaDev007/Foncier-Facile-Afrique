@@ -2,32 +2,62 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
+import { LeadsKanban } from '@/components/admin/LeadsKanban'
 
 export const metadata: Metadata = { title: 'Leads — Admin FFA' }
 
 interface PageProps {
-  searchParams: { page?: string; statut?: string }
+  searchParams: { page?: string; statut?: string; vue?: string }
 }
 
 const ITEMS_PER_PAGE = 20
-const STATUTS = ['NOUVEAU', 'CONTACTE', 'EN_NEGOCIATION', 'GAGNE', 'PERDU']
+const KANBAN_MAX = 200
+const STATUTS = ['NOUVEAU', 'CONTACTE', 'EN_NEGOCIATION', 'GAGNE', 'PERDU'] as const
+
+function buildLeadsHref(
+  current: { statut?: string; vue?: string },
+  updates: Partial<{ vue: 'kanban' | null; statut: string | null; page: string | null }>
+) {
+  const p = new URLSearchParams()
+  const vue = updates.vue !== undefined ? updates.vue : current.vue === 'kanban' ? 'kanban' : null
+  if (vue === 'kanban') p.set('vue', 'kanban')
+  const st =
+    updates.statut !== undefined ? updates.statut : current.statut && current.statut.length > 0 ? current.statut : null
+  if (st) p.set('statut', st)
+  const pg = updates.page !== undefined ? updates.page : null
+  if (pg && pg !== '1') p.set('page', pg)
+  const qs = p.toString()
+  return qs ? `/admin/leads?${qs}` : '/admin/leads'
+}
 
 export default async function AdminLeadsPage({ searchParams }: PageProps) {
+  const isKanban = searchParams.vue === 'kanban'
   const page = Math.max(1, parseInt(searchParams.page ?? '1'))
   const skip = (page - 1) * ITEMS_PER_PAGE
 
   const where = {
-    ...(searchParams.statut ? { statut: searchParams.statut as 'NOUVEAU' | 'CONTACTE' | 'EN_NEGOCIATION' | 'GAGNE' | 'PERDU' } : {}),
+    ...(searchParams.statut
+      ? { statut: searchParams.statut as (typeof STATUTS)[number] }
+      : {}),
   }
 
+  const currentQ = { statut: searchParams.statut, vue: searchParams.vue }
+
   const [leads, total] = await Promise.all([
-    prisma.lead.findMany({
-      where,
-      include: { annonce: { select: { titre: true, reference: true } } },
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take: ITEMS_PER_PAGE,
-    }),
+    isKanban
+      ? prisma.lead.findMany({
+          where,
+          include: { annonce: { select: { titre: true, reference: true } } },
+          orderBy: { createdAt: 'desc' },
+          take: KANBAN_MAX,
+        })
+      : prisma.lead.findMany({
+          where,
+          include: { annonce: { select: { titre: true, reference: true } } },
+          orderBy: { createdAt: 'desc' },
+          skip,
+          take: ITEMS_PER_PAGE,
+        }),
     prisma.lead.count({ where }),
   ])
 
@@ -48,14 +78,34 @@ export default async function AdminLeadsPage({ searchParams }: PageProps) {
         <p className="text-[#8E8E93] text-sm mt-1">{total} lead{total > 1 ? 's' : ''}</p>
       </div>
 
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex rounded-lg border border-[#3A3A3C] overflow-hidden p-0.5 bg-[#1C1C1E]">
+          <Link
+            href={buildLeadsHref(currentQ, { vue: null, page: null })}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${!isKanban ? 'bg-[#D4A843] text-[#1C1C1E]' : 'text-[#8E8E93] hover:text-[#EFEFEF]'}`}
+          >
+            Liste
+          </Link>
+          <Link
+            href={buildLeadsHref(currentQ, { vue: 'kanban', page: null })}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${isKanban ? 'bg-[#D4A843] text-[#1C1C1E]' : 'text-[#8E8E93] hover:text-[#EFEFEF]'}`}
+          >
+            Kanban
+          </Link>
+        </div>
+      </div>
+
       <div className="flex flex-wrap gap-2">
-        <Link href="/admin/leads" className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!searchParams.statut ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[rgba(212,168,67,0.12)] hover:text-[#D4A843]'}`}>
+        <Link
+          href={buildLeadsHref(currentQ, { statut: null, page: null })}
+          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!searchParams.statut ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[rgba(212,168,67,0.12)] hover:text-[#D4A843]'}`}
+        >
           Tous
         </Link>
         {STATUTS.map((s) => (
           <Link
             key={s}
-            href={`/admin/leads?statut=${s}`}
+            href={buildLeadsHref(currentQ, { statut: s, page: null })}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${searchParams.statut === s ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[rgba(212,168,67,0.12)] hover:text-[#D4A843]'}`}
           >
             {s.replace('_', ' ')}
@@ -63,6 +113,21 @@ export default async function AdminLeadsPage({ searchParams }: PageProps) {
         ))}
       </div>
 
+      {isKanban && total > KANBAN_MAX && (
+        <p className="text-xs text-amber-400/90">
+          Affichage des {KANBAN_MAX} leads les plus récents sur {total} au total. Filtrez par statut ou utilisez la vue
+          liste pour parcourir tout le CRM.
+        </p>
+      )}
+
+      {isKanban ? (
+        <LeadsKanban
+          leads={leads.map((l) => ({
+            ...l,
+            createdAt: l.createdAt,
+          }))}
+        />
+      ) : (
       <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
@@ -82,7 +147,9 @@ export default async function AdminLeadsPage({ searchParams }: PageProps) {
             {leads.map((lead) => (
               <tr key={lead.id} className="border-b border-[#3A3A3C] hover:bg-[#3A3A3C] transition-colors">
                 <td className="px-4 py-3">
-                  <p className="font-medium text-[#EFEFEF]">{lead.nom}</p>
+                  <p className="font-medium text-[#EFEFEF]">
+                    {lead.prenom} {lead.nom}
+                  </p>
                   <p className="text-xs text-[#8E8E93]">{lead.email}</p>
                   {lead.telephone && <p className="text-xs text-[#8E8E93]">{lead.telephone}</p>}
                 </td>
@@ -111,13 +178,14 @@ export default async function AdminLeadsPage({ searchParams }: PageProps) {
           </tbody>
         </table>
       </div>
+      )}
 
-      {totalPages > 1 && (
+      {!isKanban && totalPages > 1 && (
         <nav className="flex justify-center gap-2" aria-label="Pagination">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <Link
               key={p}
-              href={`/admin/leads?${new URLSearchParams({ ...searchParams, page: String(p) })}`}
+              href={buildLeadsHref(currentQ, { page: String(p) })}
               className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-colors ${p === page ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[#3A3A3C]'}`}
               aria-current={p === page ? 'page' : undefined}
             >

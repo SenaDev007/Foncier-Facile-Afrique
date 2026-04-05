@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, ROLES_ANNONCES } from '@/lib/api-admin-auth'
 
 // PUT - Mettre à jour une annonce
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  const gate = await requireAdmin(ROLES_ANNONCES)
+  if (!gate.ok) return gate.response
   try {
     const data = await request.json()
     const { id } = params
@@ -33,6 +36,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
 // DELETE - Supprimer une annonce
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const gate = await requireAdmin(ROLES_ANNONCES)
+  if (!gate.ok) return gate.response
   try {
     const { id } = params
 

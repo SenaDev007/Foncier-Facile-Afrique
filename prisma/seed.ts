@@ -10,6 +10,11 @@ async function main() {
   // Supprimer les données existantes dans le bon ordre (respect des clés étrangères)
   await prisma.commandeEbook.deleteMany()
   await prisma.ebook.deleteMany()
+  await prisma.interactionDossier.deleteMany()
+  await prisma.dossierFoncier.deleteMany()
+  await prisma.reservation.deleteMany()
+  await prisma.logementPhoto.deleteMany()
+  await prisma.logement.deleteMany()
   await prisma.pageSection.deleteMany()
   await prisma.page.deleteMany()
   await prisma.interaction.deleteMany()
@@ -457,6 +462,81 @@ async function main() {
   })
 
   console.log('✅ Leads created')
+
+  // ─── Logements séjour (démo) ─────────────────────────────────────────────
+  await prisma.logement.create({
+    data: {
+      reference: 'L-PAR-001',
+      nom: 'Villa Les Palmiers — Parakou',
+      type: 'VILLA_VAC',
+      ville: 'Parakou',
+      quartier: 'Banikanni',
+      description:
+        'Villa meublée 3 chambres, jardin, sécurité 24h/24. Idéale pour séjours famille ou affaires.',
+      prixNuit: 85000,
+      capacite: 6,
+      minNuits: 2,
+      note: 4.8,
+      nbAvis: 12,
+      equipements: ['Wifi', 'Climatisation', 'Cuisine équipée', 'Parking'],
+      services: ['Check-in flexible', 'Ménage'],
+      statut: 'DISPONIBLE',
+      photos: {
+        create: [
+          { url: '/images/services/diaspora.jpg', alt: 'Villa Parakou', ordre: 0 },
+        ],
+      },
+    },
+  })
+
+  await prisma.logement.create({
+    data: {
+      reference: 'L-COT-002',
+      nom: 'Appartement centre — Cotonou',
+      type: 'APPARTEMENT',
+      ville: 'Cotonou',
+      quartier: 'Haie Vive',
+      description: 'Appartement T3 climatisé, proche du boulevard, connexion haut débit.',
+      prixNuit: 65000,
+      capacite: 4,
+      minNuits: 1,
+      note: 4.5,
+      nbAvis: 8,
+      equipements: ['Wifi', 'Clim', 'Cuisine'],
+      services: ['Transfert aéroport (option)'],
+      statut: 'DISPONIBLE',
+      photos: {
+        create: [{ url: '/images/services/conseil-foncier.jpg', alt: 'Appartement', ordre: 0 }],
+      },
+    },
+  })
+
+  await prisma.dossierFoncier.create({
+    data: {
+      reference: 'DOS-2026-DEMO',
+      nomClient: 'Kossi Mensah',
+      emailClient: 'kossi@example.com',
+      telephoneClient: '+22990111222',
+      pays: 'Bénin',
+      typeRegul: 'PH_TO_TF',
+      situationInit: 'Parcelle avec permis d’habiter, demande de passage au titre foncier.',
+      ville: 'Parakou',
+      quartier: 'Aveloukandi',
+      etapeActuelle: 2,
+      statut: 'EN_COURS',
+      delaiEstime: '90 à 120 jours',
+      userId: agent.id,
+      interactions: {
+        create: {
+          type: 'NOTE',
+          contenu: 'Premier échange téléphonique : dossier complet demandé au client.',
+          userId: agent.id,
+        },
+      },
+    },
+  })
+
+  console.log('✅ Logements démo (L-PAR-001, L-COT-002) + dossier DOS-2026-DEMO')
 
   console.log('\n🎉 Seeding complete!')
 }

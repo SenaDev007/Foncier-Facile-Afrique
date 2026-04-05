@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, ROLES_STAFF } from '@/lib/api-admin-auth'
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const gate = await requireAdmin(ROLES_STAFF)
+  if (!gate.ok) return gate.response
   try {
-    const session = await auth()
-    if (!session?.user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
     const ebook = await prisma.ebook.findUnique({ where: { id: params.id } })
     if (!ebook) return NextResponse.json({ error: 'Ebook introuvable' }, { status: 404 })
     return NextResponse.json(ebook)
@@ -22,10 +22,9 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const gate = await requireAdmin(ROLES_STAFF)
+  if (!gate.ok) return gate.response
   try {
-    const session = await auth()
-    if (!session?.user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
-
     const body = await req.json()
     const ebook = await prisma.ebook.update({
       where: { id: params.id },

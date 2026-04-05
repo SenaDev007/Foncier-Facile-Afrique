@@ -1,4 +1,15 @@
 import { z } from 'zod'
+import {
+  StatutLead,
+  TypeLogement,
+  StatutLogement,
+  TypeRegul,
+  StatutDossier,
+  TypeInteractionDossier,
+  StatutResa,
+  StatutPayment,
+} from '@prisma/client'
+import { INTERACTION_TYPES } from '@/lib/lead-constants'
 
 export const LoginSchema = z.object({
   email: z.string().email('Email invalide'),
@@ -85,6 +96,28 @@ export const MessageReplySchema = z.object({
   reponse: z.string().min(10, 'Réponse trop courte'),
 })
 
+/** Mise à jour CRM (backoffice) : au moins un champ requis. */
+export const AdminLeadPatchSchema = z
+  .object({
+    statut: z.nativeEnum(StatutLead).optional(),
+    notes: z.string().max(20000).nullable().optional(),
+    prochainRappel: z.union([z.string(), z.null()]).optional(),
+    agentId: z.union([z.string().min(1), z.null()]).optional(),
+  })
+  .refine(
+    (d) =>
+      d.statut !== undefined ||
+      d.notes !== undefined ||
+      d.prochainRappel !== undefined ||
+      d.agentId !== undefined,
+    { message: 'Aucun champ à mettre à jour' }
+  )
+
+export const AdminInteractionCreateSchema = z.object({
+  type: z.enum(INTERACTION_TYPES),
+  contenu: z.string().min(1, 'Contenu requis').max(8000),
+})
+
 export type LoginInput = z.infer<typeof LoginSchema>
 export type ContactInput = z.infer<typeof ContactSchema>
 export type LeadInput = z.infer<typeof LeadSchema>
@@ -92,4 +125,115 @@ export type AnnonceInput = z.infer<typeof AnnonceSchema>
 export type BlogPostInput = z.infer<typeof BlogPostSchema>
 export type TemoignageInput = z.infer<typeof TemoignageSchema>
 export type NewsletterInput = z.infer<typeof NewsletterSchema>
+export const ConfierBienSchema = z.object({
+  prenom: z.string().min(2, 'Prénom requis'),
+  nom: z.string().min(2, 'Nom requis'),
+  telephone: z.string().min(8, 'Téléphone requis'),
+  email: z.string().email('Email invalide').optional().or(z.literal('')),
+  typeBien: z.enum(['TERRAIN', 'APPARTEMENT', 'MAISON', 'VILLA', 'BUREAU', 'COMMERCE']),
+  objectif: z.enum(['VENDRE', 'LOUER_LONG', 'LOUER_COURT']),
+  ville: z.string().min(2, 'Ville requise'),
+  quartier: z.string().optional(),
+  surface: z.string().optional(),
+  prixSouhaite: z.string().optional(),
+  documentDisponible: z.string().optional(),
+  description: z.string().min(20, 'Description trop courte (minimum 20 caractères)'),
+})
+
+export const DiagnosticFoncierSchema = z.object({
+  situation: z.string().min(1, 'Précisez votre situation'),
+  ville: z.string().min(2, 'Ville requise'),
+  description: z.string().min(15, 'Description trop courte'),
+  nom: z.string().min(2, 'Nom requis'),
+  prenom: z.string().min(2, 'Prénom requis'),
+  telephone: z.string().min(8, 'WhatsApp / téléphone requis'),
+  email: z.string().email('Email valide requis'),
+})
+
 export type UserInput = z.infer<typeof UserSchema>
+export type AdminLeadPatchInput = z.infer<typeof AdminLeadPatchSchema>
+export type AdminInteractionCreateInput = z.infer<typeof AdminInteractionCreateSchema>
+export type ConfierBienInput = z.infer<typeof ConfierBienSchema>
+export type DiagnosticFoncierInput = z.infer<typeof DiagnosticFoncierSchema>
+
+export const ReservationPublicSchema = z.object({
+  logementId: z.string().min(1),
+  nomVoyageur: z.string().min(2),
+  email: z.string().email(),
+  telephone: z.string().min(8),
+  pays: z.string().min(2).default('Bénin'),
+  nbVoyageurs: z.coerce.number().int().min(1),
+  dateArrivee: z.string().min(1),
+  dateDepart: z.string().min(1),
+  demandeSpeciale: z.string().optional(),
+  transfertAero: z.boolean().optional(),
+})
+
+export const AdminLogementCreateSchema = z.object({
+  reference: z.string().min(3),
+  nom: z.string().min(3),
+  type: z.nativeEnum(TypeLogement),
+  ville: z.string().min(2),
+  quartier: z.string().optional(),
+  description: z.string().min(20),
+  prixNuit: z.coerce.number().positive(),
+  capacite: z.coerce.number().int().min(1),
+  minNuits: z.coerce.number().int().min(1).optional(),
+  equipements: z.array(z.string()).default([]),
+  services: z.array(z.string()).default([]),
+  statut: z.nativeEnum(StatutLogement).optional(),
+  latitude: z.coerce.number().optional().nullable(),
+  longitude: z.coerce.number().optional().nullable(),
+  photos: z
+    .array(
+      z.object({
+        url: z.string().min(1),
+        alt: z.string().optional(),
+        ordre: z.coerce.number().int().optional(),
+      })
+    )
+    .optional(),
+})
+
+export const AdminLogementPatchSchema = AdminLogementCreateSchema.partial()
+
+export const AdminDossierCreateSchema = z.object({
+  reference: z.string().min(3),
+  nomClient: z.string().min(2),
+  emailClient: z.string().email(),
+  telephoneClient: z.string().min(8),
+  pays: z.string().min(2),
+  typeRegul: z.nativeEnum(TypeRegul),
+  situationInit: z.string().min(20),
+  ville: z.string().min(2),
+  quartier: z.string().optional(),
+  delaiEstime: z.string().optional(),
+  montantDevis: z.coerce.number().optional().nullable(),
+  userId: z.string().optional().nullable(),
+})
+
+export const AdminDossierPatchSchema = z.object({
+  statut: z.nativeEnum(StatutDossier).optional(),
+  etapeActuelle: z.coerce.number().int().min(1).optional(),
+  etapeMax: z.coerce.number().int().min(1).optional(),
+  notesInternes: z.string().nullable().optional(),
+  delaiEstime: z.string().nullable().optional(),
+  montantDevis: z.coerce.number().nullable().optional(),
+  userId: z.string().nullable().optional(),
+})
+
+export const AdminInteractionDossierSchema = z.object({
+  type: z.nativeEnum(TypeInteractionDossier),
+  contenu: z.string().min(1).max(8000),
+})
+
+export const AdminReservationPatchSchema = z
+  .object({
+    statut: z.nativeEnum(StatutResa).optional(),
+    notesAdmin: z.string().max(20000).nullable().optional(),
+    paymentStatut: z.nativeEnum(StatutPayment).optional(),
+    paymentRef: z.string().max(200).nullable().optional(),
+  })
+  .refine((d) => d.statut !== undefined || d.notesAdmin !== undefined || d.paymentStatut !== undefined || d.paymentRef !== undefined, {
+    message: 'Aucun champ à mettre à jour',
+  })

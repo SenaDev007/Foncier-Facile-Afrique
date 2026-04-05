@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, ROLES_CRM } from '@/lib/api-admin-auth'
 
 // GET - Récupérer tous les leads
 export async function GET() {
+  const gate = await requireAdmin(ROLES_CRM)
+  if (!gate.ok) return gate.response
   try {
     const leads = await prisma.lead.findMany({
       include: {
@@ -21,6 +24,8 @@ export async function GET() {
 
 // POST - Créer un nouveau lead
 export async function POST(request: NextRequest) {
+  const gate = await requireAdmin(ROLES_CRM)
+  if (!gate.ok) return gate.response
   try {
     const data = await request.json()
     

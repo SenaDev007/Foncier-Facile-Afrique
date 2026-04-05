@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, ExternalLink } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { AnnonceForm } from '@/components/admin/AnnonceForm'
 
@@ -27,6 +27,17 @@ export default async function EditAnnoncePage({ params }: PageProps) {
         </Link>
         <h1 className="font-heading text-2xl font-bold text-[#EFEFEF]">Modifier l&apos;annonce</h1>
         <p className="text-[#8E8E93] text-sm mt-1">{annonce.titre}</p>
+        {annonce.statut === 'EN_LIGNE' && (
+          <a
+            href={`/annonces/${annonce.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm text-[#D4A843] hover:underline mt-2"
+          >
+            <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+            Voir sur le site public
+          </a>
+        )}
       </div>
       <AnnonceForm
         initialData={{
@@ -42,6 +53,9 @@ export default async function EditAnnoncePage({ params }: PageProps) {
           commune: annonce.commune ?? '',
           quartier: annonce.quartier ?? '',
           modalitesPrix: annonce.modalitesPrix ?? '',
+          documents: annonce.documents,
+          latitude: annonce.latitude,
+          longitude: annonce.longitude,
           photos: annonce.photos.map((p) => ({ url: p.url, alt: p.alt ?? '' })),
         }}
       />

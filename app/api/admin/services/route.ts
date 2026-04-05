@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin, ROLES_MANAGERS } from '@/lib/api-admin-auth'
 import { writeFile, mkdir, readFile } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
@@ -42,6 +43,8 @@ async function saveServices(services: any[]) {
 
 // GET - Récupérer les services
 export async function GET() {
+  const gate = await requireAdmin(ROLES_MANAGERS)
+  if (!gate.ok) return gate.response
   try {
     const services = await getServices()
     return NextResponse.json(services)
@@ -53,6 +56,8 @@ export async function GET() {
 
 // PUT - Mettre à jour les services
 export async function PUT(request: NextRequest) {
+  const gate = await requireAdmin(ROLES_MANAGERS)
+  if (!gate.ok) return gate.response
   try {
     const { services } = await request.json()
 

@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getPageBySlugWithSections } from '@/lib/pages'
+import { requireAdmin, ROLES_CONTENT } from '@/lib/api-admin-auth'
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const gate = await requireAdmin(ROLES_CONTENT)
+  if (!gate.ok) return gate.response
   try {
     const { slug } = await params
     const page = await getPageBySlugWithSections(slug)
@@ -21,6 +24,8 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const gate = await requireAdmin(ROLES_CONTENT)
+  if (!gate.ok) return gate.response
   try {
     const { slug } = await params
     const body = await req.json()

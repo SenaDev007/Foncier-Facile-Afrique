@@ -18,6 +18,17 @@ const config: Config = {
     },
     extend: {
       colors: {
+        /** Charte spec. propriétaire (PDF Plateforme v1.0) — utilisable via bg-ffa-navy, text-ffa-purple, etc. */
+        ffa: {
+          navy: '#0D2137',
+          gold: '#C9952A',
+          'gold-light': '#E8B84B',
+          purple: '#5B2C6F',
+          brown: '#7A3500',
+          teal: '#0E6655',
+          sand: '#FBF7EE',
+          surface: '#EAF1F8',
+        },
         primary: {
           DEFAULT: '#1A6B3A',
           dark: '#145530',

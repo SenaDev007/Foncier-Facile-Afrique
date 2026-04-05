@@ -30,6 +30,26 @@ export default auth((req) => {
         return NextResponse.redirect(new URL('/admin', origin))
       }
     }
+
+    // Annonces : réservé à la direction et aux agents (pas aux éditeurs de contenu blog / pages)
+    if (pathname.startsWith('/admin/annonces')) {
+      const userRole = req.auth?.user?.role
+      if (userRole === 'EDITEUR') {
+        return NextResponse.redirect(new URL('/admin', origin))
+      }
+    }
+
+    // Séjour, réservations, dossiers fonciers : pas pour les éditeurs (pôle contenu uniquement)
+    if (
+      pathname.startsWith('/admin/logements') ||
+      pathname.startsWith('/admin/reservations') ||
+      pathname.startsWith('/admin/dossiers')
+    ) {
+      const userRole = req.auth?.user?.role
+      if (userRole === 'EDITEUR') {
+        return NextResponse.redirect(new URL('/admin', origin))
+      }
+    }
   }
 
   // Rediriger si déjà connecté vers login

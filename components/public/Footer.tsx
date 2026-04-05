@@ -18,9 +18,15 @@ const DEFAULT_LINKS_SERVICES = [
   { href: '/services#courtage', label: 'Courtage immobilier' },
   { href: '/services#investissement', label: 'Investissement locatif' },
   { href: '/simulateur', label: 'Simulateur de budget' },
+  { href: '/simulateurs', label: 'Simulateurs (notaire, rentabilité…)' },
 ]
 const DEFAULT_LINKS_UTILES = [
-  { href: '/annonces', label: 'Nos annonces' },
+  { href: '/catalogue', label: 'Catalogue des biens' },
+  { href: '/confier', label: 'Confier mon bien' },
+  { href: '/sejour', label: 'Séjour & tourisme' },
+  { href: '/regularisation', label: 'Régularisation foncière' },
+  { href: '/simulateurs', label: 'Simulateurs immobiliers' },
+  { href: '/annonces', label: 'Annonces' },
   { href: '/notre-expertise', label: 'Notre expertise' },
   { href: '/blog', label: 'Blog' },
   { href: '/contact', label: 'Contact' },

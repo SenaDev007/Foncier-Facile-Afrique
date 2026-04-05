@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, ROLES_MANAGERS } from '@/lib/api-admin-auth'
 
 // GET - Récupérer tous les paramètres
 export async function GET() {
+  const gate = await requireAdmin(ROLES_MANAGERS)
+  if (!gate.ok) return gate.response
   try {
     const parametres = await prisma.parametre.findMany({
       orderBy: { cle: 'asc' }
@@ -17,6 +20,8 @@ export async function GET() {
 
 // PUT - Mettre à jour les paramètres
 export async function PUT(request: NextRequest) {
+  const gate = await requireAdmin(ROLES_MANAGERS)
+  if (!gate.ok) return gate.response
   try {
     const data = await request.json()
     

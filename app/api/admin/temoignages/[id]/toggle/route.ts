@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, ROLES_TEMOIGNAGES } from '@/lib/api-admin-auth'
 
 // PATCH - Activer/désactiver un témoignage
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+  const gate = await requireAdmin(ROLES_TEMOIGNAGES)
+  if (!gate.ok) return gate.response
   try {
     const { actif } = await request.json()
     const { id } = params

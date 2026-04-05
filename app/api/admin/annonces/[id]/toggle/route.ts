@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, ROLES_ANNONCES } from '@/lib/api-admin-auth'
 
 // PATCH - Activer/désactiver une annonce
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+  const gate = await requireAdmin(ROLES_ANNONCES)
+  if (!gate.ok) return gate.response
   try {
     const { actif } = await request.json()
     const { id } = params

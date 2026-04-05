@@ -1,22 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { requireAdmin, ROLES_CRM } from '@/lib/api-admin-auth'
+import { executeAdminLeadPatch } from '@/lib/execute-admin-lead-patch'
 
-// PATCH - Mettre à jour le statut d'un lead
+/** PATCH — mise à jour du statut uniquement (rétrocompatibilité). */
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+  const gate = await requireAdmin(ROLES_CRM)
+  if (!gate.ok) return gate.response
   try {
-    const { statut } = await request.json()
-    const { id } = params
-
-    const lead = await prisma.lead.update({
-      where: { id },
-      data: { statut },
-      include: {
-        agent: { select: { name: true } },
-        annonce: { select: { titre: true } }
-      }
-    })
-
-    return NextResponse.json(lead)
+    const body = await request.json()
+    const result = await executeAdminLeadPatch(params.id, { statut: body?.statut }, gate.session.user.role)
+    if (result instanceof NextResponse) return result
+    return NextResponse.json(result.lead)
   } catch (error) {
     console.error('Erreur lors de la mise à jour du statut:', error)
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })

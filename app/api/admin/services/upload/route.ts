@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin, ROLES_MANAGERS } from '@/lib/api-admin-auth'
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
 
 export async function POST(request: NextRequest) {
+  const gate = await requireAdmin(ROLES_MANAGERS)
+  if (!gate.ok) return gate.response
   try {
     const formData = await request.formData()
     const file = formData.get('image') as File

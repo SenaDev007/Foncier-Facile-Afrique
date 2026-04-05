@@ -9,9 +9,13 @@ import { cn } from '@/lib/utils'
 
 const navLinks = [
   { href: '/', label: 'Accueil' },
+  { href: '/catalogue', label: 'Catalogue' },
+  { href: '/confier', label: 'Confier' },
+  { href: '/sejour', label: 'Séjour' },
+  { href: '/regularisation', label: 'Régularisation' },
   { href: '/services', label: 'Services' },
-  { href: '/annonces', label: 'Annonces' },
-  { href: '/notre-expertise', label: 'Notre expertise' },
+  { href: '/simulateurs', label: 'Simulateurs' },
+  { href: '/notre-expertise', label: 'Expertise' },
   { href: '/blog', label: 'Blog' },
   { href: '/ebooks', label: 'Boutique' },
   { href: '/contact', label: 'Contact' },
@@ -68,7 +72,7 @@ export default function Navbar() {
           </Link>
 
           <nav
-            className="hidden lg:flex items-center gap-0.5"
+            className="hidden lg:flex flex-wrap items-center justify-end gap-0 max-w-[58%] xl:max-w-[65%]"
             aria-label="Navigation principale"
           >
             {navLinks.map((link) => {
@@ -78,7 +82,7 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    'px-4 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                    'px-2.5 py-2 rounded-lg text-xs font-medium transition-colors',
                     isActive
                       ? 'text-[#D4A843] bg-[rgba(212,168,67,0.1)]'
                       : 'text-[#8E8E93] hover:text-[#EFEFEF] hover:bg-[#2C2C2E]'

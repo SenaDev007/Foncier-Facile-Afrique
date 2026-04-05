@@ -10,17 +10,19 @@ datasource db {
 // ─── UTILISATEURS & AUTH ──────────────────────────────────────────────────────
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
-  password      String
-  role          Role      @default(AGENT)
-  active        Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  annonces      Annonce[]
-  leads         Lead[]    @relation("AssignedLeads")
-  blogPosts     BlogPost[]
+  id                   String               @id @default(cuid())
+  name                 String
+  email                String               @unique
+  password             String
+  role                 Role                 @default(AGENT)
+  active               Boolean              @default(true)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  annonces             Annonce[]
+  leads                Lead[]               @relation("AssignedLeads")
+  blogPosts            BlogPost[]
+  dossiersAssignes     DossierFoncier[]     @relation("DossierAssignedUser")
+  interactionsDossier  InteractionDossier[]
 }
 
 enum Role {
@@ -88,23 +90,40 @@ model Photo {
 // ─── LEADS / CRM ─────────────────────────────────────────────────────────────
 
 model Lead {
-  id             String       @id @default(cuid())
+  id             String        @id @default(cuid())
   nom            String
   prenom         String
   telephone      String
   email          String?
-  canal          CanalLead    @default(FORMULAIRE)
+  canal          CanalLead     @default(FORMULAIRE)
   budget         String?
-  statut         StatutLead   @default(NOUVEAU)
+  statut         StatutLead    @default(NOUVEAU)
+  pole           PoleLead?
+  priorite       PrioriteLead?
   notes          String?
   prochainRappel DateTime?
-  agent          User?        @relation("AssignedLeads", fields: [agentId], references: [id])
+  agent          User?         @relation("AssignedLeads", fields: [agentId], references: [id])
   agentId        String?
-  annonce        Annonce?     @relation(fields: [annonceId], references: [id])
+  annonce        Annonce?      @relation(fields: [annonceId], references: [id])
   annonceId      String?
   interactions   Interaction[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+enum PoleLead {
+  ACHAT
+  VENTE
+  CONFIER
+  SEJOUR
+  REGULARISATION
+  AUTRE
+}
+
+enum PrioriteLead {
+  HAUTE
+  NORMALE
+  FAIBLE
 }
 
 enum CanalLead {
@@ -288,4 +307,157 @@ enum StatutCommande {
   PAYEE
   EXPIREE
   REMBOURSEE
+}
+
+// ─── SÉJOUR & TOURISME (spec plateforme v1) ───────────────────────────────────
+
+model Logement {
+  id          String         @id @default(cuid())
+  reference   String         @unique
+  nom         String
+  type        TypeLogement
+  ville       String
+  quartier    String?
+  description String          @db.Text
+  prixNuit    Float
+  capacite    Int
+  minNuits    Int             @default(1)
+  note        Float?          @default(0)
+  nbAvis      Int             @default(0)
+  equipements String[]
+  services    String[]
+  statut      StatutLogement  @default(DISPONIBLE)
+  latitude    Float?
+  longitude   Float?
+  photos      LogementPhoto[]
+  reservations Reservation[]
+  deletedAt   DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model LogementPhoto {
+  id         String   @id @default(cuid())
+  url        String
+  alt        String?
+  ordre      Int      @default(0)
+  logement   Logement @relation(fields: [logementId], references: [id], onDelete: Cascade)
+  logementId String
+  createdAt  DateTime @default(now())
+}
+
+model Reservation {
+  id              String        @id @default(cuid())
+  reference       String        @unique
+  logementId      String
+  logement        Logement      @relation(fields: [logementId], references: [id])
+  nomVoyageur     String
+  email           String
+  telephone       String
+  pays            String
+  nbVoyageurs     Int
+  dateArrivee     DateTime
+  dateDepart      DateTime
+  nbNuits         Int
+  montantTotal    Float
+  fraisService    Float         @default(10000)
+  statut          StatutResa    @default(EN_ATTENTE)
+  demandeSpeciale String?       @db.Text
+  transfertAero   Boolean       @default(false)
+  paymentRef      String?
+  paymentStatut   StatutPayment @default(NON_PAYE)
+  notesAdmin      String?       @db.Text
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+enum TypeLogement {
+  GUEST_HOUSE
+  HOTEL
+  VILLA_VAC
+  APPARTEMENT
+}
+
+enum StatutLogement {
+  DISPONIBLE
+  OCCUPE
+  ARCHIVE
+}
+
+enum StatutResa {
+  EN_ATTENTE
+  CONFIRMEE
+  EN_COURS
+  TERMINEE
+  ANNULEE
+}
+
+enum StatutPayment {
+  NON_PAYE
+  ACOMPTE
+  PAYE
+}
+
+// ─── RÉGULARISATION FONCIÈRE (spec plateforme v1) ─────────────────────────────
+
+model DossierFoncier {
+  id               String               @id @default(cuid())
+  reference        String               @unique
+  nomClient        String
+  emailClient      String
+  telephoneClient  String
+  pays             String
+  typeRegul        TypeRegul
+  situationInit    String               @db.Text
+  ville            String
+  quartier         String?
+  etapeActuelle    Int                  @default(1)
+  etapeMax         Int                  @default(5)
+  statut           StatutDossier        @default(DIAGNOSTIC)
+  delaiEstime      String?
+  montantDevis     Float?
+  notesInternes    String?              @db.Text
+  userId           String?
+  user             User?                @relation("DossierAssignedUser", fields: [userId], references: [id])
+  interactions     InteractionDossier[]
+  deletedAt        DateTime?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+}
+
+model InteractionDossier {
+  id        String         @id @default(cuid())
+  dossierId String
+  dossier   DossierFoncier @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+  type      TypeInteractionDossier
+  contenu   String         @db.Text
+  userId    String
+  user      User           @relation(fields: [userId], references: [id])
+  createdAt DateTime       @default(now())
+}
+
+enum TypeRegul {
+  PH_TO_TF
+  PREMIER_TF
+  MUTATION
+  LITIGE
+  MORCELLEMENT
+  AUDIT
+}
+
+enum StatutDossier {
+  DIAGNOSTIC
+  EN_COURS
+  ATTENTE_ADMIN
+  TERMINE
+  SUSPENDU
+}
+
+enum TypeInteractionDossier {
+  NOTE
+  APPEL
+  EMAIL
+  WHATSAPP
+  DOCUMENT
+  ETAPE
 }

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, ROLES_ANNONCES } from '@/lib/api-admin-auth'
 
 // GET - Récupérer toutes les annonces
 export async function GET() {
+  const gate = await requireAdmin(ROLES_ANNONCES)
+  if (!gate.ok) return gate.response
   try {
     const annonces = await prisma.annonce.findMany({
       include: {
@@ -21,6 +24,8 @@ export async function GET() {
 
 // POST - Créer une nouvelle annonce
 export async function POST(request: NextRequest) {
+  const gate = await requireAdmin(ROLES_ANNONCES)
+  if (!gate.ok) return gate.response
   try {
     const data = await request.json()
     

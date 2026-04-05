@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await auth()
-    if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
+    if (!session || !['ADMIN', 'SUPER_ADMIN', 'AGENT'].includes(session.user.role)) {
       return NextResponse.json({ success: false, error: 'Non autorisé' }, { status: 401 })
     }
 

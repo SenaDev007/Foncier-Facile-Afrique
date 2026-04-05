@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Loader2, Save } from 'lucide-react'
+import { Loader2, Save, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
 import ImageUploader from '@/components/admin/ImageUploader'
+import { ANNONCE_DOCUMENT_OPTIONS } from '@/lib/annonce-constants'
 
 type TypeBien = 'TERRAIN' | 'APPARTEMENT' | 'MAISON' | 'VILLA' | 'BUREAU' | 'COMMERCE'
 type StatutAnnonce = 'BROUILLON' | 'EN_LIGNE' | 'RESERVE' | 'VENDU' | 'ARCHIVE'
@@ -34,7 +36,12 @@ interface AnnonceFormData {
 }
 
 interface AnnonceFormProps {
-  initialData?: Partial<AnnonceFormData> & { photos?: PhotoItem[] }
+  initialData?: Partial<AnnonceFormData> & {
+    photos?: PhotoItem[]
+    documents?: string[]
+    latitude?: number | null
+    longitude?: number | null
+  }
 }
 
 const TYPES: TypeBien[] = ['TERRAIN', 'APPARTEMENT', 'MAISON', 'VILLA', 'BUREAU', 'COMMERCE']
@@ -60,7 +67,28 @@ export function AnnonceForm({ initialData }: AnnonceFormProps) {
   const [photos, setPhotos] = useState<PhotoItem[]>(
     initialData?.photos?.map((p) => ({ url: p.url, alt: p.alt ?? '' })) ?? []
   )
+  const [documents, setDocuments] = useState<string[]>(initialData?.documents ?? [])
+  const [latitude, setLatitude] = useState(
+    initialData?.latitude != null ? String(initialData.latitude) : ''
+  )
+  const [longitude, setLongitude] = useState(
+    initialData?.longitude != null ? String(initialData.longitude) : ''
+  )
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  const toggleDocument = (value: string) => {
+    setDocuments((prev) =>
+      prev.includes(value) ? prev.filter((d) => d !== value) : [...prev, value]
+    )
+  }
+
+  const parseCoord = (raw: string): number | undefined => {
+    const t = raw.trim().replace(',', '.')
+    if (!t) return undefined
+    const n = Number.parseFloat(t)
+    return Number.isFinite(n) ? n : undefined
+  }
 
   const set = (field: keyof AnnonceFormData) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -73,14 +101,46 @@ export function AnnonceForm({ initialData }: AnnonceFormProps) {
       return
     }
 
+    let lat: number | null | undefined
+    let lng: number | null | undefined
+    if (!latitude.trim()) {
+      lat = isEdit ? null : undefined
+    } else {
+      lat = parseCoord(latitude)
+      if (lat === undefined) {
+        toast.error('Latitude invalide (nombre décimal attendu).')
+        return
+      }
+    }
+    if (!longitude.trim()) {
+      lng = isEdit ? null : undefined
+    } else {
+      lng = parseCoord(longitude)
+      if (lng === undefined) {
+        toast.error('Longitude invalide (nombre décimal attendu).')
+        return
+      }
+    }
+
     setSaving(true)
     try {
       const url = isEdit ? `/api/annonces/${initialData!.id}` : '/api/annonces'
       const method = isEdit ? 'PUT' : 'POST'
       const body = {
-        ...form,
+        titre: form.titre,
+        description: form.description,
+        type: form.type,
+        statut: form.statut,
         prix: parseFloat(form.prix),
         surface: form.surface ? parseFloat(form.surface) : undefined,
+        localisation: form.localisation,
+        departement: form.departement || undefined,
+        commune: form.commune || undefined,
+        quartier: form.quartier || undefined,
+        modalitesPrix: form.modalitesPrix || undefined,
+        latitude: lat,
+        longitude: lng,
+        documents,
         photos: photos.map((p, i) => ({ url: p.url, alt: p.alt || form.titre, ordre: i })),
       }
       const res = await fetch(url, {
@@ -88,18 +148,41 @@ export function AnnonceForm({ initialData }: AnnonceFormProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-      if (res.ok) {
+      const payload = await res.json().catch(() => ({}))
+      if (res.ok && payload.success !== false) {
         toast.success(isEdit ? 'Annonce mise à jour.' : 'Annonce créée.')
         router.push('/admin/annonces')
         router.refresh()
       } else {
-        const data = await res.json()
-        toast.error(data.error ?? 'Une erreur est survenue.')
+        toast.error(
+          typeof payload.error === 'string' ? payload.error : 'Une erreur est survenue.'
+        )
       }
     } catch {
       toast.error('Erreur réseau.')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!isEdit || !initialData?.id) return
+    if (!window.confirm('Supprimer définitivement cette annonce ?')) return
+    setDeleting(true)
+    try {
+      const res = await fetch(`/api/annonces/${initialData.id}`, { method: 'DELETE' })
+      const payload = await res.json().catch(() => ({}))
+      if (res.ok) {
+        toast.success('Annonce supprimée.')
+        router.push('/admin/annonces')
+        router.refresh()
+      } else {
+        toast.error(typeof payload.error === 'string' ? payload.error : 'Suppression impossible.')
+      }
+    } catch {
+      toast.error('Erreur réseau.')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -181,16 +264,75 @@ export function AnnonceForm({ initialData }: AnnonceFormProps) {
             <Input id="quartier" value={form.quartier} onChange={set('quartier')} className="mt-1.5 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#8E8E93]" placeholder="Fidjrossè" />
           </div>
         </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="latitude" className="text-[#EFEFEF]">Latitude (optionnel)</Label>
+            <Input
+              id="latitude"
+              inputMode="decimal"
+              value={latitude}
+              onChange={(e) => setLatitude(e.target.value)}
+              className="mt-1.5 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#8E8E93]"
+              placeholder="ex. 6.3654"
+            />
+          </div>
+          <div>
+            <Label htmlFor="longitude" className="text-[#EFEFEF]">Longitude (optionnel)</Label>
+            <Input
+              id="longitude"
+              inputMode="decimal"
+              value={longitude}
+              onChange={(e) => setLongitude(e.target.value)}
+              className="mt-1.5 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#8E8E93]"
+              placeholder="ex. 2.4183"
+            />
+          </div>
+        </div>
+        <p className="text-xs text-[#8E8E93]">
+          Si renseignées, la fiche publique et la carte se centrent sur ce point ; sinon une position par défaut est utilisée.
+        </p>
       </div>
 
-      <div className="flex items-center gap-3">
-        <Button type="submit" disabled={saving} className="gap-2 bg-[#D4A843] hover:bg-[#B8912E] text-[#1C1C1E]">
+      <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-6 space-y-4">
+        <h2 className="font-heading font-semibold text-[#EFEFEF] text-lg">Documents juridiques</h2>
+        <p className="text-[#8E8E93] text-sm">
+          Cochez les documents associés au bien : ils servent aux filtres sur la page publique des annonces.
+        </p>
+        <div className="flex flex-col gap-3">
+          {ANNONCE_DOCUMENT_OPTIONS.map((d) => (
+            <label key={d.value} className="flex items-center gap-3 cursor-pointer text-sm text-[#EFEFEF]">
+              <Checkbox
+                checked={documents.includes(d.value)}
+                onCheckedChange={() => toggleDocument(d.value)}
+                className="border-[#3A3A3C] data-[state=checked]:bg-[#D4A843] data-[state=checked]:border-[#D4A843]"
+              />
+              {d.label}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <Button type="submit" disabled={saving || deleting} className="gap-2 bg-[#D4A843] hover:bg-[#B8912E] text-[#1C1C1E]">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="h-4 w-4" aria-hidden="true" />}
           {isEdit ? 'Mettre à jour' : 'Créer l\'annonce'}
         </Button>
         <Button type="button" variant="outline" onClick={() => router.back()} className="border-[#3A3A3C] text-[#EFEFEF] hover:bg-[#3A3A3C]">
           Annuler
         </Button>
+        {isEdit && (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={saving || deleting}
+            onClick={handleDelete}
+            className="border-red-500/50 text-red-400 hover:bg-red-500/10 ml-auto"
+          >
+            {deleting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Trash2 className="h-4 w-4" aria-hidden="true" />}
+            Supprimer
+          </Button>
+        )}
       </div>
     </form>
   )

@@ -37,6 +37,17 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       return NextResponse.json({ success: false, error: 'Non autorisé' }, { status: 401 })
     }
 
+    const current = await prisma.annonce.findUnique({
+      where: { id: params.id },
+      select: { id: true, slug: true, titre: true, auteurId: true },
+    })
+    if (!current) {
+      return NextResponse.json({ success: false, error: 'Annonce introuvable' }, { status: 404 })
+    }
+    if (session.user.role === 'AGENT' && current.auteurId !== session.user.id) {
+      return NextResponse.json({ success: false, error: 'Non autorisé' }, { status: 403 })
+    }
+
     const body = await req.json()
     const parsed = AnnonceSchema.safeParse(body)
 
@@ -48,18 +59,17 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
 
     const data = parsed.data
+    const { auteurId: _dropAuteur, ...safeData } = data
 
-    const existingSlug = await prisma.annonce.findUnique({ where: { id: params.id }, select: { slug: true, titre: true } })
-    const newSlug = existingSlug && existingSlug.titre !== data.titre
-      ? slugify(data.titre) + '-' + Date.now()
-      : existingSlug?.slug
+    const newSlug =
+      current.titre !== data.titre ? slugify(data.titre) + '-' + Date.now() : current.slug
 
     await prisma.photo.deleteMany({ where: { annonceId: params.id } })
 
     const annonce = await prisma.annonce.update({
       where: { id: params.id },
       data: {
-        ...data,
+        ...safeData,
         slug: newSlug,
         photos: {
           create: (body.photos ?? []).map((p: { url: string; alt?: string; ordre?: number }, i: number) => ({
@@ -82,8 +92,19 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
-    if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
+    if (!session || !['ADMIN', 'SUPER_ADMIN', 'AGENT'].includes(session.user.role)) {
       return NextResponse.json({ success: false, error: 'Non autorisé' }, { status: 401 })
+    }
+
+    const existing = await prisma.annonce.findUnique({
+      where: { id: params.id },
+      select: { auteurId: true },
+    })
+    if (!existing) {
+      return NextResponse.json({ success: false, error: 'Annonce introuvable' }, { status: 404 })
+    }
+    if (session.user.role === 'AGENT' && existing.auteurId !== session.user.id) {
+      return NextResponse.json({ success: false, error: 'Non autorisé' }, { status: 403 })
     }
 
     await prisma.annonce.delete({ where: { id: params.id } })

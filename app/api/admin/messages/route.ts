@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, ROLES_CRM } from '@/lib/api-admin-auth'
 
 // GET - Récupérer tous les messages
 export async function GET() {
+  const gate = await requireAdmin(ROLES_CRM)
+  if (!gate.ok) return gate.response
   try {
     const messages = await prisma.message.findMany({
       orderBy: { createdAt: 'desc' }
@@ -17,6 +20,8 @@ export async function GET() {
 
 // POST - Créer un nouveau message
 export async function POST(request: NextRequest) {
+  const gate = await requireAdmin(ROLES_CRM)
+  if (!gate.ok) return gate.response
   try {
     const data = await request.json()
     

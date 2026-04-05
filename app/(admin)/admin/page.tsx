@@ -39,7 +39,7 @@ export default async function DashboardPage() {
         <p className="text-[#8E8E93] text-sm mt-1">Vue d&apos;ensemble de l&apos;activité</p>
       </div>
 
-      <Suspense fallback={<div className="grid grid-cols-2 md:grid-cols-4 gap-4">{Array(4).fill(0).map((_, i) => <Skeleton key={i} className="h-28 rounded-xl" />)}</div>}>
+      <Suspense fallback={<div className="grid grid-cols-2 md:grid-cols-3 gap-4">{Array(6).fill(0).map((_, i) => <Skeleton key={i} className="h-28 rounded-xl" />)}</div>}>
         <DashboardStats />
       </Suspense>
 

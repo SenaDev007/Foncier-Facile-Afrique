@@ -16,6 +16,7 @@ const MapViewClient = dynamic(() => import('@/components/public/MapView'), { ssr
 type ViewMode = 'grid' | 'list' | 'map'
 
 interface AnnoncesViewProps {
+  variant?: 'annonces' | 'catalogue'
   annonces: AnnonceCardType[]
   total: number
   page: number
@@ -24,6 +25,7 @@ interface AnnoncesViewProps {
 }
 
 export default function AnnoncesView({
+  variant = 'annonces',
   annonces,
   total,
   page,
@@ -31,6 +33,9 @@ export default function AnnoncesView({
   searchParams,
 }: AnnoncesViewProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  const listingBase = variant === 'catalogue' ? '/catalogue' : '/annonces'
+  const pageTitle =
+    variant === 'catalogue' ? 'Catalogue des biens' : 'Annonces immobilières'
 
   const paginationParams = useMemo(() => {
     const p: Record<string, string> = {}
@@ -46,7 +51,7 @@ export default function AnnoncesView({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
             <h1 className="font-heading text-3xl font-bold text-[#EFEFEF]">
-              Annonces immobilières
+              {pageTitle}
             </h1>
             <p className="text-[#8E8E93] mt-1 text-sm">
               {total} bien{total > 1 ? 's' : ''} disponible{total > 1 ? 's' : ''}
@@ -163,7 +168,7 @@ export default function AnnoncesView({
                     return (
                       <Link
                         key={p}
-                        href={`/annonces?${params.toString()}`}
+                        href={`${listingBase}?${params.toString()}`}
                         className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
                           p === page
                             ? 'bg-[#D4A843] text-[#1C1C1E]'
@@ -184,7 +189,7 @@ export default function AnnoncesView({
                 Aucune annonce ne correspond à vos critères.
               </p>
               <Link
-                href="/annonces"
+                href={listingBase}
                 className="text-[#D4A843] hover:text-[#c2972e] font-medium transition-colors"
               >
                 Réinitialiser les filtres

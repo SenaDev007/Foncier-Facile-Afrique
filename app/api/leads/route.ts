@@ -1,18 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/lib/auth'
-import { LeadSchema } from '@/lib/validations'
+import { LeadSchema, AdminInteractionCreateSchema } from '@/lib/validations'
 import { sendLeadNotification } from '@/lib/mail'
 import { rateLimit } from '@/lib/utils'
+import { requireAdmin, ROLES_CRM } from '@/lib/api-admin-auth'
+import { executeAdminLeadPatch, adminLeadDetailInclude } from '@/lib/execute-admin-lead-patch'
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 
 export async function GET(req: NextRequest) {
+  const gate = await requireAdmin(ROLES_CRM)
+  if (!gate.ok) return gate.response
   try {
-    const session = await auth()
-    if (!session) {
-      return NextResponse.json({ success: false, error: 'Non autorisé' }, { status: 401 })
-    }
 
     const { searchParams } = new URL(req.url)
     const statut = searchParams.get('statut')
@@ -45,7 +44,7 @@ export async function GET(req: NextRequest) {
     })
   } catch (error) {
     console.error('GET /api/leads error:', error)
-    return NextResponse.json({ success: false, error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }
 
@@ -113,47 +112,60 @@ export async function POST(req: NextRequest) {
   }
 }
 
+/** Rétrocompatibilité : préférer PATCH /api/leads/[id]. */
 export async function PUT(req: NextRequest) {
+  const gate = await requireAdmin(ROLES_CRM)
+  if (!gate.ok) return gate.response
   try {
-    const session = await auth()
-    if (!session) {
-      return NextResponse.json({ success: false, error: 'Non autorisé' }, { status: 401 })
+    let body: Record<string, unknown>
+    try {
+      body = await req.json()
+    } catch {
+      return NextResponse.json({ error: 'JSON invalide' }, { status: 400 })
+    }
+    const id = body.id
+    if (!id || typeof id !== 'string') {
+      return NextResponse.json({ error: 'id requis' }, { status: 400 })
     }
 
-    const body = await req.json()
-    const { id, statut, agentId, notes, prochainRappel, interaction } = body
+    const { id: _id, interaction, ...rest } = body
+    const patchBody: Record<string, unknown> = {}
+    if (rest.statut !== undefined) patchBody.statut = rest.statut
+    if (rest.agentId !== undefined) patchBody.agentId = rest.agentId
+    if (rest.notes !== undefined) patchBody.notes = rest.notes
+    if (rest.prochainRappel !== undefined) patchBody.prochainRappel = rest.prochainRappel
 
-    const updates: Record<string, unknown> = {}
-    if (statut) updates.statut = statut
-    if (agentId !== undefined) updates.agentId = agentId
-    if (notes !== undefined) updates.notes = notes
-    if (prochainRappel !== undefined) updates.prochainRappel = prochainRappel ? new Date(prochainRappel) : null
+    const hasPatch = Object.keys(patchBody).length > 0
+    if (hasPatch) {
+      const r = await executeAdminLeadPatch(id, patchBody, gate.session.user.role)
+      if (r instanceof NextResponse) return r
+    }
 
-    const lead = await prisma.lead.update({
+    if (interaction && typeof interaction === 'object') {
+      const p = AdminInteractionCreateSchema.safeParse(interaction)
+      if (!p.success) {
+        return NextResponse.json(
+          { error: p.error.errors[0]?.message ?? 'Interaction invalide' },
+          { status: 400 }
+        )
+      }
+      await prisma.interaction.create({
+        data: { leadId: id, type: p.data.type, contenu: p.data.contenu },
+      })
+    }
+
+    if (!hasPatch && !interaction) {
+      return NextResponse.json({ error: 'Aucune modification' }, { status: 400 })
+    }
+
+    const lead = await prisma.lead.findUnique({
       where: { id },
-      data: {
-        ...updates,
-        ...(interaction
-          ? {
-              interactions: {
-                create: {
-                  type: interaction.type,
-                  contenu: interaction.contenu,
-                },
-              },
-            }
-          : {}),
-      },
-      include: {
-        annonce: { select: { id: true, reference: true, titre: true } },
-        agent: { select: { id: true, name: true } },
-        interactions: { orderBy: { createdAt: 'desc' } },
-      },
+      include: adminLeadDetailInclude,
     })
-
+    if (!lead) return NextResponse.json({ error: 'Lead introuvable' }, { status: 404 })
     return NextResponse.json({ success: true, data: lead })
   } catch (error) {
     console.error('PUT /api/leads error:', error)
-    return NextResponse.json({ success: false, error: 'Erreur serveur' }, { status: 500 })
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

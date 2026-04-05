@@ -1,6 +1,7 @@
 import Navbar from '@/components/public/Navbar'
 import Footer from '@/components/public/Footer'
 import WhatsAppButton from '@/components/public/WhatsAppButton'
+import { PageTransition } from '@/components/ui/PageTransition'
 import { getPageSections } from '@/lib/pages'
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -19,7 +20,9 @@ export default async function PublicLayout({ children }: { children: React.React
   return (
     <>
       <Navbar />
-      <main id="main-content">{children}</main>
+      <main id="main-content">
+        <PageTransition>{children}</PageTransition>
+      </main>
       <Footer
         tagline={tagline ?? undefined}
         sousTagline={sousTagline ?? undefined}

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
 import { writeFile, mkdir } from 'fs/promises'
+import { requireAdmin, ROLES_STAFF } from '@/lib/api-admin-auth'
 import { join } from 'path'
 import { existsSync } from 'fs'
 
@@ -9,12 +9,9 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 const MAX_SIZE = 5 * 1024 * 1024 // 5 MB
 
 export async function POST(req: NextRequest) {
+  const gate = await requireAdmin(ROLES_STAFF)
+  if (!gate.ok) return gate.response
   try {
-    const session = await auth()
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
-    }
-
     const formData = await req.formData()
     const file = formData.get('file') as File | null
     const ebookId = (formData.get('ebookId') as string) || 'cover'

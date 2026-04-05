@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { toast } from 'sonner'
 import { formatDate } from '@/lib/utils'
 
@@ -14,7 +15,7 @@ interface Lead {
   email?: string | null
   budget?: string | null
   statut: StatutLead
-  createdAt: Date
+  createdAt: Date | string
   annonce?: { titre: string } | null
 }
 
@@ -23,11 +24,11 @@ interface LeadsKanbanProps {
 }
 
 const COLONNES: { statut: StatutLead; label: string; color: string; bg: string }[] = [
-  { statut: 'NOUVEAU', label: 'Nouveaux', color: 'text-blue-700', bg: 'bg-blue-50' },
-  { statut: 'CONTACTE', label: 'Contactés', color: 'text-yellow-700', bg: 'bg-yellow-50' },
-  { statut: 'EN_NEGOCIATION', label: 'Négociation', color: 'text-purple-700', bg: 'bg-purple-50' },
-  { statut: 'GAGNE', label: 'Gagnés', color: 'text-green-700', bg: 'bg-green-50' },
-  { statut: 'PERDU', label: 'Perdus', color: 'text-red-700', bg: 'bg-red-50' },
+  { statut: 'NOUVEAU', label: 'Nouveaux', color: 'text-blue-300', bg: 'bg-blue-500/15' },
+  { statut: 'CONTACTE', label: 'Contactés', color: 'text-[#D4A843]', bg: 'bg-[rgba(212,168,67,0.12)]' },
+  { statut: 'EN_NEGOCIATION', label: 'Négociation', color: 'text-purple-300', bg: 'bg-purple-500/15' },
+  { statut: 'GAGNE', label: 'Gagnés', color: 'text-emerald-300', bg: 'bg-emerald-500/15' },
+  { statut: 'PERDU', label: 'Perdus', color: 'text-red-300', bg: 'bg-red-500/15' },
 ]
 
 export function LeadsKanban({ leads: initialLeads }: LeadsKanbanProps) {
@@ -37,9 +38,10 @@ export function LeadsKanban({ leads: initialLeads }: LeadsKanbanProps) {
   const moveLeadToStatut = async (leadId: string, newStatut: StatutLead) => {
     setUpdating(leadId)
     try {
-      const res = await fetch(`/api/leads/${leadId}`, {
+      const res = await fetch(`/api/admin/leads/${leadId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ statut: newStatut }),
       })
       if (res.ok) {
@@ -87,6 +89,12 @@ export function LeadsKanban({ leads: initialLeads }: LeadsKanbanProps) {
                     <p className="text-xs text-[#8E8E93] mt-1">
                       {formatDate(new Date(lead.createdAt).toISOString())}
                     </p>
+                    <Link
+                      href={`/admin/leads/${lead.id}`}
+                      className="text-[10px] text-[#D4A843] font-medium hover:underline mt-1 inline-block"
+                    >
+                      Fiche détail
+                    </Link>
                     <div className="mt-2 flex flex-wrap gap-1">
                       {COLONNES.filter((c) => c.statut !== statut).map((c) => (
                         <button
@@ -94,7 +102,7 @@ export function LeadsKanban({ leads: initialLeads }: LeadsKanbanProps) {
                           type="button"
                           disabled={updating === lead.id}
                           onClick={() => moveLeadToStatut(lead.id, c.statut)}
-                          className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${c.bg} ${c.color} hover:opacity-80 transition-opacity disabled:cursor-not-allowed`}
+                          className={`text-[10px] px-1.5 py-0.5 rounded font-medium border border-[#3A3A3C] ${c.bg} ${c.color} hover:opacity-90 transition-opacity disabled:cursor-not-allowed`}
                         >
                           → {c.label}
                         </button>

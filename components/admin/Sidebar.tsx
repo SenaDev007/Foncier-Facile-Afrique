@@ -3,16 +3,29 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { signOut } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import {
   LayoutDashboard, Home, FileText, Users, MessageSquare,
   Star, Settings, LogOut, ChevronRight, Briefcase, BookOpen, ShoppingCart, BarChart3, FileCode,
+  BedDouble, CalendarDays, FolderOpen,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const navItems = [
+type NavItem = {
+  href: string
+  label: string
+  icon: typeof LayoutDashboard
+  exact?: boolean
+  /** Rôles qui ne voient pas cette entrée (ex. éditeurs = contenu, pas le catalogue annonces). */
+  excludeRoles?: readonly string[]
+}
+
+const navItems: NavItem[] = [
   { href: '/admin', label: 'Tableau de bord', icon: LayoutDashboard, exact: true },
-  { href: '/admin/annonces', label: 'Annonces', icon: Home },
+  { href: '/admin/annonces', label: 'Annonces', icon: Home, excludeRoles: ['EDITEUR'] },
+  { href: '/admin/logements', label: 'Logements séjour', icon: BedDouble, excludeRoles: ['EDITEUR'] },
+  { href: '/admin/reservations', label: 'Réservations', icon: CalendarDays, excludeRoles: ['EDITEUR'] },
+  { href: '/admin/dossiers', label: 'Dossiers fonciers', icon: FolderOpen, excludeRoles: ['EDITEUR'] },
   { href: '/admin/blog', label: 'Blog', icon: FileText },
   { href: '/admin/services', label: 'Services', icon: Briefcase },
   { href: '/admin/ebooks', label: 'Ebooks', icon: BookOpen, exact: true },
@@ -28,6 +41,14 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname()
+  const { data: session } = useSession()
+  const role = session?.user?.role
+
+  const visibleItems = navItems.filter((item) => {
+    if (!item.excludeRoles?.length) return true
+    if (!role) return true
+    return !item.excludeRoles.includes(role)
+  })
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) return pathname === href
@@ -57,7 +78,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 p-4 space-y-1" aria-label="Navigation admin">
-        {navItems.map((item) => {
+        {visibleItems.map((item) => {
           const active = isActive(item.href, item.exact)
           return (
             <Link

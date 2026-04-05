@@ -15,8 +15,14 @@ export default auth((req) => {
     return NextResponse.next()
   }
 
-  // Protéger toutes les routes admin sauf login
-  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
+  const adminPublicPaths = [
+    '/admin/login',
+    '/admin/mot-de-passe-oublie',
+    '/admin/reinitialiser-mot-de-passe',
+  ]
+
+  // Protéger toutes les routes admin sauf pages de connexion / réinitialisation
+  if (pathname.startsWith('/admin') && !adminPublicPaths.includes(pathname)) {
     if (!req.auth) {
       const loginUrl = new URL('/admin/login', origin)
       loginUrl.searchParams.set('from', pathname)
@@ -52,8 +58,8 @@ export default auth((req) => {
     }
   }
 
-  // Rediriger si déjà connecté vers login
-  if (pathname === '/admin/login' && req.auth) {
+  // Déjà connecté : pas besoin des pages de connexion ou « mot de passe oublié »
+  if (req.auth && (pathname === '/admin/login' || pathname === '/admin/mot-de-passe-oublie')) {
     return NextResponse.redirect(new URL('/admin', origin))
   }
 
@@ -65,5 +71,6 @@ export default auth((req) => {
 })
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  // Inclure `/admin` seul (certaines versions ne matchent pas `:path*` sur segment vide).
+  matcher: ['/admin', '/admin/:path*'],
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { requireAdmin, ROLES_CONTENT } from '@/lib/api-admin-auth'
 
@@ -28,6 +29,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       }
     })
 
+    revalidatePath('/')
+    revalidatePath('/blog')
+    revalidatePath(`/blog/${post.slug}`)
+
     return NextResponse.json(post)
   } catch (error) {
     console.error('Erreur lors de la mise à jour de l\'article:', error)
@@ -42,9 +47,14 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   try {
     const { id } = params
 
+    const existing = await prisma.blogPost.findUnique({ where: { id }, select: { slug: true } })
     await prisma.blogPost.delete({
       where: { id }
     })
+
+    revalidatePath('/')
+    revalidatePath('/blog')
+    if (existing?.slug) revalidatePath(`/blog/${existing.slug}`)
 
     return NextResponse.json({ success: true })
   } catch (error) {

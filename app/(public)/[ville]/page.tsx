@@ -1,35 +1,53 @@
 import type { Metadata } from 'next'
+import { publicPageMetadata } from '@/lib/seo'
+import type { Prisma } from '@prisma/client'
+import nextDynamic from 'next/dynamic'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import {
-  FFA_SEO_CITIES,
   citySlugToTitle,
   getCitySearchTerms,
   isFfaSeoCitySlug,
   type FfaSeoCitySlug,
 } from '@/lib/ffa-cities'
-import AnnonceCard from '@/components/public/AnnonceCard'
-import BlogCard from '@/components/public/BlogCard'
+
+/** Chargement différé : réduit le bundle initial de la page ville. */
+const AnnonceCard = nextDynamic(() => import('@/components/public/AnnonceCard'), {
+  loading: () => (
+    <div className="h-[min(420px,70vw)] w-full max-w-[320px] mx-auto rounded-xl bg-[#2C2C2E] animate-pulse border border-[#3A3A3C]" />
+  ),
+})
+const BlogCard = nextDynamic(() => import('@/components/public/BlogCard'), {
+  loading: () => (
+    <div className="h-64 w-full rounded-xl bg-[#2C2C2E] animate-pulse border border-[#3A3A3C]" />
+  ),
+})
 
 interface PageProps {
   params: { ville: string }
 }
 
-export function generateStaticParams() {
-  return FFA_SEO_CITIES.map((ville) => ({ ville }))
-}
+/** Pas de worker `generateStaticParams` : évite en dev les erreurs build-manifest / static-paths-worker quand .next est régénéré. */
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const pathname = `/${params.ville}`
   if (!isFfaSeoCitySlug(params.ville)) {
-    return { title: 'Ville' }
+    return publicPageMetadata({
+      title: 'Page ville',
+      description: 'Page informative Foncier Facile Afrique.',
+      pathname,
+      noindex: true,
+    })
   }
   const label = citySlugToTitle(params.ville)
-  return {
-    title: `Immobilier & foncier à ${label} — Foncier Facile Afrique`,
+  return publicPageMetadata({
+    title: `Immobilier & foncier à ${label}`,
     description: `Terrains et biens sélectionnés à ${label}, conseils fonciers et actualités pour investir en confiance au Bénin.`,
-    openGraph: { title: `Foncier Facile Afrique — ${label}` },
-  }
+    pathname,
+    keywords: [`immobilier ${label}`, 'foncier Bénin', label],
+  })
 }
 
 export default async function VilleSeoPage({ params }: PageProps) {
@@ -47,33 +65,41 @@ export default async function VilleSeoPage({ params }: PageProps) {
     { departement: { contains: t, mode: 'insensitive' as const } },
   ])
 
-  const [annonces, articles] = await Promise.all([
-    prisma.annonce.findMany({
-      where: {
-        statut: 'EN_LIGNE',
-        OR: orFilters,
-      },
-      include: { photos: true },
-      orderBy: { createdAt: 'desc' },
-      take: 12,
-    }),
-    prisma.blogPost.findMany({
-      where: {
-        statut: 'PUBLIE',
-        OR: terms.flatMap((t) => [
-          { titre: { contains: t, mode: 'insensitive' as const } },
-          { contenu: { contains: t, mode: 'insensitive' as const } },
-        ]),
-      },
-      include: { auteur: { select: { id: true, name: true } } },
-      orderBy: { publishedAt: 'desc' },
-      take: 3,
-    }),
-  ])
+  type AnnonceVille = Prisma.AnnonceGetPayload<{ include: { photos: true } }>
+  type ArticleVille = Prisma.BlogPostGetPayload<{ include: { auteur: { select: { id: true; name: true } } } }>
+  let annonces: AnnonceVille[] = []
+  let articles: ArticleVille[] = []
+  try {
+    ;[annonces, articles] = await Promise.all([
+      prisma.annonce.findMany({
+        where: {
+          statut: 'EN_LIGNE',
+          OR: orFilters,
+        },
+        include: { photos: true },
+        orderBy: { createdAt: 'desc' },
+        take: 12,
+      }),
+      prisma.blogPost.findMany({
+        where: {
+          statut: 'PUBLIE',
+          OR: terms.flatMap((t) => [
+            { titre: { contains: t, mode: 'insensitive' as const } },
+            { contenu: { contains: t, mode: 'insensitive' as const } },
+          ]),
+        },
+        include: { auteur: { select: { id: true, name: true } } },
+        orderBy: { publishedAt: 'desc' },
+        take: 3,
+      }),
+    ])
+  } catch (e) {
+    console.error('[ville] Prisma:', e)
+  }
 
   return (
     <div className="bg-[#1C1C1E] min-h-screen">
-      <section className="bg-[#0D2137] border-b border-[#2C2C2E] py-12 md:py-16">
+      <section className="bg-[#161618] border-b border-[#D4A843]/20 py-12 md:py-16">
         <div className="container-site">
           <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-2">SEO local</p>
           <h1 className="font-heading text-4xl md:text-5xl font-bold text-[#EFEFEF]">

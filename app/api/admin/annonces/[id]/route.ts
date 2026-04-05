@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { requireAdmin, ROLES_ANNONCES } from '@/lib/api-admin-auth'
+import { deleteAnnonceById } from '@/lib/delete-annonce'
 
 // PUT - Mettre à jour une annonce
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
@@ -41,15 +43,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   try {
     const { id } = params
 
-    // Supprimer d'abord les photos associées
-    await prisma.photo.deleteMany({
-      where: { annonceId: id }
-    })
-
-    // Supprimer l'annonce
-    await prisma.annonce.delete({
-      where: { id }
-    })
+    await deleteAnnonceById(id)
+    revalidatePath('/')
+    revalidatePath('/annonces')
+    revalidatePath('/catalogue')
 
     return NextResponse.json({ success: true })
   } catch (error) {

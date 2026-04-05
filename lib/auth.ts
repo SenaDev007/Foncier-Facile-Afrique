@@ -37,7 +37,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     authorized({ auth, request }) {
       const pathname = request.nextUrl.pathname
       if (!pathname.startsWith('/admin')) return true
-      if (pathname === '/admin/login') return true
+      const publicAdmin = [
+        '/admin/login',
+        '/admin/mot-de-passe-oublie',
+        '/admin/reinitialiser-mot-de-passe',
+      ]
+      if (publicAdmin.includes(pathname)) return true
       return !!auth
     },
     jwt({ token, user }) {

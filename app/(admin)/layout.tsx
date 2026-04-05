@@ -1,23 +1,10 @@
 import { auth } from '@/lib/auth'
-import { Toaster } from 'sonner'
+import { AdminSessionProvider } from '@/components/admin/AdminSessionProvider'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth()
+  await auth()
 
-  if (!session) {
-    return (
-      <>
-        {children}
-        <Toaster richColors position="top-right" />
-      </>
-    )
-  }
-
-  // Connecté : seul le layout admin (/admin/layout.tsx) affiche la sidebar et le header
-  return (
-    <>
-      {children}
-      <Toaster richColors position="top-right" />
-    </>
-  )
+  // SessionProvider requis pour useSession / signOut dans Sidebar (next-auth/react).
+  // Toaster : uniquement dans app/layout.tsx (évite doublons / conflits Sonner).
+  return <AdminSessionProvider>{children}</AdminSessionProvider>
 }

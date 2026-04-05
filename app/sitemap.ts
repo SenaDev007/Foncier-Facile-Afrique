@@ -12,11 +12,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/confier',
     '/sejour',
     '/regularisation',
-    '/simulateurs',
-    '/simulateur',
     '/services',
     '/annonces',
-    '/notre-expertise',
     '/blog',
     '/ebooks',
     '/contact',
@@ -31,7 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === '' ? 1 : 0.7,
   }))
 
-  const [annonces, posts, logements] = await Promise.all([
+  const [annonces, posts, logements, ebooks] = await Promise.all([
     prisma.annonce.findMany({
       where: { statut: 'EN_LIGNE' },
       select: { slug: true, updatedAt: true },
@@ -43,6 +40,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     prisma.logement.findMany({
       where: { deletedAt: null, statut: 'DISPONIBLE' },
       select: { id: true, updatedAt: true },
+    }),
+    prisma.ebook.findMany({
+      where: { publie: true },
+      select: { slug: true, updatedAt: true },
     }),
   ])
 
@@ -68,6 +69,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: l.updatedAt,
       changeFrequency: 'weekly',
       priority: 0.7,
+    })
+  }
+  for (const e of ebooks) {
+    entries.push({
+      url: `${base}/ebooks/${e.slug}`,
+      lastModified: e.updatedAt,
+      changeFrequency: 'monthly',
+      priority: 0.65,
     })
   }
   for (const ville of FFA_SEO_CITIES) {

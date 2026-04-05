@@ -170,7 +170,10 @@ export function AnnonceForm({ initialData }: AnnonceFormProps) {
     if (!window.confirm('Supprimer définitivement cette annonce ?')) return
     setDeleting(true)
     try {
-      const res = await fetch(`/api/annonces/${initialData.id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/annonces/${initialData.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
       const payload = await res.json().catch(() => ({}))
       if (res.ok) {
         toast.success('Annonce supprimée.')

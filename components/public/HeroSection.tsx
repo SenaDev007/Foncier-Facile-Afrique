@@ -141,7 +141,7 @@ export default function HeroSection({
             >
               <Link
                 href={heroCtaAnnonces?.url ?? '/annonces'}
-                className="inline-flex items-center gap-2 bg-[#D4A843] text-[#EFEFEF] font-semibold px-6 py-4 rounded-xl hover:bg-[#B8912E] transition-all duration-200 shadow-lg hover:shadow-xl text-base"
+                className="inline-flex items-center gap-2 bg-[#D4A843] text-[#1C1C1E] font-semibold px-6 py-4 rounded-xl hover:bg-[#B8912E] transition-all duration-200 shadow-lg hover:shadow-xl text-base"
               >
                 {heroCtaAnnonces?.texte ?? 'Voir les annonces'}
                 <ArrowRight className="h-5 w-5" aria-hidden="true" />

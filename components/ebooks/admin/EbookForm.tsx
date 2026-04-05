@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import { Loader2, ArrowLeft, Save, Upload, FileUp } from 'lucide-react'
+import { Loader2, ArrowLeft, Save, Upload, FileUp, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -38,6 +38,7 @@ export default function EbookForm({ initialData }: EbookFormProps) {
   const router = useRouter()
   const isEdit = Boolean(initialData?.id)
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [uploadingCover, setUploadingCover] = useState(false)
   const [uploadingPdf, setUploadingPdf] = useState(false)
   const [form, setForm] = useState({
@@ -184,6 +185,32 @@ export default function EbookForm({ initialData }: EbookFormProps) {
       toast.error(err instanceof Error ? err.message : 'Erreur')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!isEdit || !initialData?.id) return
+    if (
+      !window.confirm(
+        'Supprimer définitivement cet ebook ? Il disparaîtra de la boutique. Impossible s’il existe déjà des commandes.',
+      )
+    )
+      return
+    setDeleting(true)
+    try {
+      const res = await fetch(`/api/admin/ebooks/${initialData.id}`, { method: 'DELETE' })
+      const data = await res.json().catch(() => ({}))
+      if (res.ok) {
+        toast.success('Ebook supprimé.')
+        router.push('/admin/ebooks')
+        router.refresh()
+      } else {
+        toast.error(typeof data.error === 'string' ? data.error : 'Suppression impossible.')
+      }
+    } catch {
+      toast.error('Erreur réseau.')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -363,7 +390,7 @@ export default function EbookForm({ initialData }: EbookFormProps) {
           </div>
         </div>
 
-        <div className="flex gap-3 pt-4">
+        <div className="flex flex-wrap gap-3 pt-4">
           <Button type="submit" disabled={saving} className="bg-[#D4A843] text-[#1C1C1E] hover:bg-[#B8912E]">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             {saving ? 'Enregistrement...' : 'Enregistrer'}
@@ -371,6 +398,18 @@ export default function EbookForm({ initialData }: EbookFormProps) {
           <Button type="button" variant="outline" onClick={() => router.push('/admin/ebooks')}>
             Annuler
           </Button>
+          {isEdit && initialData?.id && (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={deleting}
+              onClick={handleDelete}
+              className="border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 ml-auto"
+            >
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+              Supprimer
+            </Button>
+          )}
         </div>
       </form>
     </div>

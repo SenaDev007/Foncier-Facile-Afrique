@@ -3,11 +3,12 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { signOut, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
+import { AdminSignOutButton } from '@/components/admin/AdminSignOutButton'
 import {
   LayoutDashboard, Home, FileText, Users, MessageSquare,
-  Star, Settings, LogOut, ChevronRight, Briefcase, BookOpen, ShoppingCart, BarChart3, FileCode,
-  BedDouble, CalendarDays, FolderOpen,
+  Star, Settings, ChevronRight, Briefcase, BookOpen, ShoppingCart, BarChart3, FileCode,
+  BedDouble, CalendarDays, FolderOpen, KeyRound,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -35,6 +36,7 @@ const navItems: NavItem[] = [
   { href: '/admin/messages', label: 'Messages', icon: MessageSquare },
   { href: '/admin/temoignages', label: 'Témoignages', icon: Star },
   { href: '/admin/utilisateurs', label: 'Utilisateurs', icon: Users },
+  { href: '/admin/compte', label: 'Mon compte', icon: KeyRound },
   { href: '/admin/parametres', label: 'Paramètres', icon: Settings },
   { href: '/admin/contenus', label: 'Contenus des pages', icon: FileCode },
 ]
@@ -103,13 +105,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-[#3A3A3C] space-y-2">
-        <button
-          onClick={() => signOut({ callbackUrl: '/admin/login' })}
-          className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-[#8E8E93] hover:text-red-400 hover:bg-red-400/10 transition-colors"
-        >
-          <LogOut className="h-4 w-4" aria-hidden="true" />
-          Déconnexion
-        </button>
+        <AdminSignOutButton variant="sidebar" />
         <p className="text-[10px] text-[#636366] px-3 pt-2 border-t border-[#2C2C2E]">
           Conçu par <span className="text-[#D4A843]/80">YEHI OR Tech</span>
         </p>

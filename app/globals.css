@@ -100,7 +100,7 @@ body.light-mode {
   }
 
   .btn-gold {
-    @apply bg-gold text-white hover:bg-yellow-600 transition-colors font-medium px-6 py-3 rounded-lg;
+    @apply bg-gold text-[#1C1C1E] hover:bg-gold-dark transition-colors font-medium px-6 py-3 rounded-lg;
   }
 
   .card-annonce {

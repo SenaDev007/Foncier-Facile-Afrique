@@ -14,8 +14,6 @@ const navLinks = [
   { href: '/sejour', label: 'Séjour' },
   { href: '/regularisation', label: 'Régularisation' },
   { href: '/services', label: 'Services' },
-  { href: '/simulateurs', label: 'Simulateurs' },
-  { href: '/notre-expertise', label: 'Expertise' },
   { href: '/blog', label: 'Blog' },
   { href: '/ebooks', label: 'Boutique' },
   { href: '/contact', label: 'Contact' },

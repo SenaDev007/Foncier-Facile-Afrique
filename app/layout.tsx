@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Playfair_Display, Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'sonner'
+import { getSiteUrl } from '@/lib/seo'
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -15,8 +16,10 @@ const inter = Inter({
   display: 'swap',
 })
 
+const siteUrl = getSiteUrl()
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
+  metadataBase: new URL(siteUrl),
   title: {
     default: 'Foncier Facile Afrique — Terrains & Immobilier sécurisé au Bénin',
     template: '%s | Foncier Facile Afrique',
@@ -32,7 +35,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
-    url: 'https://www.foncierfacileafrique.fr',
+    url: siteUrl,
     siteName: 'Foncier Facile Afrique',
     images: [{ url: '/images/og-default.jpg', width: 1200, height: 630 }],
   },

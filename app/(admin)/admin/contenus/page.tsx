@@ -14,7 +14,6 @@ interface PageWithCount {
 const SLUG_LABELS: Record<string, string> = {
   home: 'Page d\'accueil',
   services: 'Services',
-  'notre-expertise': 'Notre expertise',
   footer: 'Pied de page',
 }
 
@@ -43,7 +42,7 @@ export default function AdminContenusPage() {
       <div>
         <h1 className="font-heading text-2xl font-bold text-[#EFEFEF]">Contenus des pages</h1>
         <p className="text-[#8E8E93] text-sm mt-1">
-          Modifier les textes et blocs affichés sur le site (accueil, services, expertise, footer).
+          Modifier les textes et blocs affichés sur le site (accueil, services, footer).
         </p>
       </div>
 

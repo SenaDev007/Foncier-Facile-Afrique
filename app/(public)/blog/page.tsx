@@ -1,13 +1,16 @@
 import type { Metadata } from 'next'
+import { publicPageMetadata } from '@/lib/seo'
 import { prisma } from '@/lib/prisma'
 import BlogCard from '@/components/public/BlogCard'
 import type { BlogPostWithAuthor } from '@/types'
 
-export const metadata: Metadata = {
-  title: 'Blog & Conseils — Foncier Facile Afrique',
-  description: 'Conseils experts en immobilier et foncier en Afrique de l\'Ouest. Guides d\'achat, actualités, tendances du marché immobilier béninois.',
-  openGraph: { title: 'Blog — Foncier Facile Afrique' },
-}
+export const metadata: Metadata = publicPageMetadata({
+  title: 'Blog & Conseils',
+  description:
+    "Conseils experts en immobilier et foncier en Afrique de l'Ouest. Guides d'achat, actualités, tendances du marché immobilier béninois.",
+  pathname: '/blog',
+  keywords: ['blog foncier Bénin', 'conseil immobilier Afrique de l’Ouest'],
+})
 
 interface PageProps {
   searchParams: { page?: string; tag?: string }
@@ -42,22 +45,22 @@ export default async function BlogPage({ searchParams }: PageProps) {
   const { posts, total, page, totalPages } = await getBlogPosts(searchParams)
 
   return (
-    <div className="bg-[#1C1C1E] min-h-screen">
-      <section className="relative py-20 md:py-28 overflow-hidden border-b border-[#2C2C2E]">
-        <div className="absolute inset-0 bg-[#161618]" />
+    <div className="bg-ffa-ink min-h-screen">
+      <section className="relative py-20 md:py-28 overflow-hidden border-b border-ffa-divider">
+        <div className="absolute inset-0 bg-ffa-ink" />
         <div className="container-site relative z-10 text-center">
-          <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
+          <p className="text-ffa-gold text-xs font-semibold uppercase tracking-[0.2em] mb-3">
             Ressources
           </p>
-          <h1 className="font-heading text-4xl md:text-5xl font-bold text-[#EFEFEF]">Blog & Conseils</h1>
-          <p className="mt-4 text-[#8E8E93] text-lg max-w-xl mx-auto">
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-ffa-fg">Blog & Conseils</h1>
+          <p className="mt-4 text-ffa-fg-muted text-lg max-w-xl mx-auto">
             Expertise foncière, guides d&apos;achat et actualités immobilières en Afrique de l&apos;Ouest.
           </p>
         </div>
       </section>
 
       <div className="container-site py-12">
-        <p className="text-[#8E8E93] text-sm mb-8">{total} article{total > 1 ? 's' : ''}</p>
+        <p className="text-ffa-fg-muted text-sm mb-8">{total} article{total > 1 ? 's' : ''}</p>
 
         {posts.length > 0 ? (
           <>
@@ -73,7 +76,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
                   <a
                     key={p}
                     href={`/blog?${new URLSearchParams({ ...searchParams, page: String(p) })}`}
-                    className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[#3A3A3C] hover:text-[#EFEFEF] border border-[#3A3A3C]'}`}
+                    className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-ffa-gold text-ffa-navy' : 'bg-ffa-elevated text-ffa-fg-muted hover:bg-ffa-panel hover:text-ffa-fg border border-ffa-divider'}`}
                     aria-current={p === page ? 'page' : undefined}
                   >
                     {p}
@@ -83,8 +86,8 @@ export default async function BlogPage({ searchParams }: PageProps) {
             )}
           </>
         ) : (
-          <div className="text-center py-20 bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl">
-            <p className="text-[#8E8E93] text-lg">Aucun article publié pour le moment.</p>
+          <div className="text-center py-20 bg-ffa-elevated border border-ffa-divider rounded-2xl">
+            <p className="text-ffa-fg-muted text-lg">Aucun article publié pour le moment.</p>
           </div>
         )}
       </div>

@@ -1,48 +1,12 @@
 import Link from 'next/link'
 import { TrendingUp, Home, Users, MessageSquare, CalendarClock, FolderOpen } from 'lucide-react'
-import { prisma } from '@/lib/prisma'
+import type { DashboardStatsData } from '@/lib/admin-dashboard'
 
-async function getStats() {
-  try {
-    const [annonces, leads, messages, temoignages, reservationsEnAttente, dossiersOuverts] = await Promise.all([
-      prisma.annonce.count({ where: { statut: 'EN_LIGNE' } }),
-      prisma.lead.count(),
-      prisma.message.count({ where: { lu: false } }),
-      prisma.temoignage.count({ where: { actif: true } }),
-      prisma.reservation.count({ where: { statut: 'EN_ATTENTE' } }),
-      prisma.dossierFoncier.count({
-        where: { deletedAt: null, statut: { not: 'TERMINE' } },
-      }),
-    ])
-    const leadsThisMonth = await prisma.lead.count({
-      where: { createdAt: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) } },
-    })
-    return {
-      annonces,
-      leads,
-      messages,
-      temoignages,
-      leadsThisMonth,
-      reservationsEnAttente,
-      dossiersOuverts,
-    }
-  } catch (err) {
-    console.error('[DashboardStats] getStats:', err)
-    return {
-      annonces: 0,
-      leads: 0,
-      messages: 0,
-      temoignages: 0,
-      leadsThisMonth: 0,
-      reservationsEnAttente: 0,
-      dossiersOuverts: 0,
-    }
-  }
+type Props = {
+  stats: DashboardStatsData
 }
 
-export default async function DashboardStats() {
-  const stats = await getStats()
-
+export default function DashboardStats({ stats }: Props) {
   const cards: {
     title: string
     value: number

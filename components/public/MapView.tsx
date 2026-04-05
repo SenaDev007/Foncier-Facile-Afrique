@@ -61,16 +61,16 @@ function MapContent({
         <Marker key={annonce.id} position={[lat, lng]} title={annonce.titre}>
           <Popup>
             <div className="p-1 min-w-[180px] font-sans">
-              <p className="font-semibold text-[#1C1C1E] text-sm m-0 mb-1 line-clamp-2">
+              <p className="font-semibold text-ffa-navy text-sm m-0 mb-1 line-clamp-2">
                 {annonce.titre}
               </p>
               <p className="text-xs text-[#6B7280] m-0">{annonce.localisation}</p>
-              <p className="font-semibold text-[#D4A843] text-xs mt-1">
+              <p className="font-semibold text-ffa-gold text-xs mt-1">
                 {new Intl.NumberFormat('fr-FR').format(annonce.prix)} FCFA
               </p>
               <Link
                 href={`/annonces/${annonce.slug}`}
-                className="text-xs text-[#D4A843] hover:underline"
+                className="text-xs text-ffa-gold hover:underline"
               >
                 Voir l&apos;annonce →
               </Link>
@@ -110,7 +110,7 @@ export default function MapView({
   if (!mounted) {
     return (
       <div
-        className="w-full h-[500px] rounded-xl border border-[#3A3A3C] bg-[#2C2C2E] flex items-center justify-center text-[#8E8E93] text-sm"
+        className="w-full h-[500px] rounded-xl border border-ffa-divider bg-ffa-elevated flex items-center justify-center text-ffa-fg-muted text-sm"
         role="region"
         aria-label="Carte des annonces immobilières"
       >
@@ -122,7 +122,7 @@ export default function MapView({
   if (points.length === 0) {
     return (
       <div
-        className="w-full h-[500px] rounded-xl border border-[#3A3A3C] bg-[#2C2C2E] flex items-center justify-center text-[#8E8E93] text-sm"
+        className="w-full h-[500px] rounded-xl border border-ffa-divider bg-ffa-elevated flex items-center justify-center text-ffa-fg-muted text-sm"
         role="region"
         aria-label="Carte des annonces immobilières"
       >
@@ -133,7 +133,7 @@ export default function MapView({
 
   return (
     <div
-      className="w-full h-[500px] rounded-xl overflow-hidden border border-[#3A3A3C] shadow-card z-0 [&_.leaflet-container]:rounded-xl"
+      className="w-full h-[500px] rounded-xl overflow-hidden border border-ffa-divider shadow-card z-0 [&_.leaflet-container]:rounded-xl"
       role="region"
       aria-label="Carte des annonces immobilières"
     >

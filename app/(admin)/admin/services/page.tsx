@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Loader2, Save, Upload } from 'lucide-react'
+import { Loader2, Save, Upload, Trash2, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -21,6 +21,7 @@ interface ServiceItem {
   description: string
   image: string
   icon: string
+  points?: string[]
 }
 
 export default function AdminServicesPage() {
@@ -46,6 +47,26 @@ export default function AdminServicesPage() {
       next[index] = { ...next[index], [field]: value }
       return next
     })
+  }
+
+  const removeService = (index: number) => {
+    if (!window.confirm('Retirer cette carte des services ? Enregistrez pour appliquer sur le site public.')) return
+    setServices((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const addService = () => {
+    const id = `service-${Date.now()}`
+    setServices((prev) => [
+      ...prev,
+      {
+        id,
+        title: 'Nouveau service',
+        description: 'Description à compléter puis enregistrer.',
+        image: '/images/services/conseil-foncier.jpg',
+        icon: 'Shield',
+      },
+    ])
+    toast.message('Carte ajoutée — pensez à enregistrer.')
   }
 
   const handleSave = async () => {
@@ -105,17 +126,29 @@ export default function AdminServicesPage() {
         <div>
           <h1 className="font-heading text-2xl font-bold text-[#EFEFEF]">Services</h1>
           <p className="text-[#8E8E93] text-sm mt-1">
-            Modifiez les services affichés sur la page d&apos;accueil et la page Services.
+            Enregistrement en base (paramètre <span className="font-mono text-[#D4A843]/90">services_cards_json</span>) — accueil et{' '}
+            <span className="text-[#EFEFEF]">/services</span>. Après enregistrement, le cache des pages concernées est rafraîchi.
           </p>
         </div>
-        <Button
-          onClick={handleSave}
-          disabled={saving}
-          className="bg-[#D4A843] hover:bg-[#B8912E] text-[#1C1C1E] font-semibold gap-2"
-        >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="h-4 w-4" aria-hidden="true" />}
-          Enregistrer
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addService}
+            className="border-[#3A3A3C] text-[#D4A843] hover:bg-[rgba(212,168,67,0.12)] gap-2"
+          >
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            Ajouter une carte
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-[#D4A843] hover:bg-[#B8912E] text-[#1C1C1E] font-semibold gap-2"
+          >
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="h-4 w-4" aria-hidden="true" />}
+            Enregistrer
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -124,8 +157,9 @@ export default function AdminServicesPage() {
             key={service.id}
             className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-6 space-y-4"
           >
-            <div className="flex items-center justify-between border-b border-[#3A3A3C] pb-3">
-              <span className="text-[#D4A843] font-mono text-sm">{service.id}</span>
+            <div className="flex items-center justify-between border-b border-[#3A3A3C] pb-3 gap-2">
+              <span className="text-[#D4A843] font-mono text-sm truncate">{service.id}</span>
+              <div className="flex items-center gap-2 shrink-0">
               <select
                 value={service.icon}
                 onChange={(e) => updateService(index, 'icon', e.target.value)}
@@ -135,6 +169,17 @@ export default function AdminServicesPage() {
                   <option key={value} value={value}>{label}</option>
                 ))}
               </select>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => removeService(index)}
+                className="border-red-500/40 text-red-400 hover:bg-red-500/10 h-9 w-9"
+                title="Retirer cette carte"
+              >
+                <Trash2 className="h-4 w-4" aria-hidden="true" />
+              </Button>
+              </div>
             </div>
 
             <div>

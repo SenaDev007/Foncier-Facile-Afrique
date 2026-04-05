@@ -1,14 +1,16 @@
 import type { Metadata } from 'next'
+import { publicPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { CheckCircle2 } from 'lucide-react'
 import { ConfierBienForm } from '@/components/public/ConfierBienForm'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = publicPageMetadata({
   title: 'Confier mon bien — Dépôt et publication',
   description:
     'Confiez la vente ou la location de votre bien à Foncier Facile Afrique : estimation, sécurisation des documents et mise en ligne.',
-  openGraph: { title: 'Confier mon bien — Foncier Facile Afrique' },
-}
+  pathname: '/confier',
+  keywords: ['vendre terrain Bénin', 'dépôt annonce immobilier'],
+})
 
 const ETAPES = [
   'Dépôt de votre dossier et des informations clés',
@@ -20,7 +22,7 @@ const ETAPES = [
 export default function ConfierPage() {
   return (
     <div className="bg-[#1C1C1E] min-h-screen">
-      <section className="bg-[#0D2137] border-b border-[#2C2C2E] py-14 md:py-20">
+      <section className="bg-[#161618] border-b border-[#D4A843]/20 py-14 md:py-20">
         <div className="container-site">
           <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
             Pôle or — Propriétaires

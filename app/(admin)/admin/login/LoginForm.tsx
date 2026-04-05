@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Loader2, Lock, Mail } from 'lucide-react'
+import { Loader2, Lock, Mail, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -43,11 +45,30 @@ export function LoginForm() {
     <div className="min-h-screen bg-[#1C1C1E] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#D4A843] mb-3">
-            <span className="text-white font-heading font-bold text-lg">FFA</span>
-          </div>
+          <Link
+            href="/"
+            className="relative inline-flex items-center justify-center w-20 h-20 mx-auto mb-3 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4A843] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1C1C1E]"
+            aria-label="Aller sur le site public"
+          >
+            <Image
+              src="/images/logo/logo FFA 1.png"
+              alt=""
+              width={80}
+              height={80}
+              className="object-contain"
+              sizes="80px"
+              priority
+            />
+          </Link>
           <h1 className="font-heading text-2xl font-bold text-[#EFEFEF]">Back-office</h1>
           <p className="text-[#8E8E93] text-sm mt-1">Foncier Facile Afrique</p>
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center gap-1.5 text-sm font-medium text-[#D4A843] hover:text-[#E8B84B] hover:underline mt-4"
+          >
+            Voir le site public
+            <ExternalLink className="h-3.5 w-3.5 opacity-90" aria-hidden="true" />
+          </Link>
         </div>
 
         <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-8">
@@ -63,7 +84,7 @@ export function LoginForm() {
                   onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
                   required
                   className="pl-9 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#8E8E93]"
-                  placeholder="isdineidisoule@gmail.com"
+                  placeholder="vous@exemple.com"
                   autoComplete="email"
                 />
               </div>
@@ -79,7 +100,7 @@ export function LoginForm() {
                   onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
                   required
                   className="pl-9 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#8E8E93]"
-                  placeholder="Admin@2024!"
+                  placeholder="••••••••"
                   autoComplete="current-password"
                 />
               </div>
@@ -94,15 +115,19 @@ export function LoginForm() {
               Se connecter
             </Button>
           </form>
-          
-          <div className="mt-6 text-center">
-            <p className="text-[#8E8E93] text-xs">
-              Identifiant par défaut : isdineidisoule@gmail.com
-            </p>
-            <p className="text-[#8E8E93] text-xs">
-              Mot de passe : Admin@2024!
-            </p>
-          </div>
+
+          <p className="mt-4 text-center">
+            <Link
+              href="/admin/mot-de-passe-oublie"
+              className="text-sm text-[#D4A843] hover:text-[#E8B84B] hover:underline"
+            >
+              Mot de passe oublié ?
+            </Link>
+          </p>
+
+          <p className="mt-4 text-center text-[#8E8E93] text-xs">
+            Compte fourni par l’administrateur. En cas de difficulté, contactez la direction.
+          </p>
         </div>
       </div>
     </div>

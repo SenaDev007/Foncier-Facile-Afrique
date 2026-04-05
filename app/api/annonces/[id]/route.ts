@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+import { deleteAnnonceById } from '@/lib/delete-annonce'
 import { AnnonceSchema } from '@/lib/validations'
 import { slugify } from '@/lib/utils'
 
@@ -82,6 +84,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       include: { photos: true },
     })
 
+    revalidatePath('/')
+    revalidatePath('/annonces')
+    revalidatePath('/catalogue')
+    revalidatePath(`/annonces/${annonce.slug}`)
+
     return NextResponse.json({ success: true, data: annonce })
   } catch (error) {
     console.error('PUT /api/annonces/[id] error:', error)
@@ -107,7 +114,10 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
       return NextResponse.json({ success: false, error: 'Non autorisé' }, { status: 403 })
     }
 
-    await prisma.annonce.delete({ where: { id: params.id } })
+    await deleteAnnonceById(params.id)
+    revalidatePath('/')
+    revalidatePath('/annonces')
+    revalidatePath('/catalogue')
     return NextResponse.json({ success: true, message: 'Annonce supprimée' })
   } catch (error) {
     console.error('DELETE /api/annonces/[id] error:', error)

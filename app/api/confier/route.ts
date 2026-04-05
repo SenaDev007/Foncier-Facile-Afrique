@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ConfierBienSchema } from '@/lib/validations'
 import { sendLeadNotification } from '@/lib/mail'
+import { getServerBaseUrl } from '@/lib/app-url'
 import { rateLimit } from '@/lib/utils'
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
@@ -111,7 +112,7 @@ export async function POST(req: NextRequest) {
       return { annonceRef: refOut, annonceTitre: titreOut, annonceId: annonceIdInner }
     })
 
-    const baseUrl = (process.env.NEXTAUTH_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/$/, '')
+    const baseUrl = getServerBaseUrl()
     const brouillonAdmin =
       annonceId && annonceRef
         ? `<p style="margin-top:12px;"><a href="${baseUrl}/admin/annonces/${annonceId}/edit" style="color:#1A6B3A;font-weight:600;">Ouvrir le brouillon ${escapeHtml(annonceRef)} dans le back-office</a></p>`

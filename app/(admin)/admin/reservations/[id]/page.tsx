@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Mail, Phone, ExternalLink } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
+import { getServerBaseUrl } from '@/lib/app-url'
 import { formatPrice, formatDate } from '@/lib/utils'
 import { ReservationAdminActions } from '@/components/admin/ReservationAdminActions'
 
@@ -25,6 +26,9 @@ export default async function AdminReservationDetailPage({ params }: PageProps) 
   })
 
   if (!r) notFound()
+
+  const publicBase = getServerBaseUrl()
+  const lienPaiementClient = r.paymentToken ? `${publicBase}/sejour/paiement/${r.paymentToken}` : null
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
@@ -113,6 +117,19 @@ export default async function AdminReservationDetailPage({ params }: PageProps) 
         )}
         {r.transfertAero && <p className="text-sm text-[#D4A843]">Transfert aéroport demandé</p>}
       </div>
+
+      {lienPaiementClient && r.paymentStatut === 'NON_PAYE' && (
+        <div className="bg-[#2C2C2E] border border-[#D4A843]/40 rounded-xl p-6 space-y-2">
+          <h2 className="font-heading font-semibold text-[#EFEFEF] text-sm">Lien paiement client (FedaPay)</h2>
+          <p className="text-xs text-[#8E8E93]">
+            À communiquer au voyageur s’il n’a pas reçu l’e-mail. Ne pas partager publiquement.
+          </p>
+          <p className="text-xs font-mono text-[#D4A843] break-all">{lienPaiementClient}</p>
+          {r.fedapayTxId && (
+            <p className="text-[10px] text-[#636366]">Dernière transaction FedaPay (id) : {r.fedapayTxId}</p>
+          )}
+        </div>
+      )}
 
       <ReservationAdminActions
         reservationId={r.id}

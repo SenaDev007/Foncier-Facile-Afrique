@@ -1,17 +1,18 @@
 import type { Metadata } from 'next'
+import { publicPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Suspense } from 'react'
-import { readFile } from 'fs/promises'
-import { join } from 'path'
-import { existsSync } from 'fs'
 import { prisma } from '@/lib/prisma'
 import { getPageSections, type SectionMap } from '@/lib/pages'
+import { DEFAULT_PUBLIC_SERVICE_CARDS, getPublicServiceCards } from '@/lib/public-services'
+import { getAccueilParametreCleList } from '@/lib/parametres-accueil'
+import { getReviewAggregate } from '@/lib/reviews-stats'
 import HeroSection from '@/components/public/HeroSection'
-import AnnonceCard from '@/components/public/AnnonceCard'
+import { HomeAnnoncesMotionGrid } from '@/components/public/HomeAnnoncesMotionGrid'
+import type { AnnonceCard as AnnonceCardModel } from '@/types'
 import BlogCard from '@/components/public/BlogCard'
-import TestimonialsCarousel from '@/components/public/TestimonialsCarousel'
-import LeadMagnetBanner from '@/components/public/LeadMagnetBanner'
+import ReviewsVerifiedSection from '@/components/public/ReviewsVerifiedSection'
 import { AnimateOnScroll } from '@/components/ui/AnimateOnScroll'
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -19,30 +20,18 @@ import { ArrowRight } from 'lucide-react'
 import ServiceCard from '@/components/public/ServiceCard'
 import { FourPolesSection } from '@/components/public/FourPolesSection'
 
-// Type pour les services
-interface ServiceItem {
-  id: string
-  title: string
-  description: string
-  image: string
-  icon: 'Shield' | 'FileCheck' | 'Search' | 'Users'
-}
-
-export const metadata: Metadata = {
-  title: 'Foncier Facile Afrique — Achetez un terrain sécurisé au Bénin',
-  description: 'Foncier Facile Afrique vous accompagne dans l\'acquisition de terrains et biens immobiliers avec titre foncier vérifié au Bénin et en Afrique de l\'Ouest.',
-  openGraph: {
-    title: 'Foncier Facile Afrique — Achetez un terrain sécurisé au Bénin',
-    description: 'Votre partenaire de confiance pour l\'immobilier sécurisé en Afrique de l\'Ouest.',
-    url: 'https://www.foncierfacileafrique.fr',
-    siteName: 'Foncier Facile Afrique',
-    type: 'website',
-  },
-}
+export const metadata: Metadata = publicPageMetadata({
+  absoluteTitle: 'Foncier Facile Afrique — Achetez un terrain sécurisé au Bénin',
+  title: 'Accueil',
+  description:
+    "Foncier Facile Afrique vous accompagne dans l'acquisition de terrains et biens immobiliers avec titre foncier vérifié au Bénin et en Afrique de l'Ouest.",
+  pathname: '/',
+  keywords: ['acheter terrain Bénin', 'immobilier sécurisé Afrique de l’Ouest'],
+})
 
 async function getHomeData() {
   try {
-    const [annonces, temoignages, blogPosts, params, homeSections] = await Promise.all([
+    const [annonces, temoignages, reviewStats, blogPosts, params, homeSections, services] = await Promise.all([
       prisma.annonce.findMany({
         where: { statut: 'EN_LIGNE' },
         include: { photos: true },
@@ -51,9 +40,10 @@ async function getHomeData() {
       }),
       prisma.temoignage.findMany({
         where: { actif: true },
-        orderBy: { ordre: 'asc' },
-        take: 6,
+        orderBy: [{ ordre: 'asc' }, { createdAt: 'desc' }],
+        take: 24,
       }),
+      getReviewAggregate(prisma),
       prisma.blogPost.findMany({
         where: { statut: 'PUBLIE' },
         include: { auteur: { select: { name: true } } },
@@ -61,21 +51,10 @@ async function getHomeData() {
         take: 3,
       }),
       prisma.parametre.findMany({
-        where: {
-          cle: {
-            in: [
-              'hero_image',
-              'hero_image_mobile',
-              'chiffre_clients',
-              'chiffre_satisfaction',
-              'chiffre_annees',
-              'chiffre_transactions',
-              'chiffre_annees_texte',
-            ],
-          },
-        },
+        where: { cle: { in: getAccueilParametreCleList() } },
       }),
       getPageSections('home'),
+      getPublicServiceCards(),
     ])
     const paramMap: Record<string, string> = {}
     params.forEach((p) => { paramMap[p.cle] = p.valeur })
@@ -88,6 +67,7 @@ async function getHomeData() {
     return {
       annonces,
       temoignages,
+      reviewStats,
       blogPosts,
       heroImage: paramMap.hero_image,
       heroImageMobile: paramMap.hero_image_mobile,
@@ -97,12 +77,18 @@ async function getHomeData() {
       chiffreTransactions: getNum('chiffre_transactions', 1000),
       chiffreAnneesTexte: getNum('chiffre_annees_texte', 5),
       homeSections: homeSections ?? {},
+      services,
     }
   } catch (err) {
     console.error('[Accueil] Erreur chargement données:', err)
     return {
       annonces: [],
       temoignages: [],
+      reviewStats: {
+        average: 5,
+        total: 0,
+        distributionDesc: [0, 0, 0, 0, 0] as [number, number, number, number, number],
+      },
       blogPosts: [],
       heroImage: undefined,
       heroImageMobile: undefined,
@@ -112,36 +98,16 @@ async function getHomeData() {
       chiffreTransactions: 1000,
       chiffreAnneesTexte: 5,
       homeSections: {},
+      services: DEFAULT_PUBLIC_SERVICE_CARDS,
     }
   }
-}
-
-// Services : chargés depuis data/services.json (éditable dans le backoffice) ou valeurs par défaut
-const DEFAULT_SERVICES: ServiceItem[] = [
-  { id: 'conseil-foncier', title: 'Conseil foncier', description: 'Accompagnement expert pour sécuriser vos acquisitions avec titre foncier officiel.', image: '/images/services/conseil-foncier.jpg', icon: 'Shield' },
-  { id: 'verification-docs', title: 'Vérification documentaire', description: 'Contrôle rigoureux de tous les documents légaux avant toute transaction.', image: '/images/services/verification-docs.jpg', icon: 'FileCheck' },
-  { id: 'recherche-terrain', title: 'Recherche terrain', description: 'Identification des meilleurs terrains selon vos critères et budget.', image: '/images/services/recherche-terrain.jpg', icon: 'Search' },
-  { id: 'diaspora', title: 'Accompagnement diaspora', description: 'Service dédié aux acheteurs de la diaspora africaine pour investir en toute confiance.', image: '/images/services/diaspora.jpg', icon: 'Users' },
-]
-
-const getServices = async (): Promise<ServiceItem[]> => {
-  try {
-    const path = join(process.cwd(), 'data', 'services.json')
-    if (existsSync(path)) {
-      const raw = await readFile(path, 'utf-8')
-      const parsed = JSON.parse(raw)
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed as ServiceItem[]
-    }
-  } catch {
-    // ignore
-  }
-  return DEFAULT_SERVICES
 }
 
 export default async function AccueilPage() {
   const {
     annonces,
     temoignages,
+    reviewStats,
     blogPosts,
     heroImage,
     heroImageMobile,
@@ -151,8 +117,8 @@ export default async function AccueilPage() {
     chiffreTransactions,
     chiffreAnneesTexte,
     homeSections,
+    services,
   } = await getHomeData()
-  const services = await getServices()
 
   const s = (key: string) => (homeSections as SectionMap)[key]
   const hero = {
@@ -167,6 +133,11 @@ export default async function AccueilPage() {
   const servicesIntro = { titre: s('services_intro')?.titre, sousTitre: s('services_intro')?.sousTitre, body: s('services_intro')?.bodyHtml }
   const annoncesIntro = { titre: s('annonces_intro')?.titre, sousTitre: s('annonces_intro')?.sousTitre, body: s('annonces_intro')?.bodyHtml }
   const blogIntro = { titre: s('blog_intro')?.titre, sousTitre: s('blog_intro')?.sousTitre, body: s('blog_intro')?.bodyHtml }
+  const avisIntro = {
+    titre: s('avis_clients')?.titre,
+    sousTitre: s('avis_clients')?.sousTitre,
+    bodyHtml: s('avis_clients')?.bodyHtml,
+  }
 
   return (
     <>
@@ -224,7 +195,7 @@ export default async function AccueilPage() {
           </AnimateOnScroll>
           
           <div className="grid justify-center gap-5 md:gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),280px))]">
-            {services.map((service: ServiceItem, index: number) => (
+            {services.map((service, index: number) => (
               <ServiceCard
                 key={service.id}
                 id={service.id}
@@ -266,14 +237,16 @@ export default async function AccueilPage() {
               </div>
             </AnimateOnScroll>
             
-            <Suspense fallback={<div className="grid justify-center gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),320px))]">{Array.from({length:6}).map((_,i)=><Skeleton key={i} className="h-72 rounded-xl"/>)}</div>}>
-              <div className="grid justify-center gap-5 md:gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),320px))] items-stretch">
-                {annonces.map((annonce, index) => (
-                  <AnimateOnScroll key={annonce.id} delay={index * 0.1} direction="up" className="h-full">
-                    <AnnonceCard annonce={annonce as Parameters<typeof AnnonceCard>[0]['annonce']} />
-                  </AnimateOnScroll>
-                ))}
-              </div>
+            <Suspense
+              fallback={
+                <div className="flex flex-wrap justify-center gap-6">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <Skeleton key={i} className="h-72 w-full max-w-[320px] rounded-xl shrink-0" />
+                  ))}
+                </div>
+              }
+            >
+              <HomeAnnoncesMotionGrid annonces={annonces as AnnonceCardModel[]} />
             </Suspense>
             
             <AnimateOnScroll delay={0.6}>
@@ -290,11 +263,7 @@ export default async function AccueilPage() {
       {/* Espacement avant témoignages */}
       <div className="h-8 md:h-10" />
 
-      {temoignages.length > 0 && (
-        <TestimonialsCarousel temoignages={temoignages as Parameters<typeof TestimonialsCarousel>[0]['temoignages']} />
-      )}
-
-      <LeadMagnetBanner />
+      <ReviewsVerifiedSection temoignages={temoignages} stats={reviewStats} intro={avisIntro} />
 
       {/* Espacement avant blog */}
       <div className="h-8 md:h-10" />

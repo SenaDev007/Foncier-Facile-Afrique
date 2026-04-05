@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendMail } from '@/lib/mail'
+import { getServerBaseUrl } from '@/lib/app-url'
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    const baseUrl = process.env.NEXTAUTH_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+    const baseUrl = getServerBaseUrl()
     const lienDownload = `${baseUrl}/ebooks/telecharger/${commande.tokenDownload}`
 
     try {

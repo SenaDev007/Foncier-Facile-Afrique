@@ -24,8 +24,8 @@ export default function ServiceCard({ id, title, description, image, index }: Se
       className="group h-full"
     >
       <Link href="/services" className="block h-full">
-        <div className="relative h-full flex flex-col bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:shadow-[#D4A843]/10 hover:border-[#D4A843]/30 transition-all duration-300">
-          <div className="relative w-full h-52 min-h-[208px] overflow-hidden flex-shrink-0 bg-[#3A3A3C]">
+        <div className="relative h-full flex flex-col bg-ffa-elevated border border-ffa-divider rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:shadow-ffa-gold/10 hover:border-ffa-gold/30 transition-all duration-300">
+          <div className="relative w-full h-52 min-h-[208px] overflow-hidden flex-shrink-0 bg-ffa-panel">
             <Image
               src={image}
               alt={title}

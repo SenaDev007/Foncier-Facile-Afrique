@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { formatPrice, formatDate, getStatutLabel, getStatutColor } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Eye, ExternalLink } from 'lucide-react'
+import { AnnonceAdminDeleteButton } from '@/components/admin/AnnonceAdminDeleteButton'
 
 export const metadata: Metadata = { title: 'Annonces — Admin FFA' }
 
@@ -105,6 +106,7 @@ export default async function AdminAnnoncesPage({ searchParams }: PageProps) {
                         Site public
                       </a>
                     )}
+                    <AnnonceAdminDeleteButton annonceId={a.id} titre={a.titre} />
                   </div>
                 </td>
               </tr>

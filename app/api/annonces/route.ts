@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import { AnnonceSchema } from '@/lib/validations'
@@ -109,6 +110,10 @@ export async function POST(req: NextRequest) {
       },
       include: { photos: true },
     })
+
+    revalidatePath('/')
+    revalidatePath('/annonces')
+    revalidatePath('/catalogue')
 
     return NextResponse.json({ success: true, data: annonce }, { status: 201 })
   } catch (error) {

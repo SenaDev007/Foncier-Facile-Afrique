@@ -172,7 +172,7 @@ export function DiagnosticFoncierForm() {
       <Button
         type="submit"
         disabled={loading}
-        className="w-full bg-gradient-to-r from-ffa-brown to-[#D4A843] text-[#EFEFEF] hover:opacity-95"
+        className="w-full bg-[#D4A843] text-[#1C1C1E] hover:bg-[#B8912E] font-semibold"
       >
         {loading ? (
           <>

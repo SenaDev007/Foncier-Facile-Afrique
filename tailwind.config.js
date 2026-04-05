@@ -17,6 +17,26 @@ const config = {
     },
     extend: {
       colors: {
+        ffa: {
+          ink: '#1C1C1E',
+          deep: '#161618',
+          elevated: '#2C2C2E',
+          panel: '#161618',
+          divider: '#3A3A3C',
+          gold: '#D4A843',
+          'gold-light': '#E8B84B',
+          'gold-dark': '#B8912E',
+          fg: '#EFEFEF',
+          'fg-muted': '#8E8E93',
+          'fg-subtle': '#636366',
+          navy: '#1C1C1E',
+          'on-gold': '#1C1C1E',
+          sand: '#FBF7EE',
+          surface: '#2C2C2E',
+          purple: '#5B2C6F',
+          brown: '#7A3500',
+          teal: '#0E6655',
+        },
         bg: {
           DEFAULT: '#1C1C1E',
           surface: '#2C2C2E',

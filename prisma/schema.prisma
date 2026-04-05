@@ -23,6 +23,19 @@ model User {
   blogPosts            BlogPost[]
   dossiersAssignes     DossierFoncier[]     @relation("DossierAssignedUser")
   interactionsDossier  InteractionDossier[]
+  passwordResetTokens  PasswordResetToken[]
+}
+
+// Jeton à usage unique : réinitialisation mot de passe admin (hash stocké, pas le secret brut).
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 enum Role {
@@ -366,6 +379,10 @@ model Reservation {
   transfertAero   Boolean       @default(false)
   paymentRef      String?
   paymentStatut   StatutPayment @default(NON_PAYE)
+  // Jeton secret page publique /sejour/paiement/[token]
+  paymentToken    String?       @unique
+  // Id transaction FedaPay (webhook)
+  fedapayTxId     String?
   notesAdmin      String?       @db.Text
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt

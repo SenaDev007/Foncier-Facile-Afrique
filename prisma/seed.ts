@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { DEFAULT_PUBLIC_SERVICE_CARDS, SERVICES_CARDS_PARAM_KEY } from '../lib/public-services'
 
 const prisma = new PrismaClient()
 
@@ -68,6 +69,12 @@ async function main() {
     { cle: 'whatsapp_numero', valeur: '+22996901204' },
     { cle: 'facebook_url', valeur: 'https://facebook.com/foncierfacileafrique' },
     { cle: 'linkedin_url', valeur: 'https://linkedin.com/company/foncier-facile-afrique' },
+    // Chiffres clés (section « Notre impact » — lus par l’accueil via Paramètres)
+    { cle: 'chiffre_clients', valeur: '500' },
+    { cle: 'chiffre_satisfaction', valeur: '98' },
+    { cle: 'chiffre_annees', valeur: '10' },
+    { cle: 'chiffre_transactions', valeur: '1000' },
+    { cle: 'chiffre_annees_texte', valeur: '5' },
   ]
 
   for (const param of parametres) {
@@ -77,6 +84,12 @@ async function main() {
       create: param,
     })
   }
+
+  await prisma.parametre.upsert({
+    where: { cle: SERVICES_CARDS_PARAM_KEY },
+    update: { valeur: JSON.stringify(DEFAULT_PUBLIC_SERVICE_CARDS) },
+    create: { cle: SERVICES_CARDS_PARAM_KEY, valeur: JSON.stringify(DEFAULT_PUBLIC_SERVICE_CARDS) },
+  })
 
   console.log('✅ Paramètres created')
 
@@ -95,6 +108,7 @@ async function main() {
         { key: 'chiffres_intro', ordre: 10, actif: true, titre: 'Notre impact en quelques chiffres', sousTitre: 'Plus de 5 ans d\'expertise au service de votre patrimoine immobilier' },
         { key: 'services_intro', ordre: 20, actif: true, titre: 'Nos services', sousTitre: 'Ce que nous proposons', bodyHtml: 'Une gamme complète de services pour sécuriser votre patrimoine immobilier.' },
         { key: 'annonces_intro', ordre: 30, actif: true, titre: 'Dernières annonces', sousTitre: 'À la une', bodyHtml: 'Terrains et biens immobiliers sécurisés disponibles' },
+        { key: 'avis_clients', ordre: 35, actif: true, titre: 'Ce que disent nos clients', sousTitre: 'Avis vérifiés', bodyHtml: 'Avis publiés par des clients ayant travaillé avec Foncier Facile Afrique. Chaque témoignage est validé en interne.' },
         { key: 'blog_intro', ordre: 40, actif: true, titre: 'Blog & Conseils', sousTitre: 'Ressources', bodyHtml: 'Expertise foncière et immobilière en Afrique' },
       ],
     },
@@ -107,16 +121,6 @@ async function main() {
       ],
     },
     {
-      slug: 'notre-expertise',
-      titre: 'Notre expertise',
-      sections: [
-        { key: 'hero', ordre: 0, actif: true, titre: 'Notre expertise', sousTitre: 'Qui sommes-nous', bodyHtml: 'Plus de 10 ans d\'expérience dans le foncier et l\'immobilier en Afrique de l\'Ouest, au service de votre patrimoine.' },
-        { key: 'valeurs_intro', ordre: 10, actif: true, titre: 'Ce qui nous guide', sousTitre: 'Nos valeurs' },
-        { key: 'methode_intro', ordre: 20, actif: true, titre: 'Un processus éprouvé', sousTitre: 'Notre méthode', bodyHtml: 'Sécuriser votre acquisition de A à Z.' },
-        { key: 'cta', ordre: 100, actif: true, titre: 'Commencez votre projet dès aujourd\'hui', sousTitre: 'Un conseiller vous accompagne gratuitement.', boutonTexte: 'Voir les annonces', boutonUrl: '/annonces' },
-      ],
-    },
-    {
       slug: 'footer',
       titre: 'Pied de page',
       sections: [
@@ -124,8 +128,8 @@ async function main() {
         { key: 'sous_tagline', ordre: 1, actif: true, sousTitre: 'Sécurisation juridique · Vérification documentaire · Accompagnement clé en main' },
         { key: 'description', ordre: 2, actif: true, bodyHtml: 'Votre partenaire de confiance pour l\'acquisition de terrains et biens immobiliers juridiquement sécurisés en Afrique de l\'Ouest.' },
         { key: 'newsletter_intro', ordre: 3, actif: true, bodyHtml: 'Recevez nos nouvelles annonces, conseils fonciers et opportunités d\'investissement en Afrique de l\'Ouest.' },
-        { key: 'links_services', ordre: 10, actif: true, contenuJson: JSON.stringify([{ href: '/services#conseil', label: 'Conseil en achat foncier' }, { href: '/services#verification', label: 'Vérification documentaire' }, { href: '/services#courtage', label: 'Courtage immobilier' }, { href: '/services#investissement', label: 'Investissement locatif' }, { href: '/simulateur', label: 'Simulateur de budget' }]) },
-        { key: 'links_utiles', ordre: 11, actif: true, contenuJson: JSON.stringify([{ href: '/annonces', label: 'Nos annonces' }, { href: '/notre-expertise', label: 'Notre expertise' }, { href: '/blog', label: 'Blog' }, { href: '/contact', label: 'Contact' }, { href: '/mentions-legales', label: 'Mentions légales' }]) },
+        { key: 'links_services', ordre: 10, actif: true, contenuJson: JSON.stringify([{ href: '/services#conseil-foncier', label: 'Conseil foncier' }, { href: '/services#verification-docs', label: 'Vérification documentaire' }, { href: '/services#recherche-terrain', label: 'Recherche terrain' }, { href: '/services#diaspora', label: 'Accompagnement diaspora' }]) },
+        { key: 'links_utiles', ordre: 11, actif: true, contenuJson: JSON.stringify([{ href: '/annonces', label: 'Nos annonces' }, { href: '/services', label: 'Nos services' }, { href: '/blog', label: 'Blog' }, { href: '/contact', label: 'Contact' }, { href: '/mentions-legales', label: 'Mentions légales' }]) },
       ],
     },
   ]
@@ -182,7 +186,7 @@ async function main() {
     },
     {
       nom: 'Fatou Ndiaye',
-      texte: 'Service irréprochable. Le simulateur de budget m\'a vraiment aidé à planifier mon investissement.',
+      texte: 'Service irréprochable. L’équipe m’a vraiment aidé à planifier mon investissement avec des conseils clairs.',
       note: 5,
       actif: true,
       ordre: 4,

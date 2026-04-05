@@ -33,9 +33,9 @@ function MapContent() {
       <Marker position={OFFICE_POSITION} title={OFFICE_TITLE}>
         <Popup>
           <div className="p-1 min-w-[200px] font-sans">
-            <p className="font-semibold text-[#1C1C1E] m-0 mb-1">{OFFICE_TITLE}</p>
+            <p className="font-semibold text-ffa-navy m-0 mb-1">{OFFICE_TITLE}</p>
             <p className="text-sm text-[#6B7280] m-0">{OFFICE_ADDRESS}</p>
-            <a href="tel:+22996901204" className="text-sm text-[#D4A843] hover:underline">
+            <a href="tel:+22996901204" className="text-sm text-ffa-gold hover:underline">
               {OFFICE_PHONE}
             </a>
           </div>
@@ -52,7 +52,7 @@ export default function ContactMap() {
   if (!mounted) {
     return (
       <div
-        className="w-full h-[280px] rounded-xl border border-[#3A3A3C] bg-[#2C2C2E] flex items-center justify-center text-[#8E8E93] text-sm"
+        className="w-full h-[280px] rounded-xl border border-ffa-divider bg-ffa-elevated flex items-center justify-center text-ffa-fg-muted text-sm"
         role="region"
         aria-label="Carte : bureau Foncier Facile Afrique"
       >
@@ -63,7 +63,7 @@ export default function ContactMap() {
 
   return (
     <div
-      className="w-full h-[280px] rounded-xl overflow-hidden border border-[#3A3A3C] z-0 [&_.leaflet-container]:rounded-xl"
+      className="w-full h-[280px] rounded-xl overflow-hidden border border-ffa-divider z-0 [&_.leaflet-container]:rounded-xl"
       role="region"
       aria-label="Carte : bureau Foncier Facile Afrique"
     >

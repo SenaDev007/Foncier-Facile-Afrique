@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getServerBaseUrl } from '@/lib/app-url'
 
 export async function GET(req: NextRequest) {
   const tx = req.nextUrl.searchParams.get('tx') ?? req.nextUrl.searchParams.get('transaction_id') ?? req.nextUrl.searchParams.get('id')
@@ -20,8 +21,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: true, paid: false, statut: commande.statut })
   }
 
-  const baseUrl = process.env.NEXTAUTH_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? ''
-  const downloadUrl = baseUrl ? `${baseUrl}/ebooks/telecharger/${commande.tokenDownload}` : null
+  const baseUrl = getServerBaseUrl()
+  const downloadUrl = `${baseUrl}/ebooks/telecharger/${commande.tokenDownload}`
 
   return NextResponse.json({
     ok: true,

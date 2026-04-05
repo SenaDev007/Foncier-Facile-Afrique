@@ -1,8 +1,14 @@
 import Sidebar from '@/components/admin/Sidebar'
-import { PageTransition } from '@/components/ui/PageTransition'
+import { AdminSignOutButton } from '@/components/admin/AdminSignOutButton'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+
+const ADMIN_BARE_PATHS = [
+  '/admin/login',
+  '/admin/mot-de-passe-oublie',
+  '/admin/reinitialiser-mot-de-passe',
+]
 
 export default async function AdminLayout({
   children,
@@ -13,14 +19,14 @@ export default async function AdminLayout({
   const headersList = await headers()
   const pathname = headersList.get('x-pathname') ?? ''
 
-  // Ne pas rediriger sur la page de login : laisser afficher le formulaire
-  if (!session && pathname !== '/admin/login') {
+  const isBare = ADMIN_BARE_PATHS.includes(pathname)
+
+  if (!session && !isBare) {
     redirect('/admin/login')
   }
 
-  // Page login : afficher uniquement le contenu (pas de sidebar)
-  if (!session && pathname === '/admin/login') {
-    return <PageTransition>{children}</PageTransition>
+  if (isBare) {
+    return <>{children}</>
   }
 
   return (
@@ -59,22 +65,13 @@ export default async function AdminLayout({
               >
                 Voir le site
               </a>
-              <form action="/api/auth/signout" method="POST">
-                <button
-                  type="submit"
-                  className="px-3 py-1.5 border border-[#3A3A3C] text-[#8E8E93] text-sm rounded-lg hover:bg-[#3A3A3C] transition-colors"
-                >
-                  Déconnexion
-                </button>
-              </form>
+              <AdminSignOutButton />
             </div>
           </div>
         </header>
         
         {/* Page content */}
-        <main className="flex-1 p-6 overflow-auto">
-          <PageTransition>{children}</PageTransition>
-        </main>
+        <main className="flex-1 p-6 overflow-auto">{children}</main>
       </div>
     </div>
   )

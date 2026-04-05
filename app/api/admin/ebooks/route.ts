@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { requireAdmin, ROLES_STAFF } from '@/lib/api-admin-auth'
 
@@ -58,6 +59,8 @@ export async function POST(req: NextRequest) {
         vedette: Boolean(body.vedette),
       },
     })
+    revalidatePath('/ebooks')
+    revalidatePath(`/ebooks/${ebook.slug}`)
     return NextResponse.json(ebook, { status: 201 })
   } catch (e) {
     console.error('[admin/ebooks POST]', e)

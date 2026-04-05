@@ -66,12 +66,12 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="bg-[#1C1C1E] min-h-screen">
+    <div className="bg-ffa-ink min-h-screen">
       <div className="container-site py-14">
         <div className="text-center mb-12">
-          <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">Contact</p>
-          <h1 className="font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF]">Contactez-nous</h1>
-          <p className="text-[#8E8E93] mt-3 max-w-xl mx-auto">Notre équipe vous répond sous 24 heures ouvrées.</p>
+          <p className="text-ffa-gold text-xs font-semibold uppercase tracking-[0.2em] mb-3">Contact</p>
+          <h1 className="font-heading text-3xl md:text-4xl font-bold text-ffa-fg">Contactez-nous</h1>
+          <p className="text-ffa-fg-muted mt-3 max-w-xl mx-auto">Notre équipe vous répond sous 24 heures ouvrées.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 max-w-5xl mx-auto">
@@ -81,27 +81,27 @@ export default function ContactPage() {
               { icon: Mail, title: 'Email', content: 'contact@foncierfacileafrique.fr', href: 'mailto:contact@foncierfacileafrique.fr' },
               { icon: MapPin, title: 'Adresse', content: 'Parakou, Bénin\nAfrique de l\'Ouest', href: undefined },
             ].map((item) => (
-              <div key={item.title} className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-5 flex items-start gap-4">
-                <div className="p-2.5 rounded-lg bg-[rgba(212,168,67,0.12)] flex-shrink-0">
-                  <item.icon className="h-5 w-5 text-[#D4A843]" aria-hidden="true" />
+              <div key={item.title} className="bg-ffa-elevated border border-ffa-divider rounded-xl p-5 flex items-start gap-4">
+                <div className="p-2.5 rounded-lg bg-ffa-gold/12 flex-shrink-0">
+                  <item.icon className="h-5 w-5 text-ffa-gold" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="font-semibold text-[#EFEFEF] text-sm">{item.title}</p>
+                  <p className="font-semibold text-ffa-fg text-sm">{item.title}</p>
                   {item.href ? (
-                    <a href={item.href} className="text-[#8E8E93] text-sm hover:text-[#D4A843] transition-colors whitespace-pre-line">{item.content}</a>
+                    <a href={item.href} className="text-ffa-fg-muted text-sm hover:text-ffa-gold transition-colors whitespace-pre-line">{item.content}</a>
                   ) : (
-                    <p className="text-[#8E8E93] text-sm whitespace-pre-line">{item.content}</p>
+                    <p className="text-ffa-fg-muted text-sm whitespace-pre-line">{item.content}</p>
                   )}
                 </div>
               </div>
             ))}
-            <div className="rounded-xl overflow-hidden border border-[#3A3A3C]">
+            <div className="rounded-xl overflow-hidden border border-ffa-divider">
               <ContactMap />
             </div>
           </div>
 
-          <div className="lg:col-span-2 bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-8">
-            <form onSubmit={handleSubmit} className="space-y-5 [&_label]:text-[#EFEFEF]" noValidate>
+          <div className="lg:col-span-2 bg-ffa-elevated border border-ffa-divider rounded-2xl p-8">
+            <form onSubmit={handleSubmit} className="space-y-5 [&_label]:text-ffa-fg" noValidate>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div className="sm:col-span-1">
               <Label htmlFor="prenom">Prénom *</Label>
@@ -111,7 +111,7 @@ export default function ContactPage() {
                 value={form.prenom}
                 onChange={handleChange}
                 required
-                className="mt-1.5 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#636366] focus-visible:ring-[#D4A843]"
+                className="mt-1.5 bg-ffa-ink border-ffa-divider text-ffa-fg placeholder:text-ffa-fg-subtle focus-visible:ring-ffa-gold"
                 placeholder="Jean"
               />
             </div>
@@ -124,7 +124,7 @@ export default function ContactPage() {
                   value={form.nom}
                   onChange={handleChange}
                   required
-                  className="mt-1.5 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#636366] focus-visible:ring-[#D4A843]"
+                  className="mt-1.5 bg-ffa-ink border-ffa-divider text-ffa-fg placeholder:text-ffa-fg-subtle focus-visible:ring-ffa-gold"
                   placeholder="Dupont"
                 />
               </div>
@@ -137,7 +137,7 @@ export default function ContactPage() {
                   value={form.email}
                   onChange={handleChange}
                   required
-                  className="mt-1.5 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#636366] focus-visible:ring-[#D4A843]"
+                  className="mt-1.5 bg-ffa-ink border-ffa-divider text-ffa-fg placeholder:text-ffa-fg-subtle focus-visible:ring-ffa-gold"
                   placeholder="jean@email.com"
                 />
               </div>
@@ -146,11 +146,11 @@ export default function ContactPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <Label htmlFor="telephone">Téléphone</Label>
-                  <Input id="telephone" name="telephone" type="tel" value={form.telephone} onChange={handleChange} className="mt-1.5 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#636366] focus-visible:ring-[#D4A843]" placeholder="+229 ..." />
+                  <Input id="telephone" name="telephone" type="tel" value={form.telephone} onChange={handleChange} className="mt-1.5 bg-ffa-ink border-ffa-divider text-ffa-fg placeholder:text-ffa-fg-subtle focus-visible:ring-ffa-gold" placeholder="+229 ..." />
                 </div>
                 <div>
                   <Label htmlFor="sujet">Sujet</Label>
-                  <Input id="sujet" name="sujet" value={form.sujet} onChange={handleChange} className="mt-1.5 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#636366] focus-visible:ring-[#D4A843]" placeholder="Objet de votre message" />
+                  <Input id="sujet" name="sujet" value={form.sujet} onChange={handleChange} className="mt-1.5 bg-ffa-ink border-ffa-divider text-ffa-fg placeholder:text-ffa-fg-subtle focus-visible:ring-ffa-gold" placeholder="Objet de votre message" />
                 </div>
               </div>
               <div>
@@ -162,11 +162,11 @@ export default function ContactPage() {
                   onChange={handleChange}
                   required
                   rows={5}
-                  className="mt-1.5 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#636366] focus-visible:ring-[#D4A843] min-h-[120px]"
+                  className="mt-1.5 bg-ffa-ink border-ffa-divider text-ffa-fg placeholder:text-ffa-fg-subtle focus-visible:ring-ffa-gold min-h-[120px]"
                   placeholder="Décrivez votre projet ou votre demande..."
                 />
               </div>
-              <Button type="submit" disabled={loading} className="w-full sm:w-auto gap-2 bg-[#D4A843] hover:bg-[#B8912E] text-[#1C1C1E] font-semibold">
+              <Button type="submit" disabled={loading} className="w-full sm:w-auto gap-2 bg-ffa-gold hover:bg-ffa-gold-light text-ffa-navy font-semibold">
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Send className="h-4 w-4" aria-hidden="true" />}
                 Envoyer le message
               </Button>

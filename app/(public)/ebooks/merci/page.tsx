@@ -1,10 +1,13 @@
 import type { Metadata } from 'next'
 import MerciContent from '@/components/ebooks/MerciContent'
+import { publicPageMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = publicPageMetadata({
   title: 'Merci pour votre achat',
-  description: 'Confirmation de votre commande ebook — Foncier Facile Afrique',
-}
+  description: 'Confirmation de votre commande ebook — Foncier Facile Afrique.',
+  pathname: '/ebooks/merci',
+  noindex: true,
+})
 
 interface PageProps {
   searchParams: Promise<{ tx?: string; transaction_id?: string; id?: string }>

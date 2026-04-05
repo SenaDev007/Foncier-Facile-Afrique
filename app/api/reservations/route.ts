@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ReservationPublicSchema } from '@/lib/validations'
 import { rateLimit } from '@/lib/utils'
-import { computeNights, generateReservationReference } from '@/lib/booking'
+import {
+  computeNights,
+  generateReservationPaymentToken,
+  generateReservationReference,
+  isLogementAvailable,
+} from '@/lib/booking'
 import { sendReservationRequestAdminEmail, sendReservationRequestTravelerEmail } from '@/lib/mail'
+import { getServerBaseUrl } from '@/lib/app-url'
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 
@@ -61,12 +67,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const disponible = await isLogementAvailable(prisma, logement.id, dateArrivee, dateDepart)
+    if (!disponible) {
+      return NextResponse.json(
+        { error: 'Ce logement n’est pas disponible sur ces dates. Choisissez d’autres dates.' },
+        { status: 409 }
+      )
+    }
+
     const fraisService = 10_000
     const montantTotal = logement.prixNuit * nbNuits + fraisService
     const reference = generateReservationReference()
+    const paymentToken = generateReservationPaymentToken()
     const { prenom, nom } = splitNomVoyageur(d.nomVoyageur)
 
     const reservation = await prisma.$transaction(async (tx) => {
+      const encore = await isLogementAvailable(tx, logement.id, dateArrivee, dateDepart)
+      if (!encore) {
+        throw new Error('INDISPONIBLE')
+      }
+
       const resa = await tx.reservation.create({
         data: {
           reference,
@@ -84,6 +104,7 @@ export async function POST(request: NextRequest) {
           statut: 'EN_ATTENTE',
           demandeSpeciale: d.demandeSpeciale ?? null,
           transfertAero: d.transfertAero ?? false,
+          paymentToken,
         },
       })
 
@@ -114,7 +135,19 @@ export async function POST(request: NextRequest) {
       })
 
       return resa
+    }).catch((err) => {
+      if (err instanceof Error && err.message === 'INDISPONIBLE') {
+        return null
+      }
+      throw err
     })
+
+    if (!reservation) {
+      return NextResponse.json(
+        { error: 'Ce logement n’est plus disponible sur ces dates. Merci de réessayer.' },
+        { status: 409 }
+      )
+    }
 
     try {
       await sendReservationRequestAdminEmail({
@@ -131,6 +164,9 @@ export async function POST(request: NextRequest) {
       console.error('Réservation email admin:', e)
     }
 
+    const siteUrl = getServerBaseUrl()
+    const paiementUrl = `${siteUrl}/sejour/paiement/${paymentToken}`
+
     try {
       await sendReservationRequestTravelerEmail({
         email: d.email,
@@ -139,6 +175,7 @@ export async function POST(request: NextRequest) {
         logementNom: logement.nom,
         montantTotal: reservation.montantTotal,
         nbNuits: reservation.nbNuits,
+        paiementUrl,
       })
     } catch (e) {
       console.error('Réservation email voyageur:', e)
@@ -147,8 +184,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         data: reservation,
+        paiementUrl,
         message:
-          'Demande enregistrée. Notre équipe confirme la disponibilité et vous envoie le lien de paiement sous peu.',
+          'Demande enregistrée. Vous pouvez régler en ligne maintenant ou attendre la confirmation de l’équipe.',
       },
       { status: 201 }
     )

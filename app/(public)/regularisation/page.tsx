@@ -1,13 +1,15 @@
 import type { Metadata } from 'next'
+import { publicPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { DiagnosticFoncierForm } from '@/components/public/DiagnosticFoncierForm'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = publicPageMetadata({
   title: 'Régularisation foncière — Diagnostic & accompagnement',
   description:
     'PH vers TF, premier titre, mutations, litiges : faites le point sur votre situation foncière au Bénin avec Foncier Facile Afrique.',
-  openGraph: { title: 'Régularisation foncière — FFA' },
-}
+  pathname: '/regularisation',
+  keywords: ['permis d’habiter titre foncier Bénin', 'régularisation foncière Parakou'],
+})
 
 const SERVICES = [
   {
@@ -53,16 +55,16 @@ const ETAPES = [
 export default function RegularisationPage() {
   return (
     <div className="bg-[#1C1C1E] min-h-screen">
-      <section className="relative border-b border-[#7A3500]/40 overflow-hidden">
+      <section className="relative border-b border-[#D4A843]/25 overflow-hidden">
         <div
-          className="absolute inset-0 bg-gradient-to-br from-[#7A3500]/35 via-[#1C1C1E] to-[#1C1C1E]"
+          className="absolute inset-0 bg-gradient-to-br from-[#D4A843]/12 via-[#1C1C1E] to-[#161618]"
           aria-hidden="true"
         />
         <div className="relative container-site py-14 md:py-20">
           <div className="grid lg:grid-cols-2 gap-10 items-start">
             <div>
-              <p className="text-[#E8B84B] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
-                Pôle brun — Juridique foncier
+              <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
+                Juridique foncier — Régularisation
               </p>
               <h1 className="font-heading text-4xl md:text-5xl font-bold text-[#EFEFEF]">
                 Régularisation foncière
@@ -96,20 +98,20 @@ export default function RegularisationPage() {
         </div>
       </section>
 
-      <section className="bg-[#FBF7EE] text-[#0D2137] py-14 md:py-16">
+      <section className="bg-[#161618] border-y border-[#2C2C2E] py-14 md:py-16">
         <div className="container-site">
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-center mb-10">
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-[#EFEFEF] text-center mb-10">
             Nos prestations régularisation
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {SERVICES.map((s) => (
               <div
                 key={s.titre}
-                className="rounded-xl border-l-4 border-[#7A3500] bg-white shadow-sm p-5 text-[#0D2137]"
+                className="rounded-xl border border-[#3A3A3C] border-l-4 border-l-[#D4A843] bg-[#2C2C2E] p-5"
               >
-                <h3 className="font-heading font-semibold text-lg mb-2">{s.titre}</h3>
-                <p className="text-sm text-[#4A5568] mb-3">{s.desc}</p>
-                <p className="text-xs font-semibold text-[#7A3500]">{s.prix}</p>
+                <h3 className="font-heading font-semibold text-lg mb-2 text-[#EFEFEF]">{s.titre}</h3>
+                <p className="text-sm text-[#8E8E93] mb-3">{s.desc}</p>
+                <p className="text-xs font-semibold text-[#D4A843]">{s.prix}</p>
               </div>
             ))}
           </div>
@@ -124,7 +126,7 @@ export default function RegularisationPage() {
           {ETAPES.map((e, i) => (
             <div key={e.titre} className="flex-1 flex md:flex-col gap-3 items-start md:items-center text-left md:text-center">
               <div className="flex md:flex-col items-center gap-2 w-full md:w-auto">
-                <span className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-[#7A3500] to-[#D4A843] text-[#EFEFEF] font-heading font-bold flex items-center justify-center">
+                <span className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-[#D4A843] to-[#B8912E] text-[#1C1C1E] font-heading font-bold flex items-center justify-center">
                   {i + 1}
                 </span>
                 {i < ETAPES.length - 1 && (

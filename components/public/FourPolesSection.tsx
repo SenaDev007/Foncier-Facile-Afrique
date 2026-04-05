@@ -1,21 +1,24 @@
 import Link from 'next/link'
 import { Building2, Home, Palmtree, Scale } from 'lucide-react'
 
+const CARD =
+  'border-[#3A3A3C] bg-[#2C2C2E]/90 hover:border-[#D4A843]/45 hover:bg-[#2C2C2E]'
+
 const POLES = [
   {
     href: '/catalogue',
     label: 'Acheter / Vendre',
     description: 'Catalogue de biens sécurisés, recherche et mandat.',
     icon: Building2,
-    className: 'border-[#0D2137]/40 bg-[#0D2137]/20 hover:border-[#D4A843]/50',
-    accent: 'text-[#8EC5FF]',
+    className: CARD,
+    accent: 'text-[#D4A843]',
   },
   {
     href: '/confier',
     label: 'Confier mon bien',
     description: 'Dépôt d’annonce, estimation et publication accompagnées.',
     icon: Home,
-    className: 'border-[#D4A843]/30 bg-[rgba(212,168,67,0.08)] hover:border-[#D4A843]/60',
+    className: CARD,
     accent: 'text-[#D4A843]',
   },
   {
@@ -23,16 +26,16 @@ const POLES = [
     label: 'Séjour & tourisme',
     description: 'Réservation de logements avant votre arrivée (bientôt).',
     icon: Palmtree,
-    className: 'border-[#5B2C6F]/50 bg-[#5B2C6F]/15 hover:border-[#5B2C6F]/70',
-    accent: 'text-[#C9A0DC]',
+    className: CARD,
+    accent: 'text-[#D4A843]',
   },
   {
     href: '/regularisation',
     label: 'Régularisation foncière',
     description: 'Diagnostic, PH → TF, mutations et accompagnement juridique.',
     icon: Scale,
-    className: 'border-[#7A3500]/45 bg-[#7A3500]/12 hover:border-[#D4A843]/40',
-    accent: 'text-[#E8A87C]',
+    className: CARD,
+    accent: 'text-[#D4A843]',
   },
 ] as const
 

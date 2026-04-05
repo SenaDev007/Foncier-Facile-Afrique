@@ -68,8 +68,8 @@ export default function LeadFormAnnonce({
   if (sent) {
     return (
       <div className="bg-[rgba(34,197,94,0.1)] border border-[rgba(34,197,94,0.3)] rounded-xl p-4 text-center">
-        <p className="text-[#EFEFEF] font-medium">Demande envoyée avec succès.</p>
-        <p className="text-[#8E8E93] text-sm mt-1">Nous vous recontacterons rapidement.</p>
+        <p className="text-ffa-fg font-medium">Demande envoyée avec succès.</p>
+        <p className="text-ffa-fg-muted text-sm mt-1">Nous vous recontacterons rapidement.</p>
       </div>
     )
   }
@@ -85,7 +85,7 @@ export default function LeadFormAnnonce({
             value={form.prenom}
             onChange={handleChange}
             required
-            className="mt-0.5 h-9 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] text-sm"
+            className="mt-0.5 h-9 bg-ffa-ink border-ffa-divider text-ffa-fg text-sm"
           />
         </div>
         <div>
@@ -96,7 +96,7 @@ export default function LeadFormAnnonce({
             value={form.nom}
             onChange={handleChange}
             required
-            className="mt-0.5 h-9 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] text-sm"
+            className="mt-0.5 h-9 bg-ffa-ink border-ffa-divider text-ffa-fg text-sm"
           />
         </div>
       </div>
@@ -109,7 +109,7 @@ export default function LeadFormAnnonce({
           value={form.telephone}
           onChange={handleChange}
           required
-          className="mt-0.5 h-9 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] text-sm"
+          className="mt-0.5 h-9 bg-ffa-ink border-ffa-divider text-ffa-fg text-sm"
         />
       </div>
       <div>
@@ -120,7 +120,7 @@ export default function LeadFormAnnonce({
           type="email"
           value={form.email}
           onChange={handleChange}
-          className="mt-0.5 h-9 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] text-sm"
+          className="mt-0.5 h-9 bg-ffa-ink border-ffa-divider text-ffa-fg text-sm"
         />
       </div>
       <div>
@@ -132,13 +132,13 @@ export default function LeadFormAnnonce({
           onChange={handleChange}
           required
           rows={3}
-          className="mt-0.5 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] text-sm"
+          className="mt-0.5 bg-ffa-ink border-ffa-divider text-ffa-fg text-sm"
         />
       </div>
       <Button
         type="submit"
         disabled={loading}
-        className="w-full h-9 bg-[#D4A843] hover:bg-[#c2972e] text-[#1C1C1E] text-sm font-semibold"
+        className="w-full h-9 bg-ffa-gold hover:bg-ffa-gold-light text-ffa-navy text-sm font-semibold"
       >
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />

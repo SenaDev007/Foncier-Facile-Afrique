@@ -61,7 +61,7 @@ export default function ShareButtons({
   }
 
   const buttonClass =
-    'inline-flex items-center justify-center w-9 h-9 rounded-lg border border-[#3A3A3C] bg-[#2C2C2E] text-[#8E8E93] hover:bg-[#D4A843] hover:text-[#1C1C1E] hover:border-[#D4A843] transition-all duration-200'
+    'inline-flex items-center justify-center w-9 h-9 rounded-lg border border-ffa-divider bg-ffa-elevated text-ffa-fg-muted hover:bg-ffa-gold hover:text-ffa-navy hover:border-ffa-gold transition-all duration-200'
   const links = [
     { label: 'Facebook', href: buildShareUrl('facebook', shareUrl, title, description), icon: Facebook },
     { label: 'Twitter / X', href: buildShareUrl('twitter', shareUrl, title, description), icon: Twitter },
@@ -77,7 +77,7 @@ export default function ShareButtons({
         <button
           type="button"
           onClick={() => setOpen((prev) => !prev)}
-          className="inline-flex items-center gap-2 rounded-full border border-[#3A3A3C] bg-[#2C2C2E] px-3.5 py-2 text-xs font-medium text-[#EFEFEF] hover:bg-[#D4A843] hover:text-[#1C1C1E] hover:border-[#D4A843] transition-all duration-200"
+          className="inline-flex items-center gap-2 rounded-full border border-ffa-divider bg-ffa-elevated px-3.5 py-2 text-xs font-medium text-ffa-fg hover:bg-ffa-gold hover:text-ffa-navy hover:border-ffa-gold transition-all duration-200"
           aria-expanded={open}
           aria-haspopup="true"
         >
@@ -87,9 +87,9 @@ export default function ShareButtons({
 
         {open && (
           <div
-            className="absolute mt-2 right-0 z-30 w-56 rounded-xl border border-[#3A3A3C] bg-[#1C1C1E] shadow-xl p-3 flex flex-col gap-2"
+            className="absolute mt-2 right-0 z-30 w-56 rounded-xl border border-ffa-divider bg-ffa-ink shadow-xl p-3 flex flex-col gap-2"
           >
-            <p className="text-[11px] text-[#8E8E93] mb-1">Partager cette page</p>
+            <p className="text-[11px] text-ffa-fg-muted mb-1">Partager cette page</p>
             <div className="flex items-center gap-1.5">
               {links.map(({ label, href, icon: Icon }) => (
                 <a

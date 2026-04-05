@@ -19,8 +19,8 @@ interface AnnonceGalleryProps {
 export default function AnnonceGallery({ photos, titre }: AnnonceGalleryProps) {
   if (photos.length === 0) {
     return (
-      <div className="h-80 bg-[#3A3A3C] rounded-2xl flex items-center justify-center">
-        <p className="text-[#8E8E93]">Aucune photo disponible</p>
+      <div className="h-80 bg-ffa-panel rounded-2xl flex items-center justify-center">
+        <p className="text-ffa-fg-muted">Aucune photo disponible</p>
       </div>
     )
   }
@@ -30,7 +30,7 @@ export default function AnnonceGallery({ photos, titre }: AnnonceGalleryProps) {
   return (
     <PhotoProvider>
       <div className="grid grid-cols-2 gap-3">
-        <div className="col-span-2 relative h-80 rounded-2xl overflow-hidden bg-[#3A3A3C]">
+        <div className="col-span-2 relative h-80 rounded-2xl overflow-hidden bg-ffa-panel">
           <PhotoView src={ordered[0].url}>
             <Image
               src={ordered[0].url}
@@ -45,7 +45,7 @@ export default function AnnonceGallery({ photos, titre }: AnnonceGalleryProps) {
         {ordered.slice(1, 5).map((photo) => (
           <div
             key={photo.id}
-            className="relative h-40 rounded-xl overflow-hidden bg-[#3A3A3C] cursor-zoom-in"
+            className="relative h-40 rounded-xl overflow-hidden bg-ffa-panel cursor-zoom-in"
           >
             <PhotoView src={photo.url}>
               <Image

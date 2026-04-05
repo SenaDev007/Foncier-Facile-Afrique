@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import type { Prisma } from '@prisma/client'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
@@ -20,25 +21,43 @@ export default async function AdminBlogPage({ searchParams }: PageProps) {
     ...(searchParams.statut ? { statut: searchParams.statut as 'BROUILLON' | 'PUBLIE' | 'ARCHIVE' } : {}),
   }
 
-  const [posts, total] = await Promise.all([
-    prisma.blogPost.findMany({
-      where,
-      include: { auteur: { select: { name: true } } },
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take: ITEMS_PER_PAGE,
-    }),
-    prisma.blogPost.count({ where }),
-  ])
+  type BlogRow = Prisma.BlogPostGetPayload<{ include: { auteur: { select: { name: true } } } }>
+  let posts: BlogRow[] = []
+  let total = 0
+  let dbUnavailable = false
+  try {
+    ;[posts, total] = await Promise.all([
+      prisma.blogPost.findMany({
+        where,
+        include: { auteur: { select: { name: true } } },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: ITEMS_PER_PAGE,
+      }),
+      prisma.blogPost.count({ where }),
+    ])
+  } catch (e) {
+    dbUnavailable = true
+    console.error('[AdminBlogPage] Prisma (ex. P1001 Neon injoignable) :', e)
+  }
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE)
 
   return (
     <div className="space-y-6">
+      {dbUnavailable && (
+        <p
+          role="alert"
+          className="rounded-xl border border-amber-500/35 bg-amber-500/10 text-amber-100 text-sm px-4 py-3"
+        >
+          Base de données injoignable (souvent Neon suspendu, réseau ou <code className="text-amber-200/90">DATABASE_URL</code>{' '}
+          incorrecte). Réactivez le projet dans la console Neon ou vérifiez votre connexion, puis rechargez la page.
+        </p>
+      )}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold text-[#EFEFEF]">Blog</h1>
-          <p className="text-[#8E8E93] text-sm mt-1">{total} article{total > 1 ? 's' : ''}</p>
+          <p className="text-[#8E8E93] text-sm mt-1">{total} article{total !== 1 ? 's' : ''}</p>
         </div>
         <Link href="/admin/blog/new" className="inline-flex items-center gap-2 bg-[#D4A843] text-[#1C1C1E] text-sm font-semibold px-4 py-2 rounded-xl hover:bg-[#B8912E] transition-colors">
           <Plus className="h-4 w-4" aria-hidden="true" /> Nouvel article

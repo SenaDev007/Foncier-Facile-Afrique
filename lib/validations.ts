@@ -16,6 +16,32 @@ export const LoginSchema = z.object({
   password: z.string().min(6, 'Mot de passe requis'),
 })
 
+export const ForgotPasswordSchema = z.object({
+  email: z.string().email('Email invalide'),
+})
+
+export const ResetPasswordSchema = z
+  .object({
+    token: z.string().min(64, 'Lien invalide ou expiré'),
+    password: z.string().min(8, 'Le mot de passe doit faire au moins 8 caractères'),
+    confirmPassword: z.string().min(1, 'Confirmation requise'),
+  })
+  .refine((d) => d.password === d.confirmPassword, {
+    message: 'Les mots de passe ne correspondent pas',
+    path: ['confirmPassword'],
+  })
+
+export const ChangePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Mot de passe actuel requis'),
+    newPassword: z.string().min(8, 'Le nouveau mot de passe doit faire au moins 8 caractères'),
+    confirmPassword: z.string().min(1, 'Confirmation requise'),
+  })
+  .refine((d) => d.newPassword === d.confirmPassword, {
+    message: 'Les mots de passe ne correspondent pas',
+    path: ['confirmPassword'],
+  })
+
 export const ContactSchema = z.object({
   nom: z.string().min(2, 'Nom requis'),
   prenom: z.string().min(2, 'Prénom requis'),
@@ -73,6 +99,13 @@ export const TemoignageSchema = z.object({
   note: z.number().int().min(1).max(5).default(5),
   actif: z.boolean().default(true),
   ordre: z.number().int().default(0),
+})
+
+/** Soumission d’avis depuis le site public (modération avant publication). */
+export const PublicAvisSchema = z.object({
+  nom: z.string().min(2, 'Indiquez au moins 2 caractères').max(100),
+  texte: z.string().min(30, 'Votre avis doit contenir au moins 30 caractères').max(2000),
+  note: z.coerce.number().int().min(1).max(5),
 })
 
 export const NewsletterSchema = z.object({

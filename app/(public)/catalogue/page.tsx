@@ -1,19 +1,18 @@
 import type { Metadata } from 'next'
+import { publicPageMetadata } from '@/lib/seo'
 import { Suspense } from 'react'
 import { getAnnoncesListing } from '@/lib/get-annonces-listing'
 import AnnoncesView from '@/components/public/AnnoncesView'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { AnnonceCard as AnnonceCardType } from '@/types'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = publicPageMetadata({
   title: 'Catalogue des biens — Acheter / Vendre',
   description:
     'Catalogue des terrains et biens immobiliers sécurisés au Bénin. Filtres par type, ville, prix et surface.',
-  openGraph: {
-    title: 'Catalogue des biens — Foncier Facile Afrique',
-    description: 'Acheter ou investir sur des biens avec dossier vérifié.',
-  },
-}
+  pathname: '/catalogue',
+  keywords: ['catalogue terrain Bénin', 'acheter bien immobilier Parakou'],
+})
 
 interface PageProps {
   searchParams: {

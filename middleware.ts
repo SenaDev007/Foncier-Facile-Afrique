@@ -4,6 +4,13 @@ import { auth } from '@/lib/auth'
 export default auth((req) => {
   const { pathname } = req.nextUrl
   const origin = req.nextUrl.origin
+  const host = req.headers.get('host') ?? ''
+
+  // Forcer l'accès back-office sur le domaine de production officiel.
+  if (pathname.startsWith('/admin') && host.includes('vercel.app')) {
+    const target = new URL(req.nextUrl.pathname + req.nextUrl.search, 'https://www.foncierfacileafrique.fr')
+    return NextResponse.redirect(target, 308)
+  }
 
   // Ne pas appliquer le middleware aux routes API et aux assets statiques
   if (

@@ -255,6 +255,33 @@ body.light-mode {
   animation-play-state: paused;
 }
 
+/* Marquee 3D (section blog landing) */
+@keyframes marquee {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes marquee-horizontal {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+.animate-marquee {
+  animation: marquee-horizontal var(--duration) linear infinite;
+}
+
+.animate-marquee-vertical {
+  animation: marquee var(--duration) linear infinite;
+}
+
 /* Espacement optimisé pour le footer */
 section:last-of-type {
   margin-bottom: 4rem;

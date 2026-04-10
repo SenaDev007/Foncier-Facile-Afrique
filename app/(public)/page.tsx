@@ -1,23 +1,20 @@
 import type { Metadata } from 'next'
 import { publicPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
-import Image from 'next/image'
-import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import { getPageSections, type SectionMap } from '@/lib/pages'
 import { DEFAULT_PUBLIC_SERVICE_CARDS, getPublicServiceCards } from '@/lib/public-services'
 import { getAccueilParametreCleList } from '@/lib/parametres-accueil'
 import { getReviewAggregate } from '@/lib/reviews-stats'
-import HeroSection from '@/components/public/HeroSection'
-import { HomeAnnoncesMotionGrid } from '@/components/public/HomeAnnoncesMotionGrid'
+import { LandingHeroGlass } from '@/components/public/LandingHeroGlass'
+import { LandingAnnoncesCircularSection } from '@/components/public/LandingAnnoncesCircularSection'
 import type { AnnonceCard as AnnonceCardModel } from '@/types'
-import BlogCard from '@/components/public/BlogCard'
+import { LandingBlog3DSection } from '@/components/public/LandingBlog3DSection'
 import ReviewsVerifiedSection from '@/components/public/ReviewsVerifiedSection'
 import { AnimateOnScroll } from '@/components/ui/AnimateOnScroll'
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter'
-import { Skeleton } from '@/components/ui/skeleton'
 import { ArrowRight } from 'lucide-react'
-import ServiceCard from '@/components/public/ServiceCard'
+import { LandingServicesFeatureSection } from '@/components/public/LandingServicesFeatureSection'
 import { FourPolesSection } from '@/components/public/FourPolesSection'
 
 export const metadata: Metadata = publicPageMetadata({
@@ -141,9 +138,8 @@ export default async function AccueilPage() {
 
   return (
     <>
-      <HeroSection
+      <LandingHeroGlass
         heroImageUrl={heroImage ?? undefined}
-        heroImageMobileUrl={heroImageMobile ?? undefined}
         heroBadge={hero.badge ?? undefined}
         heroSousTitre={hero.sousTitre ?? undefined}
         heroTitre={hero.titre ?? undefined}
@@ -194,18 +190,7 @@ export default async function AccueilPage() {
             </div>
           </AnimateOnScroll>
           
-          <div className="grid justify-center gap-5 md:gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),280px))]">
-            {services.map((service, index: number) => (
-              <ServiceCard
-                key={service.id}
-                id={service.id}
-                title={service.title}
-                description={service.description}
-                image={service.image}
-                index={index}
-              />
-            ))}
-          </div>
+          <LandingServicesFeatureSection services={services} />
           
           <AnimateOnScroll delay={0.8}>
             <div className="text-center mt-6">
@@ -237,25 +222,7 @@ export default async function AccueilPage() {
               </div>
             </AnimateOnScroll>
             
-            <Suspense
-              fallback={
-                <div className="flex flex-wrap justify-center gap-6">
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <Skeleton key={i} className="h-72 w-full max-w-[320px] rounded-xl shrink-0" />
-                  ))}
-                </div>
-              }
-            >
-              <HomeAnnoncesMotionGrid annonces={annonces as AnnonceCardModel[]} />
-            </Suspense>
-            
-            <AnimateOnScroll delay={0.6}>
-              <div className="text-center mt-6 sm:hidden">
-                <Link href="/annonces" className="inline-flex items-center gap-1.5 text-[#D4A843] font-medium text-sm hover:text-[#B8912E]">
-                  Voir toutes les annonces <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-              </div>
-            </AnimateOnScroll>
+            <LandingAnnoncesCircularSection annonces={annonces as AnnonceCardModel[]} />
           </div>
         </section>
       )}
@@ -282,24 +249,8 @@ export default async function AccueilPage() {
                 {blogIntro.body ?? 'Expertise foncière et immobilière en Afrique'}
               </p>
             </div>
-            
-            {/* Conteneur de défilement horizontal */}
-            <div className="relative overflow-hidden">
-              <div className="flex gap-6 animate-scroll">
-                {/* Dupliquer les cartes pour un défilement infini */}
-                {[...blogPosts, ...blogPosts].map((post, index) => (
-                  <div key={`${post.id}-${index}`} className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3">
-                    <BlogCard post={post as Parameters<typeof BlogCard>[0]['post']} index={index} />
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="text-center mt-6">
-              <Link href="/blog" className="inline-flex items-center gap-1.5 text-[#D4A843] font-medium text-sm hover:text-[#B8912E]">
-                Voir tous les articles <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            </div>
+
+            <LandingBlog3DSection posts={blogPosts as import('@/types').BlogPostWithAuthor[]} />
           </div>
         </section>
       )}

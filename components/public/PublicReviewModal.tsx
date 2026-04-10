@@ -16,10 +16,15 @@ export function PublicReviewModal() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    if (window.location.hash === '#donner-avis') {
-      setOpen(true)
-      window.history.replaceState(null, '', window.location.pathname + window.location.search)
+    const syncFromHash = () => {
+      if (window.location.hash === '#donner-avis') {
+        setOpen(true)
+        window.history.replaceState(null, '', window.location.pathname + window.location.search)
+      }
     }
+    syncFromHash()
+    window.addEventListener('hashchange', syncFromHash)
+    return () => window.removeEventListener('hashchange', syncFromHash)
   }, [])
 
   return (

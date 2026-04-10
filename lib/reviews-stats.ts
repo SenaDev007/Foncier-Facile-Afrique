@@ -9,18 +9,25 @@ export type ReviewAggregate = {
 }
 
 export async function getReviewAggregate(prisma: PrismaClient): Promise<ReviewAggregate> {
-  const [agg, groups] = await Promise.all([
-    prisma.temoignage.aggregate({
-      where: { actif: true },
-      _avg: { note: true },
-      _count: { id: true },
-    }),
-    prisma.temoignage.groupBy({
-      by: ['note'],
-      where: { actif: true },
-      _count: { id: true },
-    }),
-  ])
+  let agg: { _avg: { note: number | null }; _count: { id: number } }
+  let groups: Array<{ note: number; _count: { id: number } }>
+  try {
+    ;[agg, groups] = await Promise.all([
+      prisma.temoignage.aggregate({
+        where: { actif: true },
+        _avg: { note: true },
+        _count: { id: true },
+      }),
+      prisma.temoignage.groupBy({
+        by: ['note'],
+        where: { actif: true },
+        _count: { id: true },
+      }),
+    ])
+  } catch (error) {
+    console.error('[getReviewAggregate] Prisma indisponible', error)
+    return { average: 5, total: 0, distributionDesc: [0, 0, 0, 0, 0] }
+  }
 
   const dist: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
   for (const g of groups) {

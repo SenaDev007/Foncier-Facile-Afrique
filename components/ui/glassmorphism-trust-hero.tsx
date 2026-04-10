@@ -56,21 +56,23 @@ export default function GlassmorphismTrustHero(props: GlassHeroProps) {
       <div className="relative z-10 mx-auto max-w-7xl px-4 pt-24 pb-12 sm:px-6 md:pt-32 md:pb-20 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8 items-start">
           <div className="lg:col-span-7 flex flex-col justify-center space-y-8 pt-8">
-            <div className="animate-fade-in delay-100">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-md">
-                <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-zinc-300 flex items-center gap-2">
-                  {badge}
-                  <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-                </span>
+            {badge?.trim() ? (
+              <div className="animate-fade-in delay-100">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-md">
+                  <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-zinc-300 flex items-center gap-2">
+                    {badge}
+                    <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+                  </span>
+                </div>
               </div>
-            </div>
+            ) : null}
             <p className="animate-fade-in delay-100 text-zinc-400 text-xs">{subtitle}</p>
-            <h1 className="animate-fade-in delay-200 text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-medium tracking-tighter leading-[0.9]">
+            <h1 className="animate-fade-in delay-200 text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-medium tracking-tighter leading-[0.95]">
               {title}
               <br />
               <span className="bg-gradient-to-br from-white via-white to-[#ffcd75] bg-clip-text text-transparent">{highlighted}</span>
             </h1>
-            <p className="animate-fade-in delay-300 max-w-xl text-lg text-zinc-400 leading-relaxed">{description}</p>
+            <p className="animate-fade-in delay-300 max-w-xl text-lg text-[#D4A843] leading-relaxed">{description}</p>
             <div className="animate-fade-in delay-400 flex flex-col sm:flex-row gap-4">
               <Link href={ctaPrimary.href} className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-semibold text-zinc-950 transition-all hover:scale-[1.02]">
                 {ctaPrimary.label}
@@ -118,7 +120,7 @@ export default function GlassmorphismTrustHero(props: GlassHeroProps) {
                   {statMini.map((s) => (
                     <div key={s.label} className="flex flex-col items-center justify-center">
                       <span className="text-xl font-bold text-white sm:text-2xl">{s.value}</span>
-                      <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium sm:text-xs">{s.label}</span>
+                      <span className="text-[10px] uppercase tracking-wider text-[#D4A843] font-medium sm:text-xs">{s.label}</span>
                     </div>
                   ))}
                 </div>

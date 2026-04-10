@@ -12,7 +12,6 @@ import type { AnnonceCard as AnnonceCardModel } from '@/types'
 import { LandingBlog3DSection } from '@/components/public/LandingBlog3DSection'
 import ReviewsVerifiedSection from '@/components/public/ReviewsVerifiedSection'
 import { AnimateOnScroll } from '@/components/ui/AnimateOnScroll'
-import { AnimatedCounter } from '@/components/ui/AnimatedCounter'
 import { ArrowRight } from 'lucide-react'
 import { LandingServicesFeatureSection } from '@/components/public/LandingServicesFeatureSection'
 import { FourPolesSection } from '@/components/public/FourPolesSection'
@@ -55,12 +54,6 @@ async function getHomeData() {
     ])
     const paramMap: Record<string, string> = {}
     params.forEach((p) => { paramMap[p.cle] = p.valeur })
-    const getNum = (key: string, def: number) => {
-      const v = paramMap[key]
-      if (v === undefined || v === '') return def
-      const n = parseInt(v, 10)
-      return Number.isNaN(n) ? def : n
-    }
     return {
       annonces,
       temoignages,
@@ -68,11 +61,6 @@ async function getHomeData() {
       blogPosts,
       heroImage: paramMap.hero_image,
       heroImageMobile: paramMap.hero_image_mobile,
-      chiffreClients: getNum('chiffre_clients', 500),
-      chiffreSatisfaction: getNum('chiffre_satisfaction', 98),
-      chiffreAnnees: getNum('chiffre_annees', 10),
-      chiffreTransactions: getNum('chiffre_transactions', 1000),
-      chiffreAnneesTexte: getNum('chiffre_annees_texte', 5),
       homeSections: homeSections ?? {},
       services,
     }
@@ -89,11 +77,6 @@ async function getHomeData() {
       blogPosts: [],
       heroImage: undefined,
       heroImageMobile: undefined,
-      chiffreClients: 500,
-      chiffreSatisfaction: 98,
-      chiffreAnnees: 10,
-      chiffreTransactions: 1000,
-      chiffreAnneesTexte: 5,
       homeSections: {},
       services: DEFAULT_PUBLIC_SERVICE_CARDS,
     }
@@ -108,11 +91,6 @@ export default async function AccueilPage() {
     blogPosts,
     heroImage,
     heroImageMobile,
-    chiffreClients,
-    chiffreSatisfaction,
-    chiffreAnnees,
-    chiffreTransactions,
-    chiffreAnneesTexte,
     homeSections,
     services,
   } = await getHomeData()
@@ -126,7 +104,6 @@ export default async function AccueilPage() {
     ctaAnnonces: s('hero_cta_annonces'),
     ctaContact: s('hero_cta_contact'),
   }
-  const chiffresIntro = { titre: s('chiffres_intro')?.titre, sousTitre: s('chiffres_intro')?.sousTitre }
   const servicesIntro = { titre: s('services_intro')?.titre, sousTitre: s('services_intro')?.sousTitre, body: s('services_intro')?.bodyHtml }
   const annoncesIntro = { titre: s('annonces_intro')?.titre, sousTitre: s('annonces_intro')?.sousTitre, body: s('annonces_intro')?.bodyHtml }
   const blogIntro = { titre: s('blog_intro')?.titre, sousTitre: s('blog_intro')?.sousTitre, body: s('blog_intro')?.bodyHtml }
@@ -147,30 +124,6 @@ export default async function AccueilPage() {
         heroCtaAnnonces={hero.ctaAnnonces?.boutonTexte ? { texte: hero.ctaAnnonces.boutonTexte, url: hero.ctaAnnonces.boutonUrl ?? '/annonces' } : undefined}
         heroCtaContact={hero.ctaContact?.boutonTexte ? { texte: hero.ctaContact.boutonTexte, url: hero.ctaContact.boutonUrl ?? '/contact' } : undefined}
       />
-
-      {/* Section Chiffres Clés avec compteurs animés */}
-      <section className="bg-[#161618] py-14 md:py-16 border-y border-[#2C2C2E]">
-        <div className="container-site">
-          <AnimateOnScroll delay={0}>
-            <p className="text-center text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-2">
-              Chiffres clés
-            </p>
-            <h2 className="text-center font-heading text-3xl md:text-4xl font-bold text-[#EFEFEF] mb-3">
-              {chiffresIntro.titre ?? 'Notre impact en quelques chiffres'}
-            </h2>
-            <p className="text-center text-[#8E8E93] text-lg max-w-2xl mx-auto">
-              {chiffresIntro.sousTitre ?? `Plus de ${chiffreAnneesTexte} ans d'expertise au service de votre patrimoine immobilier`}
-            </p>
-          </AnimateOnScroll>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mt-10 md:mt-12">
-            <AnimatedCounter target={chiffreClients} suffix="+" label="Clients accompagnés" duration={2000} />
-            <AnimatedCounter target={chiffreSatisfaction} suffix="%" label="Taux de satisfaction" duration={1800} />
-            <AnimatedCounter target={chiffreAnnees} suffix="+" label="Années d'expérience" duration={1500} />
-            <AnimatedCounter target={chiffreTransactions} suffix="+" label="Transactions sécurisées" duration={2200} />
-          </div>
-        </div>
-      </section>
 
       <FourPolesSection />
 

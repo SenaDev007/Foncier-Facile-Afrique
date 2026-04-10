@@ -24,13 +24,13 @@ export function LandingHeroGlass({
   const title = heroTitre?.trim() || 'Achetez un terrain'
   return (
     <GlassmorphismTrustHero
-      badge={heroBadge ?? 'Immobilier sécurisé'}
+      badge={heroBadge ?? ''}
       subtitle={heroSousTitre ?? "Bénin · Afrique de l'Ouest"}
       title={title}
-      highlighted="au Bénin en confiance"
+      highlighted="en confiance"
       description={
         heroTexte ??
-        "Foncier Facile Afrique vous accompagne dans l'acquisition de terrains et biens immobiliers avec titre foncier vérifié."
+        "Foncier Facile Afrique vous accompagne dans l'acquisition de terrains et biens immobiliers avec titre foncier vérifié, de Parakou à tout le Bénin."
       }
       ctaPrimary={{ label: heroCtaAnnonces?.texte ?? 'Voir les annonces', href: heroCtaAnnonces?.url ?? '/annonces' }}
       ctaSecondary={{ label: heroCtaContact?.texte ?? 'Nous contacter', href: heroCtaContact?.url ?? '/contact' }}
@@ -39,7 +39,7 @@ export function LandingHeroGlass({
       statMini={[
         { value: '5+', label: 'Années' },
         { value: '24/7', label: 'Assistance' },
-        { value: '100%', label: 'Vérifié' },
+        { value: '100%', label: 'vérifiés' },
       ]}
       clients={[{ name: 'Diaspora Béninoise' }, { name: 'Investisseurs privés' }, { name: 'PME locales' }, { name: 'Familles' }]}
       backgroundImage={heroImageUrl ?? '/images/hero/hero-bg.jpg'}

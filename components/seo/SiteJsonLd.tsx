@@ -5,7 +5,7 @@ import { getSiteUrl, absUrl } from '@/lib/seo'
  */
 export default function SiteJsonLd() {
   const site = getSiteUrl()
-  const logo = absUrl('/images/logo/logo FFA 1.png')
+  const logo = absUrl('/images/logo/logo FFA.png')
 
   const organization = {
     '@context': 'https://schema.org',

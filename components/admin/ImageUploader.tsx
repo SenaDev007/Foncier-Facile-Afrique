@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { Upload, X, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -20,9 +20,14 @@ interface ImageUploaderProps {
 export default function ImageUploader({ images, onImagesChange, maxImages = 10 }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
+  const imagesRef = useRef(images)
+  useEffect(() => {
+    imagesRef.current = images
+  }, [images])
 
   const uploadFile = useCallback(async (file: File) => {
-    if (images.length >= maxImages) {
+    const current = imagesRef.current
+    if (current.length >= maxImages) {
       toast.error(`Maximum ${maxImages} images autorisées`)
       return
     }
@@ -43,7 +48,9 @@ export default function ImageUploader({ images, onImagesChange, maxImages = 10 }
       const res = await fetch('/api/upload', { method: 'POST', body: formData })
       const data = await res.json()
       if (data.url) {
-        onImagesChange([...images, { url: data.url, alt: file.name.replace(/\.[^/.]+$/, '') }])
+        const next = [...current, { url: data.url, alt: file.name.replace(/\.[^/.]+$/, '') }]
+        imagesRef.current = next
+        onImagesChange(next)
         toast.success('Image uploadée')
       } else {
         toast.error(data.error ?? 'Erreur lors de l\'upload')
@@ -53,7 +60,7 @@ export default function ImageUploader({ images, onImagesChange, maxImages = 10 }
     } finally {
       setUploading(false)
     }
-  }, [images, onImagesChange, maxImages])
+  }, [onImagesChange, maxImages])
 
   const handleFiles = useCallback((files: FileList | null) => {
     if (!files) return
@@ -120,7 +127,12 @@ export default function ImageUploader({ images, onImagesChange, maxImages = 10 }
           {images.map((img, index) => (
             <div key={index} className="relative group rounded-lg overflow-hidden border border-gray-100">
               <div className="relative h-28">
-                <Image src={img.url} alt={img.alt} fill className="object-cover" sizes="200px" />
+                {img.url.startsWith('http') ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={img.url} alt={img.alt} className="absolute inset-0 h-full w-full object-cover" />
+                ) : (
+                  <Image src={img.url} alt={img.alt} fill className="object-cover" sizes="200px" />
+                )}
               </div>
               <div className="p-2">
                 <input

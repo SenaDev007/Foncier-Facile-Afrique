@@ -72,7 +72,7 @@ export function ResetPasswordForm({ token }: Props) {
         <div className="text-center mb-8">
           <div className="relative inline-flex items-center justify-center w-20 h-20 mx-auto mb-3 rounded-xl">
             <Image
-              src="/images/logo/logo FFA 1.png"
+              src="/images/logo/logo FFA.png"
               alt=""
               width={80}
               height={80}

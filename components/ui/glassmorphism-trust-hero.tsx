@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Play, Target, Crown, Star, Shield, Search, TrendingUp } from 'lucide-react'
+import { ArrowRight, Phone, Target, Crown, Star, Shield, Search, TrendingUp } from 'lucide-react'
 
 type HeroTrustClient = { name: string }
 
@@ -66,7 +66,9 @@ export default function GlassmorphismTrustHero(props: GlassHeroProps) {
                 </div>
               </div>
             ) : null}
-            <p className="animate-fade-in delay-100 text-zinc-400 text-xs">{subtitle}</p>
+            {subtitle.trim() ? (
+              <p className="animate-fade-in delay-100 text-zinc-400 text-xs">{subtitle}</p>
+            ) : null}
             <h1 className="animate-fade-in delay-200 text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-medium tracking-tighter leading-[0.95]">
               {title}
               <br />
@@ -79,7 +81,7 @@ export default function GlassmorphismTrustHero(props: GlassHeroProps) {
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link href={ctaSecondary.href} className="group inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-8 py-4 text-sm font-semibold text-white">
-                <Play className="w-4 h-4 fill-current" />
+                <Phone className="w-4 h-4 text-[#D4A843]" aria-hidden="true" />
                 {ctaSecondary.label}
               </Link>
             </div>

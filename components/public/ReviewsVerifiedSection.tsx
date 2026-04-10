@@ -49,12 +49,6 @@ export default function ReviewsVerifiedSection({ temoignages, stats, intro }: Pr
 
   return (
     <div className="relative border-y border-[#2C2C2E] bg-[#1C1C1E]">
-      <div className="container-site pt-12 md:pt-14">
-        <div className="mb-6 flex items-center justify-end">
-          <PublicReviewModal />
-        </div>
-      </div>
-
       <ClientsSection
         tagLabel={intro?.sousTitre ?? 'Avis vérifiés'}
         title={intro?.titre ?? 'Ce que disent nos clients'}
@@ -64,16 +58,16 @@ export default function ReviewsVerifiedSection({ temoignages, stats, intro }: Pr
         }
         stats={statsData}
         testimonials={testimonialsData}
+        primarySlot={<PublicReviewModal triggerVariant="button" />}
         primaryActionLabel="Donner mon avis"
         secondaryActionLabel="Voir nos annonces"
-        primaryActionHref="#donner-avis"
         secondaryActionHref="/annonces"
         className="py-8 md:py-10"
       />
 
       <div className="container-site pb-10">
         <div className="rounded-2xl border border-[#3A3A3C] bg-[#2C2C2E] px-5 py-4 flex flex-wrap items-center gap-4 text-sm text-[#8E8E93]">
-          <Image src="/images/logo/logo FFA 1.png" alt="Foncier Facile Afrique" width={42} height={42} className="object-contain" />
+          <Image src="/images/logo/logo FFA.png" alt="Foncier Facile Afrique" width={42} height={42} className="object-contain" />
           <span>
             {hasStats
               ? `Basé sur ${stats.total} avis vérifiés — note moyenne ${avgDisplay}/5 (${quality}).`

@@ -27,6 +27,8 @@ export interface ClientsSectionProps {
   description: string
   stats: Stat[]
   testimonials: Testimonial[]
+  /** Remplace le bouton principal (ex. ouverture d’un modal). */
+  primarySlot?: React.ReactNode
   primaryActionLabel: string
   secondaryActionLabel: string
   primaryActionHref?: string
@@ -93,6 +95,7 @@ export const ClientsSection = ({
   description,
   stats,
   testimonials,
+  primarySlot,
   primaryActionLabel,
   secondaryActionLabel,
   primaryActionHref,
@@ -127,15 +130,16 @@ export const ClientsSection = ({
                 {secondaryActionLabel}
               </Button>
             )}
-            {primaryActionHref ? (
-              <Button asChild size="lg" className="rounded-full">
-                <Link href={primaryActionHref}>{primaryActionLabel}</Link>
-              </Button>
-            ) : (
-              <Button size="lg" className="rounded-full" disabled>
-                {primaryActionLabel}
-              </Button>
-            )}
+            {primarySlot ??
+              (primaryActionHref ? (
+                <Button asChild size="lg" className="rounded-full">
+                  <Link href={primaryActionHref}>{primaryActionLabel}</Link>
+                </Button>
+              ) : (
+                <Button size="lg" className="rounded-full" disabled>
+                  {primaryActionLabel}
+                </Button>
+              ))}
           </div>
         </div>
 

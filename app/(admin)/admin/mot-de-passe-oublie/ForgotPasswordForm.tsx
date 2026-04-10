@@ -50,7 +50,7 @@ export function ForgotPasswordForm() {
             aria-label="Retour à la connexion"
           >
             <Image
-              src="/images/logo/logo FFA 1.png"
+              src="/images/logo/logo FFA.png"
               alt=""
               width={80}
               height={80}

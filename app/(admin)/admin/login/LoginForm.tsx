@@ -51,7 +51,7 @@ export function LoginForm() {
             aria-label="Aller sur le site public"
           >
             <Image
-              src="/images/logo/logo FFA 1.png"
+              src="/images/logo/logo FFA.png"
               alt=""
               width={80}
               height={80}

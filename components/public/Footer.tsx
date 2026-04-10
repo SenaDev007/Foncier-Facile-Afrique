@@ -121,7 +121,7 @@ export default function Footer({
       ]}
       logo={
         <Image
-          src="/images/logo/logo FFA 1.png"
+          src="/images/logo/logo FFA.png"
           alt="Foncier Facile Afrique"
           width={34}
           height={34}

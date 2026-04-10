@@ -46,7 +46,7 @@ export function Header2({ links, pathname }: Header2Props) {
       <nav className="container-site flex h-[72px] items-center justify-between">
         <Link href="/" className="flex items-center gap-3" aria-label="Foncier Facile Afrique — Accueil">
           <div className="relative w-12 h-12 flex items-center justify-center">
-            <Image src="/images/logo/logo FFA 1.png" alt="" width={48} height={48} className="object-contain" />
+            <Image src="/images/logo/logo FFA.png" alt="" width={48} height={48} className="object-contain" />
           </div>
           <div className="hidden sm:flex flex-col leading-tight">
             <span className="font-heading font-bold text-[#EFEFEF] text-lg tracking-tight">Foncier Facile</span>

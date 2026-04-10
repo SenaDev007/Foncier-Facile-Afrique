@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { put } from '@vercel/blob'
 import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
 import fs from 'fs/promises'
@@ -24,14 +25,14 @@ export async function POST(req: NextRequest) {
     if (!ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
         { success: false, error: 'Type de fichier non autorisé (JPEG, PNG, WebP uniquement)' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
         { success: false, error: 'Fichier trop volumineux (5 MB maximum)' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -40,19 +41,31 @@ export async function POST(req: NextRequest) {
     const month = String(now.getMonth() + 1).padStart(2, '0')
     const ext = file.name.split('.').pop() ?? 'jpg'
     const filename = `${uuidv4()}.${ext}`
+    const buffer = Buffer.from(await file.arrayBuffer())
+
+    const blobToken = process.env.BLOB_READ_WRITE_TOKEN
+    if (blobToken) {
+      const key = `annonces/${year}/${month}/${filename}`
+      const blob = await put(key, buffer, {
+        access: 'public',
+        token: blobToken,
+        contentType: file.type,
+      })
+      return NextResponse.json(
+        { success: true, url: blob.url, data: { url: blob.url, filename } },
+        { status: 201 },
+      )
+    }
+
     const subDir = path.join('public', 'uploads', String(year), month)
     const fullDir = path.join(process.cwd(), subDir)
-
     await fs.mkdir(fullDir, { recursive: true })
-
-    const buffer = Buffer.from(await file.arrayBuffer())
     await fs.writeFile(path.join(fullDir, filename), buffer)
-
     const url = `/uploads/${year}/${month}/${filename}`
 
     return NextResponse.json({ success: true, url, data: { url, filename } }, { status: 201 })
   } catch (error) {
     console.error('POST /api/upload error:', error)
-    return NextResponse.json({ success: false, error: 'Erreur lors de l\'upload' }, { status: 500 })
+    return NextResponse.json({ success: false, error: "Erreur lors de l'upload" }, { status: 500 })
   }
 }

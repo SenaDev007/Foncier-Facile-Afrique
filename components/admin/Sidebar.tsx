@@ -63,7 +63,7 @@ export default function Sidebar() {
         <Link href="/" className="flex items-center gap-3" aria-label="Retour au site">
           <div className="relative w-12 h-12 flex-shrink-0">
             <Image
-              src="/images/logo/logo FFA 1.png"
+              src="/images/logo/logo FFA.png"
               alt="Logo FFA"
               width={48}
               height={48}

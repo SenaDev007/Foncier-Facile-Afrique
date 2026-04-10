@@ -9,7 +9,7 @@ import { getReviewAggregate } from '@/lib/reviews-stats'
 import { LandingHeroGlass } from '@/components/public/LandingHeroGlass'
 import { LandingAnnoncesNewsSection } from '@/components/public/LandingAnnoncesNewsSection'
 import type { AnnonceCard as AnnonceCardModel } from '@/types'
-import { LandingBlog3DSection } from '@/components/public/LandingBlog3DSection'
+import { BlogConseilsCarousel } from '@/components/ui/testimonals-carousel'
 import ReviewsVerifiedSection from '@/components/public/ReviewsVerifiedSection'
 import { AnimateOnScroll } from '@/components/ui/AnimateOnScroll'
 import { ArrowRight } from 'lucide-react'
@@ -203,7 +203,7 @@ export default async function AccueilPage() {
               </p>
             </div>
 
-            <LandingBlog3DSection posts={blogPosts as import('@/types').BlogPostWithAuthor[]} />
+            <BlogConseilsCarousel posts={blogPosts as import('@/types').BlogPostWithAuthor[]} />
           </div>
         </section>
       )}

@@ -1,7 +1,14 @@
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
+import { adminPageMetadata } from '@/lib/seo'
 import { LoginForm } from './LoginForm'
+
+export const metadata = adminPageMetadata({
+  title: 'Connexion — Back-office FFA',
+  pathname: '/admin/login',
+  description: 'Connexion sécurisée à l’espace d’administration Foncier Facile Afrique.',
+})
 
 export default async function LoginPage() {
   const session = await auth()

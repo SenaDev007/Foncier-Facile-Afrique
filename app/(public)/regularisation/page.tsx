@@ -72,7 +72,7 @@ export default function RegularisationPage() {
               <p className="mt-4 text-[#8E8E93] text-lg max-w-xl">
                 Un diagnostic gratuit pour orienter votre dossier : titre, mutation, litige ou audit avant achat.
               </p>
-              <dl className="mt-8 grid grid-cols-3 gap-4 text-center sm:text-left">
+              <dl className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
                 <div>
                   <dt className="text-2xl font-heading font-bold text-[#D4A843]">+200</dt>
                   <dd className="text-xs text-[#8E8E93]">Dossiers suivis</dd>

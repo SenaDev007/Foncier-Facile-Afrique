@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Mail, Phone, ExternalLink } from 'lucide-react'
@@ -7,10 +8,25 @@ import { getServerBaseUrl } from '@/lib/app-url'
 import { formatPrice, formatDate } from '@/lib/utils'
 import { ReservationAdminActions } from '@/components/admin/ReservationAdminActions'
 
-export const metadata: Metadata = { title: 'Détail réservation — Admin FFA' }
-
 interface PageProps {
   params: { id: string }
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const r = await prisma.reservation.findUnique({
+    where: { id: params.id },
+    select: { reference: true, nomVoyageur: true },
+  })
+  const title = r
+    ? `Réservation ${r.reference} — ${r.nomVoyageur} — Admin FFA`
+    : 'Détail réservation — Admin FFA'
+  return adminPageMetadata({
+    title,
+    pathname: `/admin/reservations/${params.id}`,
+    description: r
+      ? `Fiche réservation ${r.reference} — voyageur ${r.nomVoyageur}.`
+      : 'Consultation d’une réservation séjour.',
+  })
 }
 
 const payLabel: Record<string, string> = {

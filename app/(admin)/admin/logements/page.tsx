@@ -1,10 +1,14 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatPrice } from '@/lib/utils'
 import { Plus, Pencil } from 'lucide-react'
 
-export const metadata: Metadata = { title: 'Logements séjour — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Logements séjour — Admin FFA',
+  pathname: '/admin/logements',
+  description: 'Gestion des hébergements courte durée (fiches, photos, disponibilité).',
+})
 
 const statutClass: Record<string, string> = {
   DISPONIBLE: 'bg-emerald-500/20 text-emerald-300',

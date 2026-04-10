@@ -1,10 +1,14 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
 import { ArrowLeft } from 'lucide-react'
 
-export const metadata: Metadata = { title: 'Commandes ebooks — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Commandes ebooks — Admin FFA',
+  pathname: '/admin/ebooks/commandes',
+  description: 'Historique des commandes et statuts de paiement ebooks.',
+})
 
 const statutColors: Record<string, string> = {
   EN_ATTENTE: 'bg-[#3A3A3C] text-[#8E8E93]',

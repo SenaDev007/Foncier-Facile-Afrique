@@ -1,11 +1,15 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
 import { Star } from 'lucide-react'
 import { TemoignageToggle } from '@/components/admin/TemoignageToggle'
 
-export const metadata: Metadata = { title: 'Témoignages — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Témoignages — Admin FFA',
+  pathname: '/admin/temoignages',
+  description: 'Modération des avis clients affichés sur le site.',
+})
 
 interface PageProps {
   searchParams: { statut?: string }

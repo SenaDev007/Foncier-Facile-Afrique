@@ -1,14 +1,34 @@
 import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Phone, Mail, Reply } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
 
-export const metadata: Metadata = { title: 'Message — Admin FFA' }
-
 interface PageProps {
   params: { id: string }
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const message = await prisma.message.findUnique({
+    where: { id: params.id },
+    select: { nom: true, prenom: true, sujet: true },
+  })
+  const who = message ? [message.prenom, message.nom].filter(Boolean).join(' ') || message.nom : ''
+  const title =
+    who && message?.sujet
+      ? `Message : ${who} — ${message.sujet} — Admin FFA`
+      : who
+        ? `Message : ${who} — Admin FFA`
+        : 'Message — Admin FFA'
+  return adminPageMetadata({
+    title,
+    pathname: `/admin/messages/${params.id}`,
+    description: message?.sujet
+      ? `Lecture du message « ${message.sujet} ».`
+      : 'Lecture d’un message de contact.',
+  })
 }
 
 export default async function MessageDetailPage({ params }: PageProps) {

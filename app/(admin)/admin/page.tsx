@@ -1,11 +1,15 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import DashboardStats from '@/components/admin/DashboardStats'
 import { formatDate } from '@/lib/utils'
 import Link from 'next/link'
 import { MessageSquare, User, ExternalLink } from 'lucide-react'
 import { getDashboardPageData, formatLeadDisplayName } from '@/lib/admin-dashboard'
 
-export const metadata: Metadata = { title: 'Tableau de bord — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Tableau de bord — Admin FFA',
+  pathname: '/admin',
+  description: 'Vue d’ensemble des annonces, leads, messages et statistiques du back-office.',
+})
 
 export default async function DashboardPage() {
   const { stats, leads, messages, statsError } = await getDashboardPageData()

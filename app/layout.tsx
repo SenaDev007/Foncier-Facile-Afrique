@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Playfair_Display, Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'sonner'
@@ -45,10 +45,17 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [{ media: '(prefers-color-scheme: dark)', color: '#1C1C1E' }],
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className={`${playfair.variable} ${inter.variable}`}>
-      <body className="font-body antialiased">
+      <body className="font-body min-w-0 overflow-x-clip antialiased">
         {children}
         <Toaster position="top-right" richColors />
       </body>

@@ -1,8 +1,12 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import { auth } from '@/lib/auth'
 import { ChangePasswordForm } from './ChangePasswordForm'
 
-export const metadata: Metadata = { title: 'Mon compte — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Mon compte — Admin FFA',
+  pathname: '/admin/compte',
+  description: 'Profil administrateur et changement de mot de passe.',
+})
 
 export default async function ComptePage() {
   const session = await auth()

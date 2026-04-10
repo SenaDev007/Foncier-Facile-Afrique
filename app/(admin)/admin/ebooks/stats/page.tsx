@@ -1,9 +1,13 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { TrendingUp, ShoppingBag, Download, Tag, ArrowLeft } from 'lucide-react'
 
-export const metadata: Metadata = { title: 'Statistiques ebooks — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Statistiques ebooks — Admin FFA',
+  pathname: '/admin/ebooks/stats',
+  description: 'Ventes, téléchargements et performance des ebooks.',
+})
 
 export default async function EbookStatsPage() {
   const [commandes, ebooks] = await Promise.all([

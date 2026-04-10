@@ -1,10 +1,14 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
 import { LeadsKanban } from '@/components/admin/LeadsKanban'
 
-export const metadata: Metadata = { title: 'Leads — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Leads — Admin FFA',
+  pathname: '/admin/leads',
+  description: 'Pipeline commercial : prospects, statuts et relances.',
+})
 
 interface PageProps {
   searchParams: { page?: string; statut?: string; vue?: string }

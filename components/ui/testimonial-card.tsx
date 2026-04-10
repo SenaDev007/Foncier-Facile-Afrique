@@ -115,7 +115,7 @@ export const ClientsSection = ({
 
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight">{title}</h2>
           <p className="text-lg text-muted-foreground">{description}</p>
-          <div className="grid grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
             {stats.map((stat) => (
               <StatCard key={stat.label} {...stat} />
             ))}

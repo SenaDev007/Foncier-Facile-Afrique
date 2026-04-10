@@ -77,8 +77,11 @@ body.light-mode {
   * {
     @apply border-border;
   }
+  html {
+    @apply overflow-x-clip;
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground min-w-0;
     font-family: var(--font-body);
   }
   h1, h2, h3, h4, h5, h6 {

@@ -1,14 +1,26 @@
 import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { TemoignageForm } from '@/components/admin/TemoignageForm'
 
-export const metadata: Metadata = { title: 'Modifier témoignage — Admin FFA' }
-
 interface PageProps {
   params: { id: string }
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const t = await prisma.temoignage.findUnique({
+    where: { id: params.id },
+    select: { nom: true },
+  })
+  const title = t ? `Modifier témoignage : ${t.nom} — Admin FFA` : 'Modifier témoignage — Admin FFA'
+  return adminPageMetadata({
+    title,
+    pathname: `/admin/temoignages/${params.id}/edit`,
+    description: t ? `Éditer l’avis de ${t.nom}.` : 'Modifier un témoignage client.',
+  })
 }
 
 export default async function EditTemoignagePage({ params }: PageProps) {

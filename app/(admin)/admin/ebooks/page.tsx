@@ -1,10 +1,14 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import Image from 'next/image'
 import { prisma } from '@/lib/prisma'
 import { Plus, Edit, Eye, Star } from 'lucide-react'
 
-export const metadata: Metadata = { title: 'Ebooks — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Ebooks — Admin FFA',
+  pathname: '/admin/ebooks',
+  description: 'Catalogue des ebooks : prix, visibilité et liens de vente.',
+})
 
 export default async function AdminEbooksPage() {
   const ebooks = await prisma.ebook.findMany({

@@ -25,7 +25,7 @@ export default async function PublicLayout({ children }: { children: React.React
     <>
       <SiteJsonLd />
       <Navbar />
-      <main id="main-content">
+      <main id="main-content" className="w-full min-w-0">
         <PageTransition>{children}</PageTransition>
       </main>
       <Footer

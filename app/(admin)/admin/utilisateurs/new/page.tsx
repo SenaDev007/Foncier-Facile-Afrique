@@ -1,9 +1,13 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { UserForm, type RoleOption } from '@/components/admin/UserForm'
 
-export const metadata: Metadata = { title: 'Créer un utilisateur — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Créer un utilisateur — Admin FFA',
+  pathname: '/admin/utilisateurs/new',
+  description: 'Ajouter un compte administrateur, agent ou éditeur.',
+})
 
 const ROLES_SUPER_ADMIN: RoleOption[] = ['SUPER_ADMIN', 'ADMIN', 'AGENT', 'EDITEUR']
 const ROLES_ADMIN: RoleOption[] = ['AGENT', 'EDITEUR']

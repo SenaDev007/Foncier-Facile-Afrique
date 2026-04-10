@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Phone, Mail, ExternalLink } from 'lucide-react'
@@ -8,10 +9,22 @@ import { auth } from '@/lib/auth'
 import { LeadDetailCRM } from '@/components/admin/LeadDetailCRM'
 import { LEAD_STATUT_LABELS } from '@/lib/lead-constants'
 
-export const metadata: Metadata = { title: 'Détail lead — Admin FFA' }
-
 interface PageProps {
   params: { id: string }
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const lead = await prisma.lead.findUnique({
+    where: { id: params.id },
+    select: { nom: true, prenom: true },
+  })
+  const label = lead ? [lead.prenom, lead.nom].filter(Boolean).join(' ') : ''
+  const title = label ? `Lead : ${label} — Admin FFA` : 'Détail lead — Admin FFA'
+  return adminPageMetadata({
+    title,
+    pathname: `/admin/leads/${params.id}`,
+    description: label ? `Fiche prospect ${label}.` : 'Consultation d’un lead.',
+  })
 }
 
 const statutColors: Record<string, string> = {

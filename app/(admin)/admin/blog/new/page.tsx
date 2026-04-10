@@ -1,9 +1,13 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { BlogForm } from '@/components/admin/BlogForm'
 
-export const metadata: Metadata = { title: 'Nouvel article — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Nouvel article — Admin FFA',
+  pathname: '/admin/blog/new',
+  description: 'Rédiger un nouvel article pour le blog.',
+})
 
 export default function NewBlogPostPage() {
   return (

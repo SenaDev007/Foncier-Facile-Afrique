@@ -1,9 +1,13 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatPrice, formatDate } from '@/lib/utils'
 
-export const metadata: Metadata = { title: 'Réservations — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Réservations — Admin FFA',
+  pathname: '/admin/reservations',
+  description: 'Suivi des réservations séjour et paiements associés.',
+})
 
 const statutClass: Record<string, string> = {
   EN_ATTENTE: 'bg-amber-500/20 text-amber-300',

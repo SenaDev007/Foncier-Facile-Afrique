@@ -1,14 +1,28 @@
 import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { BlogForm } from '@/components/admin/BlogForm'
 
-export const metadata: Metadata = { title: 'Modifier article — Admin FFA' }
-
 interface PageProps {
   params: { id: string }
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const post = await prisma.blogPost.findUnique({
+    where: { id: params.id },
+    select: { titre: true },
+  })
+  const title = post ? `Modifier : ${post.titre} — Admin FFA` : 'Modifier article — Admin FFA'
+  return adminPageMetadata({
+    title,
+    pathname: `/admin/blog/${params.id}/edit`,
+    description: post
+      ? `Modifier l’article « ${post.titre} » (contenu, image, SEO).`
+      : 'Modifier un article du blog existant.',
+  })
 }
 
 export default async function EditBlogPostPage({ params }: PageProps) {

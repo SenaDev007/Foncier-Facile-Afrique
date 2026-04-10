@@ -1,10 +1,14 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
 
-export const metadata: Metadata = { title: 'Dossiers fonciers — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Dossiers fonciers — Admin FFA',
+  pathname: '/admin/dossiers',
+  description: 'Suivi des dossiers de régularisation foncière et missions clients.',
+})
 
 const statutClass: Record<string, string> = {
   DIAGNOSTIC: 'bg-blue-500/20 text-blue-300',

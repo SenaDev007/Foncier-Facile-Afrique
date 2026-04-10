@@ -118,7 +118,7 @@ export default function GlassmorphismTrustHero(props: GlassHeroProps) {
                   </div>
                 </div>
                 <div className="h-px w-full bg-white/10 mb-6" />
-                <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-center">
                   {statMini.map((s) => (
                     <div key={s.label} className="flex flex-col items-center justify-center">
                       <span className="text-xl font-bold text-white sm:text-2xl">{s.value}</span>

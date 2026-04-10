@@ -1,9 +1,13 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { AnnonceForm } from '@/components/admin/AnnonceForm'
 
-export const metadata: Metadata = { title: 'Nouvelle annonce — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Nouvelle annonce — Admin FFA',
+  pathname: '/admin/annonces/new',
+  description: 'Créer une nouvelle annonce immobilière pour le site public.',
+})
 
 export default function NewAnnoncePage() {
   return (

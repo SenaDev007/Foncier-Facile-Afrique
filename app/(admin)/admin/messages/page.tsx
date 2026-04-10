@@ -1,10 +1,14 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
 import { MailOpen, Mail } from 'lucide-react'
 
-export const metadata: Metadata = { title: 'Messages — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Messages — Admin FFA',
+  pathname: '/admin/messages',
+  description: 'Boîte de réception des messages envoyés depuis le site.',
+})
 
 interface PageProps {
   searchParams: { page?: string; lu?: string }

@@ -101,3 +101,56 @@ function resolveOgImageUrl(ogImage?: string | null): string {
   if (ogImage.startsWith('http://') || ogImage.startsWith('https://')) return ogImage
   return absUrl(ogImage.startsWith('/') ? ogImage : `/${ogImage}`)
 }
+
+const ADMIN_ROBOTS: Metadata['robots'] = {
+  index: false,
+  follow: false,
+  googleBot: { index: false, follow: false },
+}
+
+/**
+ * Métadonnées pages back-office : canonical, OG/Twitter (cohérence), toujours noindex.
+ */
+export function adminPageMetadata(opts: {
+  title: string
+  pathname: string
+  description?: string
+}): Metadata {
+  const desc =
+    opts.description ??
+    'Espace réservé à l’équipe Foncier Facile Afrique — gestion du site, des annonces et des demandes clients.'
+  const d = truncateMetaDescription(desc)
+  const canonical = absUrl(opts.pathname)
+  const og = absUrl('/images/og-default.jpg')
+  return {
+    title: opts.title,
+    description: d,
+    alternates: { canonical },
+    robots: ADMIN_ROBOTS,
+    openGraph: {
+      title: opts.title,
+      description: d,
+      url: canonical,
+      siteName: 'Foncier Facile Afrique',
+      locale: 'fr_FR',
+      type: 'website',
+      images: [{ url: og, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: opts.title,
+      description: d,
+      images: [og],
+    },
+  }
+}
+
+/** Métadonnées par défaut pour tout le segment (admin) : noindex + description de secours. */
+export function adminSegmentDefaultMetadata(): Metadata {
+  return {
+    description: truncateMetaDescription(
+      'Espace d’administration Foncier Facile Afrique — connexion sécurisée pour la gestion du site public.',
+    ),
+    robots: ADMIN_ROBOTS,
+  }
+}

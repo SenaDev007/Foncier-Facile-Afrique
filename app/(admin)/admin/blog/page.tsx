@@ -1,11 +1,15 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import type { Prisma } from '@prisma/client'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
 import { Plus } from 'lucide-react'
 
-export const metadata: Metadata = { title: 'Blog — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Blog — Admin FFA',
+  pathname: '/admin/blog',
+  description: 'Articles du blog public : brouillons, planification et publication.',
+})
 
 interface PageProps {
   searchParams: { page?: string; statut?: string }

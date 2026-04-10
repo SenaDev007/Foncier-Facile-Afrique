@@ -1,11 +1,15 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { DossierCreateForm } from '@/components/admin/DossierCreateForm'
 
-export const metadata: Metadata = { title: 'Nouveau dossier — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Nouveau dossier — Admin FFA',
+  pathname: '/admin/dossiers/nouveau',
+  description: 'Créer un nouveau dossier de régularisation ou d’accompagnement foncier.',
+})
 
 export default async function NouveauDossierPage() {
   const session = await auth()

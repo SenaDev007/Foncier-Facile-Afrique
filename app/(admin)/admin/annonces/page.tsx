@@ -1,12 +1,16 @@
-import type { Metadata } from 'next'
 import Link from 'next/link'
+import { adminPageMetadata } from '@/lib/seo'
 import { prisma } from '@/lib/prisma'
 import { formatPrice, formatDate, getStatutLabel, getStatutColor } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Eye, ExternalLink } from 'lucide-react'
 import { AnnonceAdminDeleteButton } from '@/components/admin/AnnonceAdminDeleteButton'
 
-export const metadata: Metadata = { title: 'Annonces — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Annonces — Admin FFA',
+  pathname: '/admin/annonces',
+  description: 'Liste et gestion des annonces immobilières publiées sur le site.',
+})
 
 interface PageProps {
   searchParams: { page?: string; statut?: string; type?: string }

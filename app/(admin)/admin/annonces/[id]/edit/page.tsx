@@ -1,14 +1,28 @@
 import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, ExternalLink } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 import { AnnonceForm } from '@/components/admin/AnnonceForm'
 
-export const metadata: Metadata = { title: 'Modifier annonce — Admin FFA' }
-
 interface PageProps {
   params: { id: string }
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const annonce = await prisma.annonce.findUnique({
+    where: { id: params.id },
+    select: { titre: true },
+  })
+  const title = annonce ? `Modifier : ${annonce.titre} — Admin FFA` : 'Modifier annonce — Admin FFA'
+  return adminPageMetadata({
+    title,
+    pathname: `/admin/annonces/${params.id}/edit`,
+    description: annonce
+      ? `Modifier l’annonce « ${annonce.titre} ».`
+      : 'Modifier une annonce existante (texte, photos, statut).',
+  })
 }
 
 export default async function EditAnnoncePage({ params }: PageProps) {

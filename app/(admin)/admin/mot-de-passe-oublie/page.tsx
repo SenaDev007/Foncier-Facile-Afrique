@@ -1,7 +1,14 @@
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
+import { adminPageMetadata } from '@/lib/seo'
 import { ForgotPasswordForm } from './ForgotPasswordForm'
+
+export const metadata = adminPageMetadata({
+  title: 'Mot de passe oublié — Back-office FFA',
+  pathname: '/admin/mot-de-passe-oublie',
+  description: 'Demander un lien de réinitialisation du mot de passe administrateur.',
+})
 
 export default async function MotDePasseOubliePage() {
   const session = await auth()

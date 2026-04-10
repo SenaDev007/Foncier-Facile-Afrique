@@ -1,9 +1,13 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { LogementForm } from '@/components/admin/LogementForm'
 
-export const metadata: Metadata = { title: 'Nouveau logement — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Nouveau logement — Admin FFA',
+  pathname: '/admin/logements/nouveau',
+  description: 'Créer une fiche logement pour l’offre séjour.',
+})
 
 export default function NouveauLogementPage() {
   return (

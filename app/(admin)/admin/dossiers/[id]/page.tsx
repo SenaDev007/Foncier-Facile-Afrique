@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Mail, Phone } from 'lucide-react'
@@ -7,10 +8,23 @@ import { formatDate } from '@/lib/utils'
 import { auth } from '@/lib/auth'
 import { DossierDetailAdmin } from '@/components/admin/DossierDetailAdmin'
 
-export const metadata: Metadata = { title: 'Détail dossier — Admin FFA' }
-
 interface PageProps {
   params: { id: string }
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const d = await prisma.dossierFoncier.findFirst({
+    where: { id: params.id, deletedAt: null },
+    select: { reference: true, nomClient: true },
+  })
+  const title = d ? `Dossier ${d.reference} — ${d.nomClient} — Admin FFA` : 'Détail dossier — Admin FFA'
+  return adminPageMetadata({
+    title,
+    pathname: `/admin/dossiers/${params.id}`,
+    description: d
+      ? `Fiche dossier ${d.reference} — client ${d.nomClient}.`
+      : 'Consultation d’un dossier foncier.',
+  })
 }
 
 const typeRegulLabel: Record<string, string> = {

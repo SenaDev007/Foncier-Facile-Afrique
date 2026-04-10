@@ -1,10 +1,14 @@
-import type { Metadata } from 'next'
+import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
 import { UserCheck, UserX, UserPlus } from 'lucide-react'
 
-export const metadata: Metadata = { title: 'Utilisateurs — Admin FFA' }
+export const metadata = adminPageMetadata({
+  title: 'Utilisateurs — Admin FFA',
+  pathname: '/admin/utilisateurs',
+  description: 'Comptes équipe : rôles, accès back-office et sécurité.',
+})
 
 export default async function AdminUtilisateursPage() {
   const users = await prisma.user.findMany({

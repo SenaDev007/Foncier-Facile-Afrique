@@ -49,14 +49,8 @@ export function LandingBlog3DSection({ posts }: Props) {
   const list = posts.length ? posts : []
   if (!list.length) return null
   return (
-    <div className="relative mx-auto flex h-[26rem] w-full max-w-[980px] items-center justify-center overflow-hidden rounded-2xl border border-[#3A3A3C] bg-[#1C1C1E] [perspective:320px]">
-      <div
-        className="flex flex-row items-center gap-3 md:gap-4"
-        style={{
-          transform:
-            'translateX(-78px) translateY(0px) translateZ(-70px) rotateX(18deg) rotateY(-11deg) rotateZ(14deg)',
-        }}
-      >
+    <div className="relative mx-auto h-[26rem] w-full max-w-[980px] overflow-hidden">
+      <div className="grid h-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
         <Marquee vertical pauseOnHover repeat={2} className="[--duration:34s]">
           {list.map((post) => (
             <BlogMiniCard key={`b1-${post.id}`} post={post} />
@@ -74,10 +68,8 @@ export function LandingBlog3DSection({ posts }: Props) {
         </Marquee>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-[#1C1C1E]" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-[#1C1C1E]" />
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-1/5 bg-gradient-to-r from-[#1C1C1E]" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-1/5 bg-gradient-to-l from-[#1C1C1E]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-[#161618]" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-[#161618]" />
 
       <div className="pointer-events-none absolute bottom-4 right-4 hidden md:flex items-center gap-1 text-[11px] text-[#8E8E93]">
         Pause au survol pour lire

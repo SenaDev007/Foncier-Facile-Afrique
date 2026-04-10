@@ -7,7 +7,7 @@ import { DEFAULT_PUBLIC_SERVICE_CARDS, getPublicServiceCards } from '@/lib/publi
 import { getAccueilParametreCleList } from '@/lib/parametres-accueil'
 import { getReviewAggregate } from '@/lib/reviews-stats'
 import { LandingHeroGlass } from '@/components/public/LandingHeroGlass'
-import { LandingAnnoncesCircularSection } from '@/components/public/LandingAnnoncesCircularSection'
+import { LandingAnnoncesNewsSection } from '@/components/public/LandingAnnoncesNewsSection'
 import type { AnnonceCard as AnnonceCardModel } from '@/types'
 import { LandingBlog3DSection } from '@/components/public/LandingBlog3DSection'
 import ReviewsVerifiedSection from '@/components/public/ReviewsVerifiedSection'
@@ -222,7 +222,7 @@ export default async function AccueilPage() {
               </div>
             </AnimateOnScroll>
             
-            <LandingAnnoncesCircularSection annonces={annonces as AnnonceCardModel[]} />
+            <LandingAnnoncesNewsSection annonces={annonces as AnnonceCardModel[]} />
           </div>
         </section>
       )}

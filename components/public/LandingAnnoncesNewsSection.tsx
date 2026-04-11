@@ -40,7 +40,7 @@ export function LandingAnnoncesNewsSection({ annonces }: { annonces: AnnonceCard
 
   return (
     <div className="space-y-6">
-      <NewsCards newsCards={cards} title="Dernières annonces" subtitle="Sélection de biens publiés depuis le back-office" />
+      <NewsCards newsCards={cards} />
       <div className="text-center">
         <Link
           href="/annonces"

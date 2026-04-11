@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence, useReducedMotion, LayoutGroup } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { BookmarkIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -40,13 +40,12 @@ const defaultStatusBars: StatusBar[] = [
 ];
 
 export function NewsCards({
-  title = "Dernières annonces",
-  subtitle = "Biens récents vérifiés par Foncier Facile Afrique",
+  title = "",
+  subtitle = "",
   statusBars = defaultStatusBars,
   newsCards = [],
   enableAnimations = true,
 }: NewsCardsProps) {
-  const [isLoaded, setIsLoaded] = useState(false);
   const [selectedCard, setSelectedCard] = useState<NewsCard | null>(null);
   const [bookmarkedCards, setBookmarkedCards] = useState<Set<string>>(new Set());
   const shouldReduceMotion = useReducedMotion();
@@ -62,33 +61,23 @@ export function NewsCards({
     });
   };
 
-  useEffect(() => {
-    if (shouldAnimate) {
-      const timer = setTimeout(() => setIsLoaded(true), 100);
-      return () => clearTimeout(timer);
-    }
-    setIsLoaded(true);
-  }, [shouldAnimate]);
-
   return (
-    <motion.div
-      className="w-full max-w-6xl mx-auto p-6 bg-[#161618] text-[#EFEFEF]"
-      initial={shouldAnimate ? { opacity: 0 } : false}
-      animate={isLoaded ? { opacity: 1 } : { opacity: 0 }}
-    >
-      <div className="mb-8">
-        <h2 className="text-4xl font-bold mb-2 font-heading">{title}</h2>
-        <p className="text-[#8E8E93] text-lg">{subtitle}</p>
-        <div className="mt-6 space-y-1">
-          {statusBars.map((bar) => (
-            <div
-              key={bar.id}
-              className={cn("h-0.5 rounded-full", bar.id === "1" ? "bg-[#D4A843]" : "bg-[#D4A843]/60")}
-              style={{ opacity: bar.opacity, width: `${(bar.length / 3) * 100}%` }}
-            />
-          ))}
+    <div className="w-full max-w-6xl mx-auto p-6 bg-[#161618] text-[#EFEFEF]">
+      {(title || subtitle) && (
+        <div className="mb-8">
+          {title && <h2 className="text-4xl font-bold mb-2 font-heading">{title}</h2>}
+          {subtitle && <p className="text-[#8E8E93] text-lg">{subtitle}</p>}
+          <div className="mt-6 space-y-1">
+            {statusBars.map((bar) => (
+              <div
+                key={bar.id}
+                className={cn("h-0.5 rounded-full", bar.id === "1" ? "bg-[#D4A843]" : "bg-[#D4A843]/60")}
+                style={{ opacity: bar.opacity, width: `${(bar.length / 3) * 100}%` }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <LayoutGroup>
         <motion.div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
@@ -155,6 +144,6 @@ export function NewsCards({
           )}
         </AnimatePresence>
       </LayoutGroup>
-    </motion.div>
+    </div>
   );
 }

@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Star, CheckCircle2 } from 'lucide-react'
 import type { Temoignage } from '@prisma/client'
@@ -81,25 +80,12 @@ export function ReviewsTemoignagesMotionList({ temoignages }: Props) {
             </blockquote>
 
             <div className="flex items-center gap-3 mt-4 pt-4 border-t border-[#3A3A3C]">
-              {t.photo ? (
-                <div className="relative h-11 w-11 rounded-full overflow-hidden border border-[#D4A843]/30 shrink-0">
-                  <Image
-                    src={t.photo}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="44px"
-                    unoptimized={t.photo.startsWith('/')}
-                  />
-                </div>
-              ) : (
-                <div
-                  className="h-11 w-11 rounded-full bg-[#D4A843]/20 border border-[#D4A843]/40 flex items-center justify-center text-sm font-semibold text-[#D4A843] shrink-0"
-                  aria-hidden
-                >
-                  {initials(t.nom)}
-                </div>
-              )}
+              <div
+                className="h-11 w-11 rounded-full bg-[#D4A843]/20 border border-[#D4A843]/40 flex items-center justify-center text-sm font-semibold text-[#D4A843] shrink-0"
+                aria-hidden
+              >
+                {initials(t.nom)}
+              </div>
               <div className="min-w-0">
                 <p className="font-medium text-[#EFEFEF] text-sm truncate">{t.nom}</p>
                 <p className="text-xs text-[#8E8E93]">Client FFA</p>

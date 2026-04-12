@@ -45,16 +45,20 @@ export async function POST(req: NextRequest) {
 
     const blobToken = process.env.BLOB_READ_WRITE_TOKEN
     if (blobToken) {
-      const key = `annonces/${year}/${month}/${filename}`
-      const blob = await put(key, buffer, {
-        access: 'public',
-        token: blobToken,
-        contentType: file.type,
-      })
-      return NextResponse.json(
-        { success: true, url: blob.url, data: { url: blob.url, filename } },
-        { status: 201 },
-      )
+      try {
+        const key = `uploads/${year}/${month}/${filename}`
+        const blob = await put(key, buffer, {
+          access: 'public',
+          token: blobToken,
+          contentType: file.type,
+        })
+        return NextResponse.json(
+          { success: true, url: blob.url, data: { url: blob.url, filename } },
+          { status: 201 },
+        )
+      } catch (blobErr) {
+        console.warn('Vercel Blob upload failed, falling back to filesystem:', blobErr)
+      }
     }
 
     const subDir = path.join('public', 'uploads', String(year), month)

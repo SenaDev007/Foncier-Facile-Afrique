@@ -44,7 +44,7 @@ async function getBlogPosts(params: PageProps['searchParams']) {
 
 export default async function BlogPage({ searchParams }: PageProps) {
   const { posts: rawPosts, total, page, totalPages } = await getBlogPosts(searchParams)
-  const posts = JSON.parse(JSON.stringify(rawPosts))
+  const posts = JSON.parse(JSON.stringify(rawPosts)) as BlogPostWithAuthor[]
 
   return (
     <div className="bg-ffa-ink min-h-screen">
@@ -90,7 +90,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
           <>
             <div className="grid justify-center gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),320px))]">
               {posts.map((post) => (
-                <BlogCard key={post.id} post={post as BlogPostWithAuthor} />
+                <BlogCard key={post.id} post={post} />
               ))}
             </div>
 

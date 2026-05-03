@@ -11,8 +11,8 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 
 interface TemoignageFormProps {
-  initialData: {
-    id: string
+  initialData?: {
+    id?: string
     nom: string
     photo: string | null
     texte: string
@@ -25,12 +25,12 @@ interface TemoignageFormProps {
 export function TemoignageForm({ initialData }: TemoignageFormProps) {
   const router = useRouter()
   const [form, setForm] = useState({
-    nom: initialData.nom,
-    photo: initialData.photo ?? '',
-    texte: initialData.texte,
-    note: initialData.note,
-    actif: initialData.actif,
-    ordre: initialData.ordre,
+    nom: initialData?.nom ?? '',
+    photo: initialData?.photo ?? '',
+    texte: initialData?.texte ?? '',
+    note: initialData?.note ?? 5,
+    actif: initialData?.actif ?? true,
+    ordre: initialData?.ordre ?? 0,
   })
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -64,8 +64,10 @@ export function TemoignageForm({ initialData }: TemoignageFormProps) {
     e.preventDefault()
     setSaving(true)
     try {
-      const res = await fetch(`/api/admin/temoignages/${initialData.id}`, {
-        method: 'PUT',
+      const url = initialData?.id ? `/api/admin/temoignages/${initialData.id}` : '/api/admin/temoignages'
+      const method = initialData?.id ? 'PUT' : 'POST'
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,

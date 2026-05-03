@@ -12,7 +12,7 @@ export const metadata = adminPageMetadata({
 })
 
 interface PageProps {
-  searchParams: { page?: string; statut?: string; vue?: string }
+  searchParams: { page?: string; statut?: string; vue?: string; q?: string }
 }
 
 const ITEMS_PER_PAGE = 20

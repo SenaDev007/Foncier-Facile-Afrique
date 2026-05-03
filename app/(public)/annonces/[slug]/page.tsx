@@ -69,8 +69,6 @@ export default async function AnnonceDetailPage({ params }: PageProps) {
 
   if (!annonce || annonce.statut !== 'EN_LIGNE') notFound()
 
-  await prisma.annonce.update({ where: { id: annonce.id }, data: { vues: { increment: 1 } } })
-
   const similarAnnonces = await prisma.annonce.findMany({
     where: { statut: 'EN_LIGNE', id: { not: annonce.id }, type: annonce.type },
     include: { photos: true },
@@ -78,13 +76,15 @@ export default async function AnnonceDetailPage({ params }: PageProps) {
     take: 3,
   })
 
+  const serializedSimilar = JSON.parse(JSON.stringify(similarAnnonces)) as AnnonceCardType[]
+  
   const whatsappMsg = `Bonjour, je suis intéressé(e) par l'annonce "${annonce.titre}" (Réf. ${annonce.reference}). Pouvez-vous me contacter ?`
-  const mapAnnonce: AnnonceCardType = {
+  const mapAnnonce: AnnonceCardType = JSON.parse(JSON.stringify({
     ...annonce,
     photos: annonce.photos,
     latitude: annonce.latitude,
     longitude: annonce.longitude,
-  }
+  }))
 
   return (
     <div className="bg-ffa-ink min-h-screen py-10">
@@ -120,10 +120,10 @@ export default async function AnnonceDetailPage({ params }: PageProps) {
                 {annonce.surface && (
                   <span className="flex items-center gap-1.5"><Maximize2 className="h-4 w-4 text-ffa-gold" aria-hidden="true" />{annonce.surface} m²</span>
                 )}
-                {annonce.documents.length > 0 && (
+                {annonce.documents && annonce.documents.length > 0 && (
                   <span className="flex items-center gap-1.5"><FileCheck className="h-4 w-4 text-ffa-gold" aria-hidden="true" />{annonce.documents.join(', ')}</span>
                 )}
-                <span className="flex items-center gap-1.5"><Eye className="h-4 w-4" aria-hidden="true" />{annonce.vues + 1} vue{annonce.vues > 0 ? 's' : ''}</span>
+                <span className="flex items-center gap-1.5"><Eye className="h-4 w-4" aria-hidden="true" />{annonce.vues} vue{annonce.vues > 1 ? 's' : ''}</span>
                 <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4" aria-hidden="true" />Réf. {annonce.reference}</span>
               </div>
 
@@ -152,8 +152,8 @@ export default async function AnnonceDetailPage({ params }: PageProps) {
               <div>
                 <h2 className="font-heading text-xl font-bold text-ffa-fg mb-4">Biens similaires</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {similarAnnonces.map((a) => (
-                    <AnnonceCard key={a.id} annonce={a as AnnonceCardType} />
+                  {serializedSimilar.map((a) => (
+                    <AnnonceCard key={a.id} annonce={a} />
                   ))}
                 </div>
               </div>

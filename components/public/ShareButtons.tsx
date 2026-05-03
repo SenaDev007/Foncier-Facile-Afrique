@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Share2, Facebook, Twitter, Linkedin, MessageCircle, Link2, Check } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -47,17 +47,7 @@ export default function ShareButtons({
 }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false)
   const [open, setOpen] = useState(false)
-  const [shareUrl, setShareUrl] = useState('')
-
-  useEffect(() => {
-    setShareUrl(
-      url
-        ? url.startsWith('http')
-          ? url
-          : `${window.location.origin}${url}`
-        : window.location.href
-    )
-  }, [url])
+  const shareUrl = url ? (url.startsWith('http') ? url : `${SITE_URL}${url}`) : (typeof window !== 'undefined' ? window.location.href : SITE_URL)
 
   const handleCopyLink = async () => {
     try {

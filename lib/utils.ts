@@ -7,8 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatPrice(price: number): string {
-  const formatted = new Intl.NumberFormat('fr-FR').format(price)
-  return formatted.replace(/\s/g, ' ') + ' FCFA'
+  return new Intl.NumberFormat('fr-FR').format(price) + ' FCFA'
 }
 
 export function slugify(text: string): string {

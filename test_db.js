@@ -1,0 +1,1 @@
+const { PrismaClient } = require('@prisma/client'); const prisma = new PrismaClient(); async function run() { const a = await prisma.annonce.findUnique({ where: { slug: 'domaine-securise-avec-certificat-denregistrement-cadastral-de-23-hectares-a-mareborou-1775903131143' }, include: { photos: true }}); console.log(a); } run();

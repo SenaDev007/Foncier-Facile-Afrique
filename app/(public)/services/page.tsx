@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { publicPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import ServicePageCard from '@/components/public/ServicePageCard'
 import { getPageSections } from '@/lib/pages'
@@ -21,9 +22,26 @@ export default async function ServicesPage() {
 
   return (
     <div className="bg-ffa-ink min-h-screen">
-      <section className="relative py-20 md:py-28 overflow-hidden border-b border-ffa-divider bg-ffa-ink">
-        <div className="absolute inset-0 z-0 bg-gradient-to-b from-ffa-ink via-ffa-ink to-ffa-ink" />
-        <div className="container-site relative z-10 text-center">
+      {/* Hero avec image */}
+      <section className="relative overflow-hidden border-b border-ffa-divider" style={{ minHeight: '380px' }}>
+        <div className="absolute inset-0">
+          <Image
+            src="/images/hero/hero-services.jpg"
+            alt="Experts immobiliers Foncier Facile Afrique"
+            fill
+            className="object-cover object-center"
+            style={{ animation: 'slowZoom 22s ease-in-out infinite alternate' }}
+            priority
+            sizes="100vw"
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(to right, rgba(22,22,24,0.95) 0%, rgba(22,22,24,0.80) 60%, rgba(22,22,24,0.50) 100%)' }}
+          />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(28,28,30,1) 0%, transparent 55%)' }} />
+        </div>
+        <style>{`@keyframes slowZoom { from { transform: scale(1); } to { transform: scale(1.12); } }`}</style>
+        <div className="container-site relative z-10 text-center py-16 md:py-24">
           <p className="text-ffa-gold text-xs font-semibold uppercase tracking-[0.2em] mb-3">
             {hero?.sousTitre ?? 'Nos expertises'}
           </p>

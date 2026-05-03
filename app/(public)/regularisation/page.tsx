@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { publicPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
+import Image from 'next/image'
 import { DiagnosticFoncierForm } from '@/components/public/DiagnosticFoncierForm'
 
 export const metadata: Metadata = publicPageMetadata({
@@ -55,11 +56,30 @@ const ETAPES = [
 export default function RegularisationPage() {
   return (
     <div className="bg-[#1C1C1E] min-h-screen">
-      <section className="relative border-b border-[#D4A843]/25 overflow-hidden">
-        <div
-          className="absolute inset-0 bg-gradient-to-br from-[#D4A843]/12 via-[#1C1C1E] to-[#161618]"
-          aria-hidden="true"
-        />
+      {/* Hero avec image */}
+      <section className="relative overflow-hidden border-b border-[#D4A843]/20" style={{ minHeight: '480px' }}>
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <Image
+            src="/images/hero/hero-regularisation.jpg"
+            alt="Régularisation foncière au Bénin"
+            fill
+            className="object-cover object-center"
+            style={{ animation: 'slowZoom 25s ease-in-out infinite alternate' }}
+            priority
+            sizes="100vw"
+          />
+          {/* Overlays */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to right, rgba(22,22,24,0.95) 0%, rgba(22,22,24,0.75) 55%, rgba(22,22,24,0.35) 100%)',
+            }}
+          />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(28,28,30,0.95) 0%, transparent 60%)' }} />
+        </div>
+        <style>{`@keyframes slowZoom { from { transform: scale(1); } to { transform: scale(1.15); } }`}</style>
         <div className="relative container-site py-14 md:py-20">
           <div className="grid lg:grid-cols-2 gap-10 items-start">
             <div>

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatPrice } from '@/lib/utils'
 import { Plus, Pencil } from 'lucide-react'
+import { AdminDeleteButton } from '@/components/admin/AdminDeleteButton'
 
 export const metadata = adminPageMetadata({
   title: 'Logements séjour — Admin FFA',
@@ -103,6 +104,7 @@ export default async function AdminLogementsPage() {
                         >
                           <Pencil className="h-3 w-3" aria-hidden="true" /> Modifier
                         </Link>
+                        <AdminDeleteButton id={l.id} endpoint="/api/admin/logements" name="ce logement" className="mt-1" />
                       </div>
                     </td>
                   </tr>

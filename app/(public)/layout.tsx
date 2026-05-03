@@ -2,7 +2,6 @@ import Navbar from '@/components/public/Navbar'
 import Footer from '@/components/public/Footer'
 import WhatsAppButton from '@/components/public/WhatsAppButton'
 import SiteJsonLd from '@/components/seo/SiteJsonLd'
-import { PageTransition } from '@/components/ui/PageTransition'
 import { getPageSections } from '@/lib/pages'
 
 /** Données CMS (footer, annonces, blog…) toujours relues à la requête — pas de HTML figé au build. */
@@ -26,7 +25,7 @@ export default async function PublicLayout({ children }: { children: React.React
       <SiteJsonLd />
       <Navbar />
       <main id="main-content" className="w-full min-w-0">
-        <PageTransition>{children}</PageTransition>
+        {children}
       </main>
       <Footer
         tagline={tagline ?? undefined}

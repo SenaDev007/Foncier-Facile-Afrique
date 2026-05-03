@@ -94,13 +94,13 @@ export function NewsCards({
                 <motion.div layoutId={`card-image-${card.id}`} className="relative h-56 overflow-hidden bg-[#1C1C1E]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={card.image} alt={card.title} className="w-full h-full object-cover transform-gpu group-hover:scale-105 transition-transform duration-700 ease-out" />
-                  <div className="absolute inset-x-0 bottom-0 h-1/5 bg-gradient-to-t from-black/70 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/95 via-black/50 to-transparent pointer-events-none" />
                   <motion.div className="absolute top-3 right-3" onClick={(e) => toggleBookmark(card.id, e)}>
                     <BookmarkIcon className={cn("w-5 h-5 cursor-pointer", bookmarkedCards.has(card.id) ? "text-[#D4A843] fill-[#D4A843]" : "text-white/80")} />
                   </motion.div>
-                  <div className="absolute bottom-3 left-3 text-white">
-                    <div className="text-xs mb-1 opacity-90">{card.category}, {card.subcategory}</div>
-                    <div className="text-xs opacity-75">{card.timeAgo}, {card.location}</div>
+                  <div className="absolute bottom-3 left-3 text-white drop-shadow-md z-10">
+                    <div className="text-xs mb-1 font-semibold text-white">{card.category}, {card.subcategory}</div>
+                    <div className="text-xs text-white/90">{card.timeAgo}, {card.location}</div>
                   </div>
                 </motion.div>
                 <motion.div layoutId={`card-content-${card.id}`} className="p-6">

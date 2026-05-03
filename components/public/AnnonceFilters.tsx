@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { Search, SlidersHorizontal, X } from 'lucide-react'
+import { Search, SlidersHorizontal, X, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -56,6 +56,7 @@ export default function AnnonceFilters() {
   const listingBase = pathname.startsWith('/catalogue') ? '/catalogue' : '/annonces'
 
   const [localisation, setLocalisation] = useState(searchParams.get('localisation') ?? '')
+  const [q, setQ] = useState(searchParams.get('q') ?? '')
   const [type, setType] = useState(searchParams.get('type') ?? 'ALL')
   const [prixMax, setPrixMax] = useState(searchParams.get('prixMax') ?? '')
   const [surfaceMin, setSurfaceMin] = useState(searchParams.get('surfaceMin') ?? '')
@@ -72,6 +73,7 @@ export default function AnnonceFilters() {
   const applyFilters = useCallback(() => {
     const params = new URLSearchParams()
     if (localisation) params.set('localisation', localisation)
+    if (q) params.set('q', q)
     if (type && type !== 'ALL') params.set('type', type)
     if (prixMax) params.set('prixMax', prixMax)
     if (surfaceMin) params.set('surfaceMin', surfaceMin)
@@ -79,10 +81,11 @@ export default function AnnonceFilters() {
     if (documents.length > 0) params.set('documents', documents.join(','))
     params.set('page', '1')
     router.push(`${listingBase}?${params.toString()}`)
-  }, [localisation, type, prixMax, surfaceMin, sort, documents, router, listingBase])
+  }, [localisation, q, type, prixMax, surfaceMin, sort, documents, router, listingBase])
 
   const resetFilters = useCallback(() => {
     setLocalisation('')
+    setQ('')
     setType('ALL')
     setPrixMax('')
     setSurfaceMin('')
@@ -91,14 +94,14 @@ export default function AnnonceFilters() {
     router.push(listingBase)
   }, [router, listingBase])
 
-  const hasActiveFilters = localisation || type !== 'ALL' || prixMax || surfaceMin || documents.length > 0
+  const hasActiveFilters = localisation || q || type !== 'ALL' || prixMax || surfaceMin || documents.length > 0
 
   return (
-    <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-5">
+    <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-2xl p-5 shadow-lg shadow-black/10">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 text-[#EFEFEF] font-semibold text-sm">
           <SlidersHorizontal className="h-4 w-4 text-[#D4A843]" aria-hidden="true" />
-          Filtres
+          Filtres de recherche
         </div>
         {hasActiveFilters && (
           <button onClick={resetFilters} className="flex items-center gap-1 text-xs text-[#8E8E93] hover:text-red-400 transition-colors">
@@ -108,11 +111,23 @@ export default function AnnonceFilters() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        <div className="relative sm:col-span-2 lg:col-span-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8E8E93]" aria-hidden="true" />
           <Input
-            placeholder="Localisation..."
+            placeholder="Titre, réf..."
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
+            className="pl-9 bg-[#1C1C1E] border-[#3A3A3C] text-[#EFEFEF] placeholder:text-[#8E8E93]"
+            aria-label="Recherche par mot-clé"
+          />
+        </div>
+
+        <div className="relative">
+          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8E8E93]" aria-hidden="true" />
+          <Input
+            placeholder="Ville, quartier..."
             value={localisation}
             onChange={(e) => setLocalisation(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
@@ -166,27 +181,31 @@ export default function AnnonceFilters() {
         </Select>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-4">
-        <span className="text-xs text-[#8E8E93]">Documents :</span>
-        {ANNONCE_DOCUMENT_OPTIONS.map((d) => (
-          <label
-            key={d.value}
-            className="flex items-center gap-2 text-sm text-[#EFEFEF] cursor-pointer"
-          >
-            <Checkbox
-              checked={documents.includes(d.value)}
-              onCheckedChange={() => toggleDocument(d.value)}
-              className="border-[#3A3A3C] data-[state=checked]:bg-[#D4A843] data-[state=checked]:border-[#D4A843]"
-            />
-            {d.label}
-          </label>
-        ))}
+      <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
+        <span className="text-xs font-semibold text-[#8E8E93] uppercase tracking-wider">Documents requis :</span>
+        <div className="flex flex-wrap gap-4">
+          {ANNONCE_DOCUMENT_OPTIONS.map((d) => (
+            <label
+              key={d.value}
+              className="flex items-center gap-2 text-sm text-[#EFEFEF] cursor-pointer hover:text-[#D4A843] transition-colors"
+            >
+              <Checkbox
+                checked={documents.includes(d.value)}
+                onCheckedChange={() => toggleDocument(d.value)}
+                className="border-[#3A3A3C] data-[state=checked]:bg-[#D4A843] data-[state=checked]:border-[#D4A843]"
+              />
+              {d.label}
+            </label>
+          ))}
+        </div>
       </div>
 
-      <Button onClick={applyFilters} className="mt-4 w-full sm:w-auto" aria-label="Appliquer les filtres">
-        <Search className="h-4 w-4" aria-hidden="true" />
-        Rechercher
-      </Button>
+      <div className="mt-5 flex justify-end">
+        <Button onClick={applyFilters} className="w-full sm:w-auto bg-[#D4A843] hover:bg-[#c2972e] text-[#1C1C1E] font-bold" aria-label="Appliquer les filtres">
+          <Search className="h-4 w-4 mr-2" aria-hidden="true" />
+          Rechercher des biens
+        </Button>
+      </div>
     </div>
   )
 }

@@ -78,6 +78,15 @@ export const AnnonceSchema = z.object({
   documents: z.array(z.string()).default([]),
   modalitesPrix: z.string().optional(),
   auteurId: z.string().min(1, 'Agent requis').optional(),
+  photos: z
+    .array(
+      z.object({
+        url: z.string().min(1),
+        alt: z.string().optional(),
+        ordre: z.coerce.number().int().optional(),
+      })
+    )
+    .optional(),
 })
 
 export const BlogPostSchema = z.object({

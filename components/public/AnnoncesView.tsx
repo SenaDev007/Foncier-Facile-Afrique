@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
+import { useRouter } from 'next/navigation'
 import { LayoutGrid, List, MapPin } from 'lucide-react'
 import AnnonceCard from '@/components/public/AnnonceCard'
 import AnnonceFilters from '@/components/public/AnnonceFilters'
@@ -22,6 +23,7 @@ interface AnnoncesViewProps {
   page: number
   totalPages: number
   searchParams: Record<string, string | undefined>
+  hideHeader?: boolean
 }
 
 export default function AnnoncesView({
@@ -31,8 +33,20 @@ export default function AnnoncesView({
   page,
   totalPages,
   searchParams,
+  hideHeader = false,
 }: AnnoncesViewProps) {
-  const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  const router = useRouter()
+  const viewMode = (searchParams.view as ViewMode) || 'grid'
+
+  const setViewMode = (mode: ViewMode) => {
+    const params = new URLSearchParams(window.location.search)
+    if (mode === 'grid') {
+      params.delete('view')
+    } else {
+      params.set('view', mode)
+    }
+    router.push(`?${params.toString()}`, { scroll: false })
+  }
   const listingBase = variant === 'catalogue' ? '/catalogue' : '/annonces'
   const pageTitle =
     variant === 'catalogue' ? 'Catalogue des biens' : 'Annonces immobilières'
@@ -46,47 +60,82 @@ export default function AnnoncesView({
   }, [searchParams])
 
   return (
-    <div className="bg-[#1C1C1E] min-h-screen">
+    <div className="">
       <div className="container-site py-10">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <div>
-            <h1 className="font-heading text-3xl font-bold text-[#EFEFEF]">
-              {pageTitle}
-            </h1>
-            <p className="text-[#8E8E93] mt-1 text-sm">
-              {total} bien{total > 1 ? 's' : ''} disponible{total > 1 ? 's' : ''}
-            </p>
+        {!hideHeader && (
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+              <h1 className="font-heading text-3xl font-bold text-[#EFEFEF]">
+                {pageTitle}
+              </h1>
+              <p className="text-[#8E8E93] mt-1 text-sm">
+                {total} bien{total > 1 ? 's' : ''} disponible{total > 1 ? 's' : ''}
+              </p>
+            </div>
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-[#2C2C2E] border border-[#3A3A3C]">
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-[#D4A843] text-[#1C1C1E]' : 'text-[#8E8E93] hover:text-[#EFEFEF]'}`}
+                aria-label="Vue grille"
+                aria-pressed={viewMode === 'grid'}
+              >
+                <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-[#D4A843] text-[#1C1C1E]' : 'text-[#8E8E93] hover:text-[#EFEFEF]'}`}
+                aria-label="Vue liste"
+                aria-pressed={viewMode === 'list'}
+              >
+                <List className="h-4 w-4" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('map')}
+                className={`p-2 rounded-lg transition-colors ${viewMode === 'map' ? 'bg-[#D4A843] text-[#1C1C1E]' : 'text-[#8E8E93] hover:text-[#EFEFEF]'}`}
+                aria-label="Vue carte"
+                aria-pressed={viewMode === 'map'}
+              >
+                <MapPin className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-[#2C2C2E] border border-[#3A3A3C]">
-            <button
-              type="button"
-              onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-[#D4A843] text-[#1C1C1E]' : 'text-[#8E8E93] hover:text-[#EFEFEF]'}`}
-              aria-label="Vue grille"
-              aria-pressed={viewMode === 'grid'}
-            >
-              <LayoutGrid className="h-4 w-4" aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('list')}
-              className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-[#D4A843] text-[#1C1C1E]' : 'text-[#8E8E93] hover:text-[#EFEFEF]'}`}
-              aria-label="Vue liste"
-              aria-pressed={viewMode === 'list'}
-            >
-              <List className="h-4 w-4" aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('map')}
-              className={`p-2 rounded-lg transition-colors ${viewMode === 'map' ? 'bg-[#D4A843] text-[#1C1C1E]' : 'text-[#8E8E93] hover:text-[#EFEFEF]'}`}
-              aria-label="Vue carte"
-              aria-pressed={viewMode === 'map'}
-            >
-              <MapPin className="h-4 w-4" aria-hidden="true" />
-            </button>
+        )}
+        {hideHeader && (
+          <div className="flex justify-end mb-6">
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-[#2C2C2E] border border-[#3A3A3C]">
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-[#D4A843] text-[#1C1C1E]' : 'text-[#8E8E93] hover:text-[#EFEFEF]'}`}
+                aria-label="Vue grille"
+                aria-pressed={viewMode === 'grid'}
+              >
+                <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-[#D4A843] text-[#1C1C1E]' : 'text-[#8E8E93] hover:text-[#EFEFEF]'}`}
+                aria-label="Vue liste"
+                aria-pressed={viewMode === 'list'}
+              >
+                <List className="h-4 w-4" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('map')}
+                className={`p-2 rounded-lg transition-colors ${viewMode === 'map' ? 'bg-[#D4A843] text-[#1C1C1E]' : 'text-[#8E8E93] hover:text-[#EFEFEF]'}`}
+                aria-label="Vue carte"
+                aria-pressed={viewMode === 'map'}
+              >
+                <MapPin className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         <Suspense fallback={<div className="h-24 rounded-xl bg-[#2C2C2E] border border-[#3A3A3C] animate-pulse" />}>
           <AnnonceFilters />

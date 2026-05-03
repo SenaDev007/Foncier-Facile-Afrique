@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
 import fs from 'fs/promises'
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
 const MAX_FILE_SIZE = Number(process.env.MAX_FILE_SIZE ?? 5242880)
 
 export async function POST(req: NextRequest) {
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     if (!ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { success: false, error: 'Type de fichier non autorisé (JPEG, PNG, WebP uniquement)' },
+        { success: false, error: `Type ${file.type} non autorisé (JPEG, PNG, WebP uniquement)` },
         { status: 400 },
       )
     }
@@ -39,10 +39,11 @@ export async function POST(req: NextRequest) {
     const now = new Date()
     const year = now.getFullYear()
     const month = String(now.getMonth() + 1).padStart(2, '0')
-    const ext = file.name.split('.').pop() ?? 'jpg'
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
     const filename = `${uuidv4()}.${ext}`
     const buffer = Buffer.from(await file.arrayBuffer())
 
+    // 1. Essayer Vercel Blob si configuré (Recommandé pour la production)
     const blobToken = process.env.BLOB_READ_WRITE_TOKEN
     if (blobToken) {
       try {
@@ -57,19 +58,44 @@ export async function POST(req: NextRequest) {
           { status: 201 },
         )
       } catch (blobErr) {
-        console.warn('Vercel Blob upload failed, falling back to filesystem:', blobErr)
+        console.error('Vercel Blob upload failed:', blobErr)
+        // On continue vers le fallback filesystem si on n'est pas sur Vercel (détection approximative)
+        if (process.env.VERCEL) {
+          return NextResponse.json(
+            { success: false, error: "L'upload sur Vercel Blob a échoué. Vérifiez votre token." },
+            { status: 500 }
+          )
+        }
       }
     }
 
-    const subDir = path.join('public', 'uploads', String(year), month)
-    const fullDir = path.join(process.cwd(), subDir)
-    await fs.mkdir(fullDir, { recursive: true })
-    await fs.writeFile(path.join(fullDir, filename), buffer)
-    const url = `/uploads/${year}/${month}/${filename}`
+    // 2. Fallback Local Filesystem (pour développement local uniquement)
+    try {
+      const subDir = path.join('public', 'uploads', String(year), month)
+      const fullDir = path.join(process.cwd(), subDir)
+      
+      await fs.mkdir(fullDir, { recursive: true })
+      await fs.writeFile(path.join(fullDir, filename), buffer)
+      
+      // Toujours utiliser des slashes / pour les URLs web, même sur Windows
+      const url = `/uploads/${year}/${month}/${filename}`
 
-    return NextResponse.json({ success: true, url, data: { url, filename } }, { status: 201 })
+      return NextResponse.json({ success: true, url, data: { url, filename } }, { status: 201 })
+    } catch (fsErr: any) {
+      console.error('Filesystem upload error:', fsErr)
+      
+      let errorMsg = "Erreur lors de l'écriture du fichier sur le serveur."
+      if (fsErr.code === 'EROFS' || process.env.VERCEL) {
+        errorMsg = "Impossible d'écrire sur le disque (système de fichiers en lecture seule). Utilisez Vercel Blob en production."
+      }
+
+      return NextResponse.json(
+        { success: false, error: errorMsg },
+        { status: 500 }
+      )
+    }
   } catch (error) {
     console.error('POST /api/upload error:', error)
-    return NextResponse.json({ success: false, error: "Erreur lors de l'upload" }, { status: 500 })
+    return NextResponse.json({ success: false, error: "Erreur critique lors de l'upload" }, { status: 500 })
   }
 }

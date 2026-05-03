@@ -31,13 +31,7 @@ export default function ReviewsVerifiedSection({ temoignages, stats, intro }: Pr
     name: t.nom,
     title: 'Client vérifié — Foncier Facile Afrique',
     quote: t.texte,
-    avatarSrc:
-      t.photo ||
-      [
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=240&auto=format&fit=crop&q=60',
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=240&auto=format&fit=crop&q=60',
-        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=240&auto=format&fit=crop&q=60',
-      ][i % 3],
+    avatarSrc: t.photo || '',
     rating: Math.max(1, Math.min(5, t.note)),
   }))
 

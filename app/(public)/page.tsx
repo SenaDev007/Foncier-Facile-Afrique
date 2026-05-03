@@ -84,6 +84,11 @@ async function getHomeData() {
 }
 
 export default async function AccueilPage() {
+  const rawData = await getHomeData()
+  
+  // Sérialisation stricte de toutes les données pour éviter l'erreur "stringify" de Next.js
+  const serializedData = JSON.parse(JSON.stringify(rawData))
+  
   const {
     annonces,
     temoignages,
@@ -93,7 +98,7 @@ export default async function AccueilPage() {
     heroImageMobile,
     homeSections,
     services,
-  } = await getHomeData()
+  } = serializedData
 
   const s = (key: string) => (homeSections as SectionMap)[key]
   const hero = {

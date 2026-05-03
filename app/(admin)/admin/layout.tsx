@@ -3,6 +3,7 @@ import { AdminSignOutButton } from '@/components/admin/AdminSignOutButton'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { AdminMobileMenu } from '@/components/admin/AdminMobileMenu'
 
 const ADMIN_BARE_PATHS = [
   '/admin/login',
@@ -42,12 +43,7 @@ export default async function AdminLayout({
         <header className="bg-[#2C2C2E] border-b border-[#3A3A3C] px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {/* Mobile menu button */}
-              <button className="lg:hidden p-2 rounded-lg hover:bg-[#3A3A3C]">
-                <svg className="w-6 h-6 text-[#EFEFEF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
+              <AdminMobileMenu />
               <h1 className="text-xl font-semibold text-[#EFEFEF]">
                 Backoffice Foncier Facile Afrique
               </h1>

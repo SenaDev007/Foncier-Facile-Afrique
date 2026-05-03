@@ -5,13 +5,28 @@ import { Header2 } from '@/components/ui/header-2'
 
 const navLinks = [
   { href: '/', label: 'Accueil' },
-  { href: '/catalogue', label: 'Catalogue' },
-  { href: '/confier', label: 'Confier' },
-  { href: '/sejour', label: 'Séjour' },
-  { href: '/regularisation', label: 'Régularisation' },
-  { href: '/services', label: 'Services' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/ebooks', label: 'Boutique' },
+  {
+    label: 'Nos Biens',
+    sublinks: [
+      { href: '/catalogue', label: 'Catalogue' },
+      { href: '/confier', label: 'Confier mon bien' },
+      { href: '/sejour', label: 'Séjour' },
+    ],
+  },
+  {
+    label: 'Services',
+    sublinks: [
+      { href: '/services', label: 'Nos services' },
+      { href: '/regularisation', label: 'Régularisation' },
+    ],
+  },
+  {
+    label: 'Ressources',
+    sublinks: [
+      { href: '/blog', label: 'Blog & Conseils' },
+      { href: '/ebooks', label: 'Boutique' },
+    ],
+  },
   { href: '/contact', label: 'Contact' },
 ]
 

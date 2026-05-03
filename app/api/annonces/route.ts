@@ -89,19 +89,19 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const data = parsed.data
+    const { photos: photosData, ...safeData } = data
     const count = await prisma.annonce.count()
     const reference = generateReference(count)
     const slug = slugify(data.titre) + '-' + Date.now()
 
     const annonce = await prisma.annonce.create({
       data: {
-        ...data,
+        ...safeData,
         auteurId: session.user.id,
         reference,
         slug,
         photos: {
-          create: (body.photos ?? []).map((p: { url: string; alt?: string; ordre?: number }, i: number) => ({
+          create: (photosData ?? []).map((p, i) => ({
             url: p.url,
             alt: p.alt ?? data.titre,
             ordre: p.ordre ?? i,

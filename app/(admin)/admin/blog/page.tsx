@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
 import { Plus } from 'lucide-react'
+import { AdminSearchInput } from '@/components/admin/AdminSearchInput'
+import { AdminDeleteButton } from '@/components/admin/AdminDeleteButton'
 
 export const metadata = adminPageMetadata({
   title: 'Blog — Admin FFA',
@@ -12,7 +14,7 @@ export const metadata = adminPageMetadata({
 })
 
 interface PageProps {
-  searchParams: { page?: string; statut?: string }
+  searchParams: { page?: string; statut?: string; q?: string }
 }
 
 const ITEMS_PER_PAGE = 15
@@ -20,9 +22,11 @@ const ITEMS_PER_PAGE = 15
 export default async function AdminBlogPage({ searchParams }: PageProps) {
   const page = Math.max(1, parseInt(searchParams.page ?? '1'))
   const skip = (page - 1) * ITEMS_PER_PAGE
+  const query = searchParams.q?.trim()
 
   const where = {
     ...(searchParams.statut ? { statut: searchParams.statut as 'BROUILLON' | 'PUBLIE' | 'ARCHIVE' } : {}),
+    ...(query ? { titre: { contains: query, mode: 'insensitive' as const } } : {}),
   }
 
   type BlogRow = Prisma.BlogPostGetPayload<{ include: { auteur: { select: { name: true } } } }>
@@ -68,16 +72,19 @@ export default async function AdminBlogPage({ searchParams }: PageProps) {
         </Link>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {[undefined, 'BROUILLON', 'PUBLIE', 'ARCHIVE'].map((s) => (
-          <Link
-            key={s ?? 'all'}
-            href={s ? `/admin/blog?statut=${s}` : '/admin/blog'}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${(searchParams.statut ?? undefined) === s ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[rgba(212,168,67,0.12)] hover:text-[#D4A843]'}`}
-          >
-            {s ?? 'Tous'}
-          </Link>
-        ))}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-wrap gap-2">
+          {[undefined, 'BROUILLON', 'PUBLIE', 'ARCHIVE'].map((s) => (
+            <Link
+              key={s ?? 'all'}
+              href={s ? `/admin/blog?statut=${s}${query ? `&q=${query}` : ''}` : `/admin/blog${query ? `?q=${query}` : ''}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${(searchParams.statut ?? undefined) === s ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[rgba(212,168,67,0.12)] hover:text-[#D4A843]'}`}
+            >
+              {s ?? 'Tous'}
+            </Link>
+          ))}
+        </div>
+        <AdminSearchInput placeholder="Rechercher un titre..." />
       </div>
 
       <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl overflow-hidden">
@@ -112,6 +119,7 @@ export default async function AdminBlogPage({ searchParams }: PageProps) {
                 </td>
                 <td className="px-4 py-3">
                   <Link href={`/admin/blog/${post.id}/edit`} className="text-xs text-[#D4A843] font-medium hover:underline">Modifier</Link>
+                  <AdminDeleteButton id={post.id} endpoint="/api/blog" name="cet article" className="ml-2" />
                 </td>
               </tr>
             ))}
@@ -124,7 +132,7 @@ export default async function AdminBlogPage({ searchParams }: PageProps) {
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <Link
               key={p}
-              href={`/admin/blog?${new URLSearchParams({ ...searchParams, page: String(p) })}`}
+              href={`/admin/blog?${new URLSearchParams({ ...searchParams, page: String(p) }).toString()}`}
               className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-colors ${p === page ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[#3A3A3C]'}`}
               aria-current={p === page ? 'page' : undefined}
             >

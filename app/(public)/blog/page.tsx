@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { publicPageMetadata } from '@/lib/seo'
+import Image from 'next/image'
 import { prisma } from '@/lib/prisma'
 import BlogCard from '@/components/public/BlogCard'
 import type { BlogPostWithAuthor } from '@/types'
@@ -42,18 +43,41 @@ async function getBlogPosts(params: PageProps['searchParams']) {
 }
 
 export default async function BlogPage({ searchParams }: PageProps) {
-  const { posts, total, page, totalPages } = await getBlogPosts(searchParams)
+  const { posts: rawPosts, total, page, totalPages } = await getBlogPosts(searchParams)
+  const posts = JSON.parse(JSON.stringify(rawPosts))
 
   return (
     <div className="bg-ffa-ink min-h-screen">
-      <section className="relative py-20 md:py-28 overflow-hidden border-b border-ffa-divider">
-        <div className="absolute inset-0 bg-ffa-ink" />
-        <div className="container-site relative z-10 text-center">
+      {/* Hero avec image */}
+      <section className="relative overflow-hidden border-b border-ffa-divider" style={{ minHeight: '380px' }}>
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <Image
+            src="/images/hero/hero-blog.jpg"
+            alt="Conseils experts en immobilier"
+            fill
+            className="object-cover object-center"
+            style={{ animation: 'slowZoom 25s ease-in-out infinite alternate' }}
+            priority
+            sizes="100vw"
+          />
+          {/* Overlays */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to right, rgba(22,22,24,0.95) 0%, rgba(22,22,24,0.80) 55%, rgba(22,22,24,0.45) 100%)',
+            }}
+          />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(28,28,30,1) 0%, transparent 60%)' }} />
+        </div>
+        <style>{`@keyframes slowZoom { from { transform: scale(1); } to { transform: scale(1.15); } }`}</style>
+        <div className="container-site relative z-10 text-center py-16 md:py-24">
           <p className="text-ffa-gold text-xs font-semibold uppercase tracking-[0.2em] mb-3">
             Ressources
           </p>
-          <h1 className="font-heading text-4xl md:text-5xl font-bold text-ffa-fg">Blog & Conseils</h1>
-          <p className="mt-4 text-ffa-fg-muted text-lg max-w-xl mx-auto">
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-ffa-fg leading-tight">Blog & Conseils</h1>
+          <p className="mt-4 text-ffa-fg-muted text-lg max-w-xl mx-auto leading-relaxed">
             Expertise foncière, guides d&apos;achat et actualités immobilières en Afrique de l&apos;Ouest.
           </p>
         </div>

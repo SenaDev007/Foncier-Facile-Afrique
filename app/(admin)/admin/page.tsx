@@ -1,5 +1,6 @@
 import { adminPageMetadata } from '@/lib/seo'
 import DashboardStats from '@/components/admin/DashboardStats'
+import DashboardCharts from '@/components/admin/DashboardCharts'
 import { formatDate } from '@/lib/utils'
 import Link from 'next/link'
 import { MessageSquare, User, ExternalLink } from 'lucide-react'
@@ -33,6 +34,8 @@ export default async function DashboardPage() {
       )}
 
       <DashboardStats stats={stats} />
+
+      <DashboardCharts data={stats.chartLeads} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-5">
@@ -91,7 +94,7 @@ export default async function DashboardPage() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-[#EFEFEF] truncate">
-                    {[msg.prenom?.trim(), msg.nom?.trim()].filter(Boolean).join(' ') || msg.nom || 'Sans nom'}
+                    {[msg.prenom?.trim(), msg.nom?.trim()].filter(Boolean).join(' ') || 'Sans nom'}
                   </p>
                   <p className="text-xs text-[#8E8E93] truncate">
                     {msg.sujet ?? (msg.contenu?.slice(0, 50) ?? '')}

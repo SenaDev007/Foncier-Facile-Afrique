@@ -102,7 +102,7 @@ export function BlogForm({ initialData }: BlogFormProps) {
     setSaving(true)
     try {
       const url = isEdit ? `/api/blog/${initialData!.id}` : '/api/blog'
-      const method = isEdit ? 'PATCH' : 'POST'
+      const method = isEdit ? 'PUT' : 'POST'
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },

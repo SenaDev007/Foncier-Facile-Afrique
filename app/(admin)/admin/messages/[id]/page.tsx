@@ -57,7 +57,9 @@ export default async function MessageDetailPage({ params }: PageProps) {
       <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl p-6 space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="font-semibold text-[#EFEFEF]">{message.nom}</p>
+            <p className="font-semibold text-[#EFEFEF]">
+              {[message.prenom?.trim(), message.nom?.trim()].filter(Boolean).join(' ') || 'Sans nom'}
+            </p>
             <div className="flex items-center gap-2 mt-1">
               <Mail className="h-3.5 w-3.5 text-[#8E8E93]" aria-hidden="true" />
               <a href={`mailto:${message.email}`} className="text-sm text-[#D4A843] hover:underline">{message.email}</a>

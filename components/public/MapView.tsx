@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import MarkerClusterGroup from 'react-leaflet-cluster'
 import Link from 'next/link'
 import 'leaflet/dist/leaflet.css'
 import type { AnnonceCard } from '@/types'
@@ -17,18 +18,6 @@ interface MapViewProps {
 
 const DEFAULT_CENTER: [number, number] = [6.3654, 2.4183]
 const DEFAULT_ZOOM = 12
-
-function useFixLeafletIcon() {
-  useEffect(() => {
-    const L = require('leaflet')
-    delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-    })
-  }, [])
-}
 
 function FitBounds({ points, single }: { points: { lat: number; lng: number }[]; single?: boolean }) {
   const map = useMap()
@@ -49,7 +38,21 @@ function MapContent({
   points: { annonce: AnnonceCard; lat: number; lng: number }[]
   single?: boolean
 }) {
-  useFixLeafletIcon()
+  const [icon, setIcon] = useState<any>(null)
+
+  useEffect(() => {
+    const L = require('leaflet')
+    const goldIcon = new L.Icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    })
+    setIcon(goldIcon)
+  }, [])
+
   return (
     <>
       <TileLayer
@@ -57,27 +60,51 @@ function MapContent({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <FitBounds points={points.map((p) => ({ lat: p.lat, lng: p.lng }))} single={single} />
-      {points.map(({ annonce, lat, lng }) => (
-        <Marker key={annonce.id} position={[lat, lng]} title={annonce.titre}>
-          <Popup>
-            <div className="p-1 min-w-[180px] font-sans">
-              <p className="font-semibold text-ffa-navy text-sm m-0 mb-1 line-clamp-2">
-                {annonce.titre}
-              </p>
-              <p className="text-xs text-[#6B7280] m-0">{annonce.localisation}</p>
-              <p className="font-semibold text-ffa-gold text-xs mt-1">
-                {new Intl.NumberFormat('fr-FR').format(annonce.prix)} FCFA
-              </p>
-              <Link
-                href={`/annonces/${annonce.slug}`}
-                className="text-xs text-ffa-gold hover:underline"
-              >
-                Voir l&apos;annonce →
-              </Link>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+      
+      <MarkerClusterGroup 
+        chunkedLoading 
+        maxClusterRadius={60}
+        showCoverageOnHover={false}
+        spiderfyOnMaxZoom={true}
+      >
+        {points.map(({ annonce, lat, lng }) => (
+          <Marker 
+            key={annonce.id} 
+            position={[lat, lng]} 
+            title={annonce.titre}
+            icon={icon}
+          >
+            <Popup className="premium-map-popup">
+              <div className="p-1 min-w-[200px] font-sans">
+                {annonce.photos?.[0] && (
+                  <div className="relative w-full h-24 mb-2 rounded-lg overflow-hidden border border-[#3A3A3C]">
+                    <img 
+                      src={annonce.photos[0].url} 
+                      alt="" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <p className="font-heading font-semibold text-[#1C1C1E] text-sm m-0 mb-1 line-clamp-1">
+                  {annonce.titre}
+                </p>
+                <p className="text-xs text-[#8E8E93] m-0 line-clamp-1">{annonce.localisation}</p>
+                <div className="flex items-center justify-between mt-2">
+                  <p className="font-heading font-bold text-[#D4A843] text-sm">
+                    {new Intl.NumberFormat('fr-BJ').format(annonce.prix)} FCFA
+                  </p>
+                  <Link
+                    href={`/annonces/${annonce.slug}`}
+                    className="text-[10px] bg-[#1C1C1E] text-white px-2 py-1 rounded-md hover:bg-[#D4A843] hover:text-[#1C1C1E] transition-colors"
+                  >
+                    Détails
+                  </Link>
+                </div>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MarkerClusterGroup>
     </>
   )
 }

@@ -2,7 +2,8 @@ import { adminPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
-import { MailOpen, Mail } from 'lucide-react'
+import { MailOpen, Mail, Search } from 'lucide-react'
+import { AdminSearchInput } from '@/components/admin/AdminSearchInput'
 
 export const metadata = adminPageMetadata({
   title: 'Messages — Admin FFA',
@@ -11,7 +12,7 @@ export const metadata = adminPageMetadata({
 })
 
 interface PageProps {
-  searchParams: { page?: string; lu?: string }
+  searchParams: { page?: string; lu?: string; q?: string }
 }
 
 const ITEMS_PER_PAGE = 20
@@ -19,9 +20,20 @@ const ITEMS_PER_PAGE = 20
 export default async function AdminMessagesPage({ searchParams }: PageProps) {
   const page = Math.max(1, parseInt(searchParams.page ?? '1'))
   const skip = (page - 1) * ITEMS_PER_PAGE
+  const query = searchParams.q?.trim()
 
   const where = {
     ...(searchParams.lu === 'true' ? { lu: true } : searchParams.lu === 'false' ? { lu: false } : {}),
+    ...(query
+      ? {
+          OR: [
+            { nom: { contains: query, mode: 'insensitive' as const } },
+            { prenom: { contains: query, mode: 'insensitive' as const } },
+            { email: { contains: query, mode: 'insensitive' as const } },
+            { sujet: { contains: query, mode: 'insensitive' as const } },
+          ],
+        }
+      : {}),
   }
 
   const [messages, total, unreadCount] = await Promise.all([
@@ -48,20 +60,23 @@ export default async function AdminMessagesPage({ searchParams }: PageProps) {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {[
-          { label: 'Tous', value: undefined },
-          { label: 'Non lus', value: 'false' },
-          { label: 'Lus', value: 'true' },
-        ].map(({ label, value }) => (
-          <Link
-            key={label}
-            href={value !== undefined ? `/admin/messages?lu=${value}` : '/admin/messages'}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${(searchParams.lu ?? undefined) === value ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[rgba(212,168,67,0.12)] hover:text-[#D4A843]'}`}
-          >
-            {label}
-          </Link>
-        ))}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-wrap gap-2">
+          {[
+            { label: 'Tous', value: undefined },
+            { label: 'Non lus', value: 'false' },
+            { label: 'Lus', value: 'true' },
+          ].map(({ label, value }) => (
+            <Link
+              key={label}
+              href={value !== undefined ? `/admin/messages?lu=${value}${query ? `&q=${query}` : ''}` : `/admin/messages${query ? `?q=${query}` : ''}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${(searchParams.lu ?? undefined) === value ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[rgba(212,168,67,0.12)] hover:text-[#D4A843]'}`}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+        <AdminSearchInput placeholder="Nom, email, sujet..." />
       </div>
 
       <div className="space-y-3">
@@ -82,7 +97,9 @@ export default async function AdminMessagesPage({ searchParams }: PageProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <p className={`text-sm ${msg.lu ? 'text-[#8E8E93]' : 'font-semibold text-[#EFEFEF]'}`}>{msg.nom}</p>
+                  <p className={`text-sm ${msg.lu ? 'text-[#8E8E93]' : 'font-semibold text-[#EFEFEF]'}`}>
+                    {[msg.prenom?.trim(), msg.nom?.trim()].filter(Boolean).join(' ') || 'Sans nom'}
+                  </p>
                   <p className="text-xs text-[#8E8E93] flex-shrink-0">{formatDate(msg.createdAt.toISOString())}</p>
                 </div>
                 <p className="text-xs text-[#8E8E93]">{msg.email}</p>
@@ -99,7 +116,7 @@ export default async function AdminMessagesPage({ searchParams }: PageProps) {
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <Link
               key={p}
-              href={`/admin/messages?${new URLSearchParams({ ...searchParams, page: String(p) })}`}
+              href={`/admin/messages?${new URLSearchParams({ ...searchParams, page: String(p) }).toString()}`}
               className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-colors ${p === page ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[#3A3A3C] hover:text-[#EFEFEF]'}`}
               aria-current={p === page ? 'page' : undefined}
             >

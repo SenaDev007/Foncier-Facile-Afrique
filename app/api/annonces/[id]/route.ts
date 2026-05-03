@@ -61,7 +61,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
 
     const data = parsed.data
-    const { auteurId: _dropAuteur, ...safeData } = data
+    const { auteurId: _dropAuteur, photos: photosData, ...safeData } = data
 
     const newSlug =
       current.titre !== data.titre ? slugify(data.titre) + '-' + Date.now() : current.slug
@@ -74,7 +74,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         ...safeData,
         slug: newSlug,
         photos: {
-          create: (body.photos ?? []).map((p: { url: string; alt?: string; ordre?: number }, i: number) => ({
+          create: (photosData ?? []).map((p, i) => ({
             url: p.url,
             alt: p.alt ?? data.titre,
             ordre: p.ordre ?? i,

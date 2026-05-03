@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { MinimalFooter } from '@/components/ui/minimal-footer'
+import DOMPurify from 'isomorphic-dompurify'
 
 const DEFAULT_TAGLINE = 'Foncier Facile Afrique · Expertise foncière & immobilière premium'
 const DEFAULT_SOUS_TAGLINE = 'Sécurisation juridique · Vérification documentaire · Accompagnement clé en main'
@@ -52,6 +53,8 @@ export default function Footer({
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const safeDescription = description ? DOMPurify.sanitize(description) : null
+
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email) return
@@ -93,10 +96,9 @@ export default function Footer({
       brandSubtitle={sousTagline ?? DEFAULT_SOUS_TAGLINE}
       description={
         <div className="space-y-2">
-          <p>{tagline ?? DEFAULT_TAGLINE}</p>
           <p>
-            {description ? (
-              <span dangerouslySetInnerHTML={{ __html: description }} />
+            {safeDescription ? (
+              <span dangerouslySetInnerHTML={{ __html: safeDescription }} />
             ) : (
               DEFAULT_DESCRIPTION
             )}
@@ -112,8 +114,8 @@ export default function Footer({
           </div>
         </div>
       }
-      resources={resourceLinks.slice(0, 8)}
-      company={companyLinks}
+      resources={[]}
+      company={[]}
       socialLinks={[
         { icon: <Facebook className="size-4" />, link: 'https://facebook.com', label: 'Facebook' },
         { icon: <Instagram className="size-4" />, link: 'https://instagram.com', label: 'Instagram' },
@@ -128,29 +130,7 @@ export default function Footer({
           className="object-contain"
         />
       }
-      newsletter={
-        <div>
-          <h3 className="mb-2 text-xs text-[#8E8E93]">Newsletter</h3>
-          <p className="mb-2 text-xs text-[#8E8E93]">{newsletterIntro ?? DEFAULT_NEWSLETTER_INTRO}</p>
-          <form onSubmit={handleSubscribe} className="space-y-2">
-            <div className="flex gap-2">
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Votre email professionnel"
-                required
-                className="h-9 bg-[#2C2C2E] border-[#3A3A3C] text-[#EFEFEF] text-xs"
-                aria-label="Adresse email pour la newsletter"
-              />
-              <Button type="submit" disabled={loading} size="sm" className="h-9 bg-[#D4A843] hover:bg-[#c2972e] text-[#1C1C1E]">
-                <Send className="h-3.5 w-3.5" aria-hidden="true" />
-              </Button>
-            </div>
-            <p className="text-[10px] text-[#636366]">Aucun spam. 1 à 2 emails par mois.</p>
-          </form>
-        </div>
-      }
+      newsletter={undefined}
       bottomText={
         <>
           &copy; {currentYear} Foncier Facile Afrique. Tous droits réservés. Conçu par{' '}

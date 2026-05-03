@@ -8,17 +8,22 @@ import { cn, formatDate, truncate } from '@/lib/utils'
 import type { BlogPostWithAuthor } from '@/types'
 import { CalendarDays } from 'lucide-react'
 
-const MdOutlineFormatQuote = ({ className }: { className?: string }) => (
+const BookOpenIcon = ({ className }: { className?: string }) => (
   <svg
     className={className}
     xmlns="http://www.w3.org/2000/svg"
     width="24"
     height="24"
     viewBox="0 0 24 24"
-    fill="currentColor"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
     aria-hidden
   >
-    <path d="M9.99 12.15l-1.42 1.42L7.15 12 0 19.15 7.15 24 14.3 16.85 14.3 0H0v12.15h9.99zM24 0v12.15l-1.42-1.42-1.42 1.42L16.85 12 9.7 19.15 16.85 24 24 16.85V0h-9.7v12.15L24 0z" />
+    <path d="M2 3h6a4 4 0 0 1 4 4v14a4 4 0 0 0-4-4H2z" />
+    <path d="M22 3h-6a4 4 0 0 0-4 4v14a4 4 0 0 1 4-4h6z" />
   </svg>
 )
 
@@ -313,8 +318,8 @@ export function BlogConseilsCarousel({ posts }: BlogConseilsCarouselProps) {
                   return (
                     <CarouselItem key={post.id}>
                       <div className="p-2 pb-8">
-                        <div className="rounded-2xl border border-[#3A3A3C] bg-[#2C2C2E] p-6 text-center shadow-lg">
-                          <MdOutlineFormatQuote className="mx-auto my-3 text-3xl text-[#D4A843]" />
+                        <div className="rounded-2xl border border-[#3A3A3C] bg-[#2C2C2E] p-6 text-center shadow-lg group-hover:border-[#D4A843]/30 transition-colors">
+                          <BookOpenIcon className="mx-auto my-3 h-6 w-6 text-[#D4A843]" />
                           <Link href={`/blog/${post.slug}`} className="group block">
                             <h3 className="mx-auto max-w-lg px-2 text-lg font-semibold leading-snug text-[#EFEFEF] group-hover:text-[#D4A843] transition-colors line-clamp-3">
                               {post.titre}

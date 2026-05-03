@@ -3,8 +3,9 @@ import { adminPageMetadata } from '@/lib/seo'
 import { prisma } from '@/lib/prisma'
 import { formatPrice, formatDate, getStatutLabel, getStatutColor } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Eye, ExternalLink } from 'lucide-react'
+import { Plus, Eye, ExternalLink, Search } from 'lucide-react'
 import { AnnonceAdminDeleteButton } from '@/components/admin/AnnonceAdminDeleteButton'
+import { AdminSearchInput } from '@/components/admin/AdminSearchInput'
 
 export const metadata = adminPageMetadata({
   title: 'Annonces — Admin FFA',
@@ -13,7 +14,7 @@ export const metadata = adminPageMetadata({
 })
 
 interface PageProps {
-  searchParams: { page?: string; statut?: string; type?: string }
+  searchParams: { page?: string; statut?: string; type?: string; q?: string }
 }
 
 const ITEMS_PER_PAGE = 15
@@ -21,10 +22,20 @@ const ITEMS_PER_PAGE = 15
 export default async function AdminAnnoncesPage({ searchParams }: PageProps) {
   const page = Math.max(1, parseInt(searchParams.page ?? '1'))
   const skip = (page - 1) * ITEMS_PER_PAGE
+  const query = searchParams.q?.trim()
 
   const where = {
     ...(searchParams.statut ? { statut: searchParams.statut as 'BROUILLON' | 'EN_LIGNE' | 'RESERVE' | 'VENDU' | 'ARCHIVE' } : {}),
     ...(searchParams.type ? { type: searchParams.type as 'TERRAIN' | 'APPARTEMENT' | 'MAISON' | 'VILLA' | 'BUREAU' | 'COMMERCE' } : {}),
+    ...(query
+      ? {
+          OR: [
+            { titre: { contains: query, mode: 'insensitive' as const } },
+            { reference: { contains: query, mode: 'insensitive' as const } },
+            { localisation: { contains: query, mode: 'insensitive' as const } },
+          ],
+        }
+      : {}),
   }
 
   const [annonces, total] = await Promise.all([
@@ -52,16 +63,19 @@ export default async function AdminAnnoncesPage({ searchParams }: PageProps) {
         </Link>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {[undefined, 'BROUILLON', 'EN_LIGNE', 'RESERVE', 'VENDU', 'ARCHIVE'].map((s) => (
-          <Link
-            key={s ?? 'all'}
-            href={s ? `/admin/annonces?statut=${s}` : '/admin/annonces'}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${(searchParams.statut ?? undefined) === s ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[rgba(212,168,67,0.12)] hover:text-[#D4A843]'}`}
-          >
-            {s ?? 'Toutes'}
-          </Link>
-        ))}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-wrap gap-2">
+          {[undefined, 'BROUILLON', 'EN_LIGNE', 'RESERVE', 'VENDU', 'ARCHIVE'].map((s) => (
+            <Link
+              key={s ?? 'all'}
+              href={s ? `/admin/annonces?statut=${s}${query ? `&q=${query}` : ''}` : `/admin/annonces${query ? `?q=${query}` : ''}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${(searchParams.statut ?? undefined) === s ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[rgba(212,168,67,0.12)] hover:text-[#D4A843]'}`}
+            >
+              {s ?? 'Toutes'}
+            </Link>
+          ))}
+        </div>
+        <AdminSearchInput placeholder="Titre, réf, ville..." />
       </div>
 
       <div className="bg-[#2C2C2E] border border-[#3A3A3C] rounded-xl overflow-hidden">
@@ -124,8 +138,8 @@ export default async function AdminAnnoncesPage({ searchParams }: PageProps) {
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <Link
               key={p}
-              href={`/admin/annonces?${new URLSearchParams({ ...searchParams, page: String(p) })}`}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-colors ${p === page ? 'bg-[#D4A843] text-[#EFEFEF]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[rgba(212,168,67,0.12)]'}`}
+              href={`/admin/annonces?${new URLSearchParams({ ...searchParams, page: String(p) }).toString()}`}
+              className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-colors ${p === page ? 'bg-[#D4A843] text-[#1C1C1E]' : 'bg-[#2C2C2E] text-[#8E8E93] hover:bg-[rgba(212,168,67,0.12)]'}`}
               aria-current={p === page ? 'page' : undefined}
             >
               {p}

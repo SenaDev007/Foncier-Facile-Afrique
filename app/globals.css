@@ -31,9 +31,9 @@
   --color-error:         #FF453A;
   --color-info:          #64D2FF;
 
-  /* Typographie — inchangée */
-  --font-heading:        'Playfair Display', Georgia, serif;
-  --font-body:           'DM Sans', system-ui, sans-serif;
+  /* Typographie — Utilisée via RootLayout variables */
+  --font-heading:        var(--font-heading), 'Playfair Display', Georgia, serif;
+  --font-body:           var(--font-body), 'Inter', system-ui, sans-serif;
 
   /* Effets */
   --radius-sm:           0.375rem;

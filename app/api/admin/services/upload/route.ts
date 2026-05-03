@@ -32,10 +32,35 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Fichier trop volumineux (max 5MB)' }, { status: 400 })
     }
 
+    // Vérifier si Vercel Blob est configuré
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      try {
+        const { put } = await import('@vercel/blob')
+        const blob = await put(`services/${file.name}`, file, {
+          access: 'public',
+        })
+        return NextResponse.json({
+          success: true,
+          imageUrl: blob.url,
+          filename: file.name,
+          message: 'Image uploadée avec succès sur Vercel Blob',
+        })
+      } catch (blobError) {
+        console.error('Erreur Vercel Blob:', blobError)
+        // Fallback en local si erreur
+      }
+    }
+
     // Créer le dossier services s'il n'existe pas
     const servicesDir = join(process.cwd(), 'public', 'images', 'services')
-    if (!existsSync(servicesDir)) {
-      await mkdir(servicesDir, { recursive: true })
+    try {
+      if (!existsSync(servicesDir)) {
+        await mkdir(servicesDir, { recursive: true })
+      }
+    } catch (fsError) {
+      return NextResponse.json({ 
+        error: 'Le système de fichiers est en lecture seule. Veuillez configurer Vercel Blob.' 
+      }, { status: 500 })
     }
 
     // Générer un nom de fichier sécurisé
@@ -56,7 +81,7 @@ export async function POST(request: NextRequest) {
       success: true, 
       imageUrl,
       filename,
-      message: 'Image uploadée avec succès'
+      message: 'Image uploadée avec succès en local'
     })
 
   } catch (error) {

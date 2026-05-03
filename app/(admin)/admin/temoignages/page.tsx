@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
 import { Star } from 'lucide-react'
 import { TemoignageToggle } from '@/components/admin/TemoignageToggle'
-
+import { AdminDeleteButton } from '@/components/admin/AdminDeleteButton'
 export const metadata = adminPageMetadata({
   title: 'Témoignages — Admin FFA',
   pathname: '/admin/temoignages',
@@ -40,6 +40,15 @@ export default async function AdminTemoignagesPage({ searchParams }: PageProps) 
         <p className="text-[#8E8E93] text-sm mt-1">{total} témoignage{total > 1 ? 's' : ''}</p>
       </div>
 
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <Link
+          href="/admin/temoignages/new"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#D4A843] text-[#1C1C1E] text-sm font-semibold hover:bg-[#B8912E] transition-colors"
+        >
+          Ajouter un témoignage
+        </Link>
+      </div>
+
       <div className="flex flex-wrap gap-2">
         {statutLinks.map(({ label, value }) => (
           <Link
@@ -62,6 +71,7 @@ export default async function AdminTemoignagesPage({ searchParams }: PageProps) 
               <p className="font-semibold text-[#EFEFEF] text-sm">{t.nom}</p>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <Link href={`/admin/temoignages/${t.id}/edit`} className="text-xs text-[#D4A843] font-medium hover:underline">Modifier</Link>
+                <AdminDeleteButton id={t.id} endpoint="/api/admin/temoignages" name="ce témoignage" />
                 <TemoignageToggle id={t.id} actif={t.actif} />
                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${t.actif ? 'bg-emerald-500/20 text-emerald-300' : 'bg-[#3A3A3C] text-[#8E8E93]'}`}>
                   {t.actif ? 'Actif' : 'Inactif'}

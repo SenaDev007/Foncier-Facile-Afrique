@@ -52,14 +52,16 @@ export default function ServicePageCard({ id, title, description, points, index,
       </div>
       <div className="p-6 flex flex-col flex-1">
         <p className="text-ffa-fg-muted text-sm leading-relaxed mb-5">{description}</p>
-        <ul className="space-y-2 mt-auto">
-          {points.map((point) => (
-            <li key={point} className="flex items-start gap-2 text-sm text-ffa-fg-muted">
-              <CheckCircle className="h-4 w-4 text-ffa-gold mt-0.5 flex-shrink-0" aria-hidden="true" />
-              {point}
-            </li>
-          ))}
-        </ul>
+        {points.length > 0 && !(points.length === 1 && points[0] === description) && (
+          <ul className="space-y-2 mt-auto">
+            {points.map((point) => (
+              <li key={point} className="flex items-start gap-2 text-sm text-ffa-fg-muted">
+                <CheckCircle className="h-4 w-4 text-ffa-gold mt-0.5 flex-shrink-0" aria-hidden="true" />
+                {point}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </motion.div>
   )

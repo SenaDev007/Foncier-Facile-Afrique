@@ -9,6 +9,7 @@ export type DashboardStatsData = {
   leadsThisMonth: number
   reservationsEnAttente: number
   dossiersOuverts: number
+  chartLeads: Array<{ date: string; count: number }>
 }
 
 type LeadRecent = Lead & { annonce: { titre: string; reference: string } | null }
@@ -21,6 +22,7 @@ const emptyStats: DashboardStatsData = {
   leadsThisMonth: 0,
   reservationsEnAttente: 0,
   dossiersOuverts: 0,
+  chartLeads: [],
 }
 
 /**
@@ -45,6 +47,7 @@ export async function getDashboardPageData(): Promise<{
       leadsRecent,
       messagesRecent,
       reservationsResult,
+      leadsLastWeek,
     ] = await Promise.all([
       prisma.annonce.count({ where: { statut: 'EN_LIGNE' } }),
       prisma.lead.count(),
@@ -67,7 +70,29 @@ export async function getDashboardPageData(): Promise<{
         console.error('[Dashboard] réservations :', e)
         return 0
       }),
+      prisma.lead.findMany({
+        where: { createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
+        select: { createdAt: true },
+      }),
     ])
+
+    // Group leads by date
+    const chartDataMap = new Map<string, number>()
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      chartDataMap.set(d.toISOString().split('T')[0], 0)
+    }
+    leadsLastWeek.forEach((l) => {
+      const key = l.createdAt.toISOString().split('T')[0]
+      if (chartDataMap.has(key)) {
+        chartDataMap.set(key, (chartDataMap.get(key) || 0) + 1)
+      }
+    })
+    const chartLeads = Array.from(chartDataMap.entries()).map(([date, count]) => ({
+      date: date.split('-').slice(1).reverse().join('/'),
+      count,
+    }))
 
     return {
       stats: {
@@ -78,6 +103,7 @@ export async function getDashboardPageData(): Promise<{
         leadsThisMonth,
         reservationsEnAttente: reservationsResult,
         dossiersOuverts,
+        chartLeads,
       },
       leads: leadsRecent,
       messages: messagesRecent,

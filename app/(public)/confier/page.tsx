@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { publicPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
+import Image from 'next/image'
 import { CheckCircle2 } from 'lucide-react'
 import { ConfierBienForm } from '@/components/public/ConfierBienForm'
 
@@ -22,8 +23,26 @@ const ETAPES = [
 export default function ConfierPage() {
   return (
     <div className="bg-[#1C1C1E] min-h-screen">
-      <section className="bg-[#161618] border-b border-[#D4A843]/20 py-14 md:py-20">
-        <div className="container-site">
+      {/* Hero avec image */}
+      <section className="relative overflow-hidden border-b border-[#D4A843]/20" style={{ minHeight: '360px' }}>
+        <div className="absolute inset-0">
+          <Image
+            src="/images/hero/hero-confier.jpg"
+            alt="Confier son bien immobilier au Bénin"
+            fill
+            className="object-cover object-center"
+            style={{ animation: 'slowZoom 22s ease-in-out infinite alternate' }}
+            priority
+            sizes="100vw"
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(to right, rgba(22,22,24,0.95) 0%, rgba(22,22,24,0.75) 55%, rgba(22,22,24,0.35) 100%)' }}
+          />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(28,28,30,1) 0%, transparent 60%)' }} />
+        </div>
+        <style>{`@keyframes slowZoom { from { transform: scale(1); } to { transform: scale(1.12); } }`}</style>
+        <div className="relative container-site py-14 md:py-20">
           <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
             Pôle or — Propriétaires
           </p>

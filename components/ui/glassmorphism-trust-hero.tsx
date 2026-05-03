@@ -16,6 +16,7 @@ interface GlassHeroProps {
   statMini: Array<{ value: string; label: string }>
   clients: HeroTrustClient[]
   backgroundImage: string
+  children?: React.ReactNode
 }
 
 export default function GlassmorphismTrustHero(props: GlassHeroProps) {
@@ -32,6 +33,7 @@ export default function GlassmorphismTrustHero(props: GlassHeroProps) {
     statMini,
     clients,
     backgroundImage,
+    children,
   } = props
 
   return (
@@ -85,6 +87,12 @@ export default function GlassmorphismTrustHero(props: GlassHeroProps) {
                 {ctaSecondary.label}
               </Link>
             </div>
+
+            {children && (
+              <div className="animate-fade-in delay-500">
+                {children}
+              </div>
+            )}
             <div className="animate-fade-in delay-500 mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[{ icon: Shield, t: 'Sécurité juridique' }, { icon: Search, t: 'Biens vérifiés' }, { icon: TrendingUp, t: 'Rentabilité' }].map((x) => (
                 <div key={x.t} className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-200 flex items-center gap-2">

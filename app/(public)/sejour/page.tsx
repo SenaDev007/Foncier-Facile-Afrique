@@ -2,11 +2,12 @@ import type { Metadata } from 'next'
 import { publicPageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Plane, CalendarCheck, Sparkles, Building2 } from 'lucide-react'
+import { Plane, CalendarCheck, Sparkles, Building2, ShieldCheck, Star } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
-import { libelleStatutLogementPublic, ORDRE_STATUT_LOGEMENT } from '@/lib/sejour-utils'
+import { ORDRE_STATUT_LOGEMENT } from '@/lib/sejour-utils'
+import { SejourListClient } from '@/components/public/SejourComponents'
 
-/** Toujours lire la base à la requête (évite une page figée vide si le build n’avait aucun logement). */
+/** Toujours lire la base à la requête */
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = publicPageMetadata({
@@ -20,77 +21,148 @@ export const metadata: Metadata = publicPageMetadata({
 export default async function SejourPage() {
   const logementsRaw = await prisma.logement.findMany({
     where: { deletedAt: null },
-    include: { photos: { orderBy: { ordre: 'asc' }, take: 1 } },
+    include: { photos: { orderBy: { ordre: 'asc' }, take: 3 } },
     orderBy: { createdAt: 'desc' },
   })
-  const logements = [...logementsRaw].sort((a, b) => {
+
+  const logementsTriés = [...logementsRaw].sort((a, b) => {
     const d = ORDRE_STATUT_LOGEMENT[a.statut] - ORDRE_STATUT_LOGEMENT[b.statut]
     if (d !== 0) return d
     return b.createdAt.getTime() - a.createdAt.getTime()
   })
 
+  const logements = JSON.parse(JSON.stringify(logementsTriés))
+  const disponibles = logements.filter((l: { statut: string }) => l.statut === 'DISPONIBLE').length
+
   return (
     <div className="bg-[#1C1C1E] min-h-screen">
-      <section className="relative overflow-hidden border-b border-[#D4A843]/25">
-        <div
-          className="absolute inset-0 opacity-90"
-          style={{
-            background: 'linear-gradient(135deg, rgba(212,168,67,0.18) 0%, #1C1C1E 50%, #161618 100%)',
-          }}
-          aria-hidden="true"
-        />
+      {/* Hero avec image */}
+      <section className="relative overflow-hidden border-b border-[#D4A843]/20" style={{ minHeight: '480px' }}>
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <Image
+            src="/images/hero/hero-sejour.jpg"
+            alt="Villa de luxe au Bénin"
+            fill
+            className="object-cover object-center scale-105"
+            style={{ animation: 'slowZoom 20s ease-in-out infinite alternate' }}
+            priority
+            sizes="100vw"
+          />
+          {/* Overlay dégradé */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to right, rgba(22,22,24,0.92) 0%, rgba(22,22,24,0.70) 50%, rgba(22,22,24,0.40) 100%)',
+            }}
+          />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(28,28,30,0.95) 0%, transparent 60%)' }} />
+        </div>
+        <style>{`@keyframes slowZoom { from { transform: scale(1.05); } to { transform: scale(1.15); } }`}</style>
         <div className="relative container-site py-16 md:py-24">
           <p className="text-[#D4A843] text-xs font-semibold uppercase tracking-[0.2em] mb-3">
-            Séjour & tourisme
+            Séjour &amp; tourisme
           </p>
-          <h1 className="font-heading text-4xl md:text-5xl font-bold text-[#EFEFEF] max-w-2xl">
-            Séjour & tourisme
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-[#EFEFEF] max-w-2xl leading-tight">
+            Séjournez au Bénin{' '}
+            <span className="text-[#D4A843]">en toute sérénité</span>
           </h1>
-          <p className="mt-4 text-[#8E8E93] text-lg max-w-xl">
-            Logements sélectionnés, tarif par nuit affiché. Les biens marqués comme non disponibles restent visibles pour
-            référence ; la réservation en ligne (FedaPay) est réservée aux logements disponibles.
+          <p className="mt-4 text-[#8E8E93] text-lg max-w-xl leading-relaxed">
+            Logements sélectionnés et vérifiés par notre équipe. Réservation en ligne sécurisée,
+            confirmation personnalisée et options de transfert aéroport disponibles.
           </p>
+
+          {/* Compteurs rapides */}
+          <div className="mt-8 flex flex-wrap gap-6">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-full bg-[#D4A843]/15 flex items-center justify-center">
+                <Building2 className="h-4 w-4 text-[#D4A843]" aria-hidden />
+              </div>
+              <div>
+                <p className="text-[#EFEFEF] font-heading font-bold text-lg leading-none">{logements.length}</p>
+                <p className="text-[#8E8E93] text-xs">logement{logements.length > 1 ? 's' : ''}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-full bg-emerald-500/15 flex items-center justify-center">
+                <ShieldCheck className="h-4 w-4 text-emerald-400" aria-hidden />
+              </div>
+              <div>
+                <p className="text-[#EFEFEF] font-heading font-bold text-lg leading-none">{disponibles}</p>
+                <p className="text-[#8E8E93] text-xs">disponible{disponibles > 1 ? 's' : ''}</p>
+              </div>
+            </div>
+          </div>
+
           <div className="mt-10 flex flex-wrap gap-4">
+            <a
+              href="#logements"
+              className="inline-flex items-center gap-2 bg-[#D4A843] text-[#1C1C1E] font-semibold px-6 py-3 rounded-xl hover:bg-[#E8B84B] transition-colors text-sm shadow-lg shadow-[#D4A843]/20"
+            >
+              Voir les logements
+            </a>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-[#D4A843] text-[#1C1C1E] font-semibold px-5 py-3 rounded-xl hover:bg-[#E8B84B] transition-colors text-sm"
+              className="inline-flex items-center gap-2 border border-[#EFEFEF]/20 text-[#EFEFEF] font-medium px-6 py-3 rounded-xl hover:bg-white/5 text-sm"
             >
-              Nous contacter
-            </Link>
-            <Link
-              href="/catalogue"
-              className="inline-flex items-center gap-2 border border-[#EFEFEF]/30 text-[#EFEFEF] font-medium px-5 py-3 rounded-xl hover:bg-white/5 text-sm"
-            >
-              Voir aussi le catalogue achat
+              Séjour sur mesure
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="container-site py-14 md:py-16">
-        <div className="grid md:grid-cols-3 gap-6 mb-14">
-          <div className="rounded-2xl border border-[#3A3A3C] bg-[#2C2C2E] p-6">
-            <CalendarCheck className="h-8 w-8 text-[#D4A843] mb-3" aria-hidden="true" />
-            <h2 className="font-heading font-semibold text-[#EFEFEF] mb-2">Confirmation avant arrivée</h2>
-            <p className="text-sm text-[#8E8E93]">
-              Chaque demande passe par validation équipe FFA avant confirmation définitive.
-            </p>
+      {/* Garanties */}
+      <section className="border-b border-[#2C2C2E] bg-[#161618]">
+        <div className="container-site py-10">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5">
+            {[
+              {
+                icon: CalendarCheck,
+                title: 'Confirmation avant arrivée',
+                desc: 'Chaque demande est validée par notre équipe avant confirmation définitive.',
+              },
+              {
+                icon: Plane,
+                title: 'Transfert aéroport',
+                desc: 'Option transfert disponible à préciser lors de la réservation.',
+              },
+              {
+                icon: ShieldCheck,
+                title: 'Paiement sécurisé',
+                desc: 'Paiement en ligne via FedaPay (Mobile Money ou carte bancaire).',
+              },
+              {
+                icon: Sparkles,
+                title: 'Hébergements vérifiés',
+                desc: 'Villas, appartements, guest houses — chaque bien est inspecté.',
+              },
+            ].map((item) => (
+              <div key={item.title} className="flex gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#D4A843]/10 border border-[#D4A843]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <item.icon className="h-4 w-4 text-[#D4A843]" aria-hidden />
+                </div>
+                <div>
+                  <h2 className="font-semibold text-[#EFEFEF] text-sm">{item.title}</h2>
+                  <p className="text-xs text-[#8E8E93] mt-0.5 leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="rounded-2xl border border-[#3A3A3C] bg-[#2C2C2E] p-6">
-            <Plane className="h-8 w-8 text-[#D4A843] mb-3" aria-hidden="true" />
-            <h2 className="font-heading font-semibold text-[#EFEFEF] mb-2">Transfert aéroport</h2>
-            <p className="text-sm text-[#8E8E93]">Option transfert : à préciser lors de la réservation.</p>
-          </div>
-          <div className="rounded-2xl border border-[#3A3A3C] bg-[#2C2C2E] p-6">
-            <Sparkles className="h-8 w-8 text-[#D4A843] mb-3" aria-hidden="true" />
-            <h2 className="font-heading font-semibold text-[#EFEFEF] mb-2">Types d&apos;hébergement</h2>
-            <p className="text-sm text-[#8E8E93]">Villas, appartements, guest houses — offre enrichie au fil du temps.</p>
+        </div>
+      </section>
+
+      {/* Liste des logements */}
+      <section id="logements" className="container-site py-12 md:py-16">
+        <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
+          <div>
+            <h2 className="font-heading text-2xl md:text-3xl font-bold text-[#EFEFEF]">Nos logements</h2>
+            <p className="text-[#8E8E93] text-sm mt-1">Sélectionnez votre hébergement et réservez en ligne</p>
           </div>
         </div>
 
-        <h2 className="font-heading text-2xl font-bold text-[#EFEFEF] mb-6">Nos logements</h2>
         {logements.length === 0 ? (
-          <div className="rounded-2xl border border-[#3A3A3C] bg-[#2C2C2E] p-8 md:p-10 max-w-2xl">
+          <div className="rounded-2xl border border-[#3A3A3C] bg-[#2C2C2E] p-10 max-w-2xl">
             <div className="flex items-start gap-4">
               <div className="p-3 rounded-xl bg-[#D4A843]/12 border border-[#D4A843]/25 flex-shrink-0">
                 <Building2 className="h-8 w-8 text-[#D4A843]" aria-hidden />
@@ -100,96 +172,48 @@ export default async function SejourPage() {
                   Aucun logement affiché pour le moment
                 </h3>
                 <p className="text-sm text-[#8E8E93] leading-relaxed">
-                  Cette liste se remplit automatiquement lorsque des hébergements sont créés dans le back-office
-                  (statut publié, non supprimés). Si vous venez d’ajouter des biens, actualisez la page.
+                  Notre offre de séjour est en cours de constitution. Contactez-nous pour un séjour sur mesure.
                 </p>
-                <ul className="text-sm text-[#8E8E93] list-disc pl-5 space-y-1">
-                  <li>
-                    <strong className="text-[#EFEFEF] font-medium">Équipe FFA :</strong>{' '}
-                    <Link href="/admin/logements" className="text-[#D4A843] hover:underline">
-                      Gérer les logements
-                    </Link>
-                  </li>
-                  <li>
-                    <strong className="text-[#EFEFEF] font-medium">Voyageurs :</strong>{' '}
-                    <Link href="/contact" className="text-[#D4A843] hover:underline">
-                      nous contacter
-                    </Link>{' '}
-                    pour un séjour sur mesure.
-                  </li>
-                </ul>
-                {process.env.NODE_ENV === 'development' && (
-                  <p className="text-xs text-[#636366] pt-2 border-t border-[#3A3A3C]">
-                    Environnement local : la commande <code className="text-[#8E8E93]">npm run db:seed</code> insère
-                    deux logements démo (Parakou et Cotonou).
-                  </p>
-                )}
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 bg-[#D4A843] text-[#1C1C1E] text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-[#E8B84B] transition-colors"
+                >
+                  Nous contacter
+                </Link>
               </div>
             </div>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {logements.map((l) => {
-              const ph = l.photos[0]
-              const dispo = l.statut === 'DISPONIBLE'
-              const badgeIndispo = dispo ? null : libelleStatutLogementPublic(l.statut)
-              return (
-                <Link
-                  key={l.id}
-                  href={`/sejour/${l.id}`}
-                  className={`group rounded-2xl border bg-[#2C2C2E] overflow-hidden transition-colors ${
-                    dispo
-                      ? 'border-[#3A3A3C] hover:border-[#D4A843]/45'
-                      : 'border-[#3A3A3C] opacity-90 hover:border-[#636366]'
-                  }`}
-                >
-                  <div className="relative h-44 bg-[#3A3A3C]">
-                    {ph ? (
-                      <Image
-                        src={ph.url}
-                        alt={ph.alt ?? l.nom}
-                        fill
-                        className={`object-cover transition-transform ${dispo ? 'group-hover:scale-[1.02]' : 'grayscale-[35%]'}`}
-                        sizes="(max-width:640px) 100vw, 33vw"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-[#D4A843]/60 font-heading">
-                        FFA
-                      </div>
-                    )}
-                    {!dispo && (
-                      <div
-                        className="absolute inset-0 bg-[#1C1C1E]/45 pointer-events-none"
-                        aria-hidden
-                      />
-                    )}
-                    {badgeIndispo && (
-                      <span className="absolute top-2 right-2 z-[1] rounded-full px-2.5 py-0.5 text-xs font-semibold border bg-[#2C2C2E]/95 text-[#8E8E93] border-[#3A3A3C]">
-                        {badgeIndispo}
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3
-                      className={`font-heading font-semibold transition-colors ${
-                        dispo ? 'text-[#EFEFEF] group-hover:text-[#D4A843]' : 'text-[#EFEFEF]/90'
-                      }`}
-                    >
-                      {l.nom}
-                    </h3>
-                    <p className="text-xs text-[#8E8E93] mt-1">
-                      {l.ville} · {l.capacite} pers. · min. {l.minNuits} nuit(s)
-                    </p>
-                    <p className={`font-heading font-bold mt-2 ${dispo ? 'text-[#D4A843]' : 'text-[#8E8E93]'}`}>
-                      {new Intl.NumberFormat('fr-FR').format(l.prixNuit)} FCFA{' '}
-                      <span className="text-xs font-normal text-[#8E8E93]">/ nuit</span>
-                    </p>
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
+          <SejourListClient logements={logements} />
         )}
+      </section>
+
+      {/* CTA bas de page */}
+      <section className="border-t border-[#2C2C2E] bg-[#161618]">
+        <div className="container-site py-12 text-center">
+          <Star className="h-8 w-8 text-[#D4A843] mx-auto mb-4" aria-hidden />
+          <h2 className="font-heading text-2xl font-bold text-[#EFEFEF] mb-3">
+            Vous ne trouvez pas ce qu&apos;il vous faut ?
+          </h2>
+          <p className="text-[#8E8E93] max-w-lg mx-auto text-sm leading-relaxed mb-6">
+            Notre équipe peut organiser un séjour sur mesure selon vos dates, votre budget et vos exigences.
+            Contactez-nous directement.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 bg-[#D4A843] text-[#1C1C1E] font-semibold px-6 py-3 rounded-xl hover:bg-[#E8B84B] transition-colors text-sm"
+            >
+              Demander un séjour personnalisé
+            </Link>
+            <Link
+              href="/catalogue"
+              className="inline-flex items-center gap-2 border border-[#3A3A3C] text-[#8E8E93] font-medium px-6 py-3 rounded-xl hover:border-[#D4A843]/50 hover:text-[#EFEFEF] transition-colors text-sm"
+            >
+              Voir aussi le catalogue immobilier
+            </Link>
+          </div>
+        </div>
       </section>
     </div>
   )

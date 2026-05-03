@@ -1,6 +1,7 @@
 'use client'
 
 import GlassmorphismTrustHero from '@/components/ui/glassmorphism-trust-hero'
+import { HeroSearchBar } from '@/components/public/HeroSearchBar'
 
 function stripHtml(html: string): string {
   return html
@@ -55,12 +56,14 @@ export function LandingHeroGlass({
       statMain={{ value: '200+', label: 'Clients accompagnés' }}
       statProgress={{ label: 'Satisfaction client', value: 98 }}
       statMini={[
-        { value: '5+', label: 'Années' },
-        { value: '24/7', label: 'Assistance' },
-        { value: '100%', label: 'vérifiés' },
-      ]}
-      clients={[{ name: 'Diaspora Béninoise' }, { name: 'Investisseurs privés' }, { name: 'PME locales' }, { name: 'Familles' }]}
-      backgroundImage={heroImageUrl ?? '/images/hero/hero-bg.jpg'}
-    />
-  )
-}
+            { value: '5+', label: 'Années' },
+            { value: '24/7', label: 'Assistance' },
+            { value: '100%', label: 'vérifiés' },
+          ]}
+          clients={[{ name: 'Diaspora Béninoise' }, { name: 'Investisseurs privés' }, { name: 'PME locales' }, { name: 'Familles' }]}
+          backgroundImage={heroImageUrl ?? '/images/hero/hero-bg.jpg'}
+        >
+          <HeroSearchBar />
+        </GlassmorphismTrustHero>
+      )
+    }

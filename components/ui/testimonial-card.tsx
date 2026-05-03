@@ -57,11 +57,20 @@ const StickyTestimonialCard = ({ testimonial, index }: { testimonial: Testimonia
     >
       <div className={cn('p-6 rounded-2xl shadow-lg flex flex-col h-auto w-full', 'bg-card border border-border')}>
         <div className="flex items-center gap-4">
-          <div
-            className="w-14 h-14 rounded-xl bg-cover bg-center flex-shrink-0"
-            style={{ backgroundImage: `url(${testimonial.avatarSrc})` }}
-            aria-label={`Photo de ${testimonial.name}`}
-          />
+          {testimonial.avatarSrc ? (
+            <div
+              className="w-14 h-14 rounded-xl bg-cover bg-center flex-shrink-0"
+              style={{ backgroundImage: `url(${testimonial.avatarSrc})` }}
+              aria-label={`Photo de ${testimonial.name}`}
+            />
+          ) : (
+            <div
+              className="w-14 h-14 rounded-xl bg-[#D4A843]/10 text-[#D4A843] flex items-center justify-center font-bold text-xl flex-shrink-0 border border-[#D4A843]/20"
+              aria-label={`Avatar de ${testimonial.name}`}
+            >
+              {testimonial.name.charAt(0).toUpperCase()}
+            </div>
+          )}
           <div className="flex-grow">
             <p className="font-semibold text-lg text-foreground">{testimonial.name}</p>
             <p className="text-sm text-muted-foreground">{testimonial.title}</p>

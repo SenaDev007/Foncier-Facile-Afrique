@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { formatDate } from '@/lib/utils'
 import { LeadsKanban } from '@/components/admin/LeadsKanban'
+import { AdminSearchInput } from '@/components/admin/AdminSearchInput'
 
 export const metadata = adminPageMetadata({
   title: 'Leads — Admin FFA',
@@ -19,8 +20,8 @@ const KANBAN_MAX = 200
 const STATUTS = ['NOUVEAU', 'CONTACTE', 'EN_NEGOCIATION', 'GAGNE', 'PERDU'] as const
 
 function buildLeadsHref(
-  current: { statut?: string; vue?: string },
-  updates: Partial<{ vue: 'kanban' | null; statut: string | null; page: string | null }>
+  current: { statut?: string; vue?: string; q?: string },
+  updates: Partial<{ vue: 'kanban' | null; statut: string | null; page: string | null; q: string | null }>
 ) {
   const p = new URLSearchParams()
   const vue = updates.vue !== undefined ? updates.vue : current.vue === 'kanban' ? 'kanban' : null
@@ -28,6 +29,8 @@ function buildLeadsHref(
   const st =
     updates.statut !== undefined ? updates.statut : current.statut && current.statut.length > 0 ? current.statut : null
   if (st) p.set('statut', st)
+  const q = updates.q !== undefined ? updates.q : current.q ?? null
+  if (q) p.set('q', q)
   const pg = updates.page !== undefined ? updates.page : null
   if (pg && pg !== '1') p.set('page', pg)
   const qs = p.toString()
@@ -38,14 +41,25 @@ export default async function AdminLeadsPage({ searchParams }: PageProps) {
   const isKanban = searchParams.vue === 'kanban'
   const page = Math.max(1, parseInt(searchParams.page ?? '1'))
   const skip = (page - 1) * ITEMS_PER_PAGE
+  const query = searchParams.q?.trim()
 
   const where = {
     ...(searchParams.statut
       ? { statut: searchParams.statut as (typeof STATUTS)[number] }
       : {}),
+    ...(query
+      ? {
+          OR: [
+            { nom: { contains: query, mode: 'insensitive' as const } },
+            { prenom: { contains: query, mode: 'insensitive' as const } },
+            { email: { contains: query, mode: 'insensitive' as const } },
+            { telephone: { contains: query, mode: 'insensitive' as const } },
+          ],
+        }
+      : {}),
   }
 
-  const currentQ = { statut: searchParams.statut, vue: searchParams.vue }
+  const currentQ = { statut: searchParams.statut, vue: searchParams.vue, q: query }
 
   const [leads, total] = await Promise.all([
     isKanban
@@ -82,7 +96,7 @@ export default async function AdminLeadsPage({ searchParams }: PageProps) {
         <p className="text-[#8E8E93] text-sm mt-1">{total} lead{total > 1 ? 's' : ''}</p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex rounded-lg border border-[#3A3A3C] overflow-hidden p-0.5 bg-[#1C1C1E]">
           <Link
             href={buildLeadsHref(currentQ, { vue: null, page: null })}
@@ -97,6 +111,7 @@ export default async function AdminLeadsPage({ searchParams }: PageProps) {
             Kanban
           </Link>
         </div>
+        <AdminSearchInput placeholder="Nom, email, tel..." />
       </div>
 
       <div className="flex flex-wrap gap-2">

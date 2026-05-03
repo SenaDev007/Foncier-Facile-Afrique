@@ -8,9 +8,9 @@ interface MinimalFooterProps {
   brandTitle: string
   brandSubtitle?: string
   description: React.ReactNode
-  resources: FooterLink[]
-  company: FooterLink[]
-  socialLinks: FooterSocial[]
+  resources?: FooterLink[]
+  company?: FooterLink[]
+  socialLinks?: FooterSocial[]
   bottomText: React.ReactNode
   logo?: React.ReactNode
   newsletter?: React.ReactNode
@@ -32,21 +32,21 @@ export function MinimalFooter({
       <div className="mx-auto max-w-7xl bg-[radial-gradient(35%_80%_at_30%_0%,rgba(255,255,255,0.08),transparent)] md:border-x md:border-[#3A3A3C]">
         <div className="bg-[#3A3A3C] absolute inset-x-0 h-px w-full" />
         <div className="grid max-w-7xl grid-cols-12 gap-6 p-6">
-          <div className="col-span-12 flex flex-col gap-4 md:col-span-5">
-            <div className="flex items-center gap-3">
+          <div className={`col-span-12 flex flex-col gap-4 ${resources?.length || company?.length || newsletter ? 'md:col-span-5' : 'items-center text-center'}`}>
+            <div className={`flex items-center gap-3 ${resources?.length || company?.length || newsletter ? '' : 'justify-center'}`}>
               {logo ?? (
                 <span className="opacity-50">
                   <Building2 className="size-7" />
                 </span>
               )}
-              <div>
+              <div className="text-left">
                 <p className="font-heading text-base font-semibold">{brandTitle}</p>
                 {brandSubtitle ? <p className="text-xs text-[#8E8E93]">{brandSubtitle}</p> : null}
               </div>
             </div>
-            <div className="max-w-sm text-sm text-[#8E8E93]">{description}</div>
-            <div className="flex gap-2">
-              {socialLinks.map((item, i) => (
+            <div className={`max-w-sm text-sm text-[#8E8E93] ${resources?.length || company?.length || newsletter ? '' : 'mx-auto'}`}>{description}</div>
+            <div className={`flex gap-2 ${resources?.length || company?.length || newsletter ? '' : 'justify-center'}`}>
+              {socialLinks?.map((item, i) => (
                 <a
                   key={i}
                   className="rounded-md border border-[#3A3A3C] p-1.5 hover:bg-[#2C2C2E] hover:border-[#D4A843]/40"
@@ -61,29 +61,35 @@ export function MinimalFooter({
             </div>
           </div>
 
-          <div className="col-span-6 md:col-span-2">
-            <span className="mb-2 block text-xs text-[#8E8E93]">Ressources</span>
-            <div className="flex flex-col gap-1">
-              {resources.map(({ href, title }, i) => (
-                <Link key={i} className="w-max py-1 text-sm text-[#EFEFEF] duration-200 hover:underline" href={href}>
-                  {title}
-                </Link>
-              ))}
+          {resources && resources.length > 0 && (
+            <div className="col-span-6 md:col-span-2">
+              <span className="mb-2 block text-xs text-[#8E8E93]">Ressources</span>
+              <div className="flex flex-col gap-1">
+                {resources.map(({ href, title }, i) => (
+                  <Link key={i} className="w-max py-1 text-sm text-[#EFEFEF] duration-200 hover:underline" href={href}>
+                    {title}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="col-span-6 md:col-span-2">
-            <span className="mb-2 block text-xs text-[#8E8E93]">Entreprise</span>
-            <div className="flex flex-col gap-1">
-              {company.map(({ href, title }, i) => (
-                <Link key={i} className="w-max py-1 text-sm text-[#EFEFEF] duration-200 hover:underline" href={href}>
-                  {title}
-                </Link>
-              ))}
+          {company && company.length > 0 && (
+            <div className="col-span-6 md:col-span-2">
+              <span className="mb-2 block text-xs text-[#8E8E93]">Entreprise</span>
+              <div className="flex flex-col gap-1">
+                {company.map(({ href, title }, i) => (
+                  <Link key={i} className="w-max py-1 text-sm text-[#EFEFEF] duration-200 hover:underline" href={href}>
+                    {title}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="col-span-12 md:col-span-3">{newsletter}</div>
+          {newsletter && (
+            <div className="col-span-12 md:col-span-3">{newsletter}</div>
+          )}
         </div>
 
         <div className="bg-[#3A3A3C] absolute inset-x-0 h-px w-full" />

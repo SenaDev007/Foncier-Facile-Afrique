@@ -117,7 +117,7 @@ export default function Footer({
       resources={[]}
       company={[]}
       socialLinks={[
-        { icon: <Facebook className="size-4" />, link: 'https://facebook.com', label: 'Facebook' },
+        { icon: <Facebook className="size-4" />, link: 'https://www.facebook.com/profile.php?id=61583686790556', label: 'Facebook' },
         { icon: <Instagram className="size-4" />, link: 'https://instagram.com', label: 'Instagram' },
         { icon: <Linkedin className="size-4" />, link: 'https://linkedin.com', label: 'LinkedIn' },
       ]}

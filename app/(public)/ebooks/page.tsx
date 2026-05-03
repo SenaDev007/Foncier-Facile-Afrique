@@ -14,7 +14,7 @@ export const metadata: Metadata = publicPageMetadata({
 export default async function EbooksPage() {
   const rawEbooks = await getEbooksPublic()
   const ebooks = JSON.parse(JSON.stringify(rawEbooks))
-  const categories = ['Tous', ...Array.from(new Set(ebooks.map((e: {categorie: string}) => e.categorie)))]
+  const categories = ['Tous', ...Array.from(new Set(ebooks.map((e: {categorie: string}) => e.categorie))) as string[]]
 
   return (
     <main className="min-h-screen bg-ffa-ink">

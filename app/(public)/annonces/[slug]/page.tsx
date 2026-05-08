@@ -85,6 +85,8 @@ export default async function AnnonceDetailPage({ params }: PageProps) {
     latitude: annonce.latitude,
     longitude: annonce.longitude,
   }))
+  
+  const serializedPhotos = JSON.parse(JSON.stringify(annonce.photos))
 
   return (
     <div className="bg-ffa-ink min-h-screen py-10">
@@ -99,7 +101,7 @@ export default async function AnnonceDetailPage({ params }: PageProps) {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <AnnonceGallery photos={annonce.photos} titre={annonce.titre} />
+            <AnnonceGallery photos={serializedPhotos} titre={annonce.titre} />
 
             <div className="bg-ffa-elevated border border-ffa-divider rounded-2xl p-6">
               <div className="flex flex-wrap items-start justify-between gap-4 mb-4">

@@ -69,13 +69,24 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 2. Fallback Local Filesystem (pour développement local uniquement)
+    // 2. Fallback Local Filesystem (pour développement local et VPS PM2)
     try {
       const subDir = path.join('public', 'uploads', String(year), month)
       const fullDir = path.join(process.cwd(), subDir)
       
+      // 2a. Écrire dans le dossier public racine (pour la persistance au prochain déploiement)
       await fs.mkdir(fullDir, { recursive: true })
       await fs.writeFile(path.join(fullDir, filename), buffer)
+      
+      // 2b. Écrire dans le dossier .next/standalone (pour l'affichage immédiat sur le serveur en cours)
+      try {
+        const standaloneDir = path.join(process.cwd(), '.next', 'standalone', subDir)
+        await fs.mkdir(standaloneDir, { recursive: true })
+        await fs.writeFile(path.join(standaloneDir, filename), buffer)
+      } catch (standaloneErr) {
+        // Silencieux, car ce dossier n'existe pas en mode développement local
+        console.log('Mode standalone non détecté, ignoré pour .next/standalone')
+      }
       
       // Toujours utiliser des slashes / pour les URLs web, même sur Windows
       const url = `/uploads/${year}/${month}/${filename}`

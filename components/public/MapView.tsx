@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
-import MarkerClusterGroup from 'react-leaflet-cluster'
+
 import Link from 'next/link'
 import 'leaflet/dist/leaflet.css'
 import type { AnnonceCard } from '@/types'
@@ -60,13 +60,7 @@ function MapContent({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <FitBounds points={points.map((p) => ({ lat: p.lat, lng: p.lng }))} single={single} />
-      
-      <MarkerClusterGroup 
-        chunkedLoading 
-        maxClusterRadius={60}
-        showCoverageOnHover={false}
-        spiderfyOnMaxZoom={true}
-      >
+      <>
         {points.map(({ annonce, lat, lng }) => (
           <Marker 
             key={annonce.id} 
@@ -104,7 +98,7 @@ function MapContent({
             </Popup>
           </Marker>
         ))}
-      </MarkerClusterGroup>
+      </>
     </>
   )
 }

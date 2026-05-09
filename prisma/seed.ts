@@ -37,7 +37,7 @@ async function main() {
     where: { email: 'isdineidisoule@gmail.com' },
     update: {},
     create: {
-      name: 'Isdiné Iddi Soulé',
+      name: 'IDI SOULE Is-Dine',
       email: 'isdineidisoule@gmail.com',
       password: hashedPassword,
       role: 'SUPER_ADMIN',

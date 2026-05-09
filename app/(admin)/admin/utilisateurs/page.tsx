@@ -10,6 +10,8 @@ export const metadata = adminPageMetadata({
   description: 'Comptes équipe : rôles, accès back-office et sécurité.',
 })
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminUtilisateursPage() {
   const users = await prisma.user.findMany({
     orderBy: { createdAt: 'desc' },

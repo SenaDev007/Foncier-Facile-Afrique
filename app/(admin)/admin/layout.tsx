@@ -4,12 +4,15 @@ import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { AdminMobileMenu } from '@/components/admin/AdminMobileMenu'
+import { prisma } from '@/lib/prisma'
 
 const ADMIN_BARE_PATHS = [
   '/admin/login',
   '/admin/mot-de-passe-oublie',
   '/admin/reinitialiser-mot-de-passe',
 ]
+
+export const dynamic = 'force-dynamic'
 
 export default async function AdminLayout({
   children,
@@ -24,6 +27,16 @@ export default async function AdminLayout({
 
   if (!session && !isBare) {
     redirect('/admin/login')
+  }
+
+  // Si on est connecté, on récupère le nom frais en BDD pour éviter le cache session
+  let dbUserName = session?.user?.name
+  if (session?.user?.email) {
+    const dbUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { name: true }
+    })
+    if (dbUser) dbUserName = dbUser.name
   }
 
   if (isBare) {
@@ -51,7 +64,7 @@ export default async function AdminLayout({
             
             <div className="flex items-center gap-4">
               <span className="text-[#8E8E93] text-sm">
-                {session?.user?.name ?? ''}
+                {dbUserName ?? ''}
               </span>
               <a
                 href="/"

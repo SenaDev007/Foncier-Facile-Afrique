@@ -14,6 +14,8 @@ const nextConfig = {
       { protocol: 'https', hostname: 'www.foncierfacileafrique.fr' },
       { protocol: 'https', hostname: 'foncierfacileafrique.fr' },
       { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
+      // Vercel Blob storage — tous les sous-domaines *.public.blob.vercel-storage.com
+      { protocol: 'https', hostname: '*.public.blob.vercel-storage.com', pathname: '/**' },
     ],
   },
   experimental: {

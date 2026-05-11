@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAdmin, ROLES_SEJOUR } from '@/lib/api-admin-auth'
 import { AdminLogementCreateSchema } from '@/lib/validations'
+import { generateSequentialRef } from '@/lib/utils'
 
 export async function GET() {
   const gate = await requireAdmin(ROLES_SEJOUR)
@@ -32,9 +33,15 @@ export async function POST(request: NextRequest) {
       )
     }
     const d = parsed.data
+    const lastItem = await prisma.logement.findFirst({
+      orderBy: { createdAt: 'desc' },
+      select: { reference: true },
+    })
+    const reference = generateSequentialRef('LOG', lastItem?.reference)
+
     const logement = await prisma.logement.create({
       data: {
-        reference: d.reference,
+        reference,
         nom: d.nom,
         type: d.type,
         ville: d.ville,

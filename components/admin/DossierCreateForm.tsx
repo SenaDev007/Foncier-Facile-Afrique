@@ -66,7 +66,6 @@ export function DossierCreateForm({ canAssign, agents, currentUserId }: DossierC
     setSaving(true)
     try {
       const body: Record<string, unknown> = {
-        reference: reference.trim(),
         nomClient: nomClient.trim(),
         emailClient: emailClient.trim(),
         telephoneClient: telephoneClient.trim(),
@@ -116,8 +115,12 @@ export function DossierCreateForm({ canAssign, agents, currentUserId }: DossierC
     <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className="text-[#8E8E93]">Référence dossier</Label>
-          <Input className={inputClass} value={reference} onChange={(e) => setReference(e.target.value)} required minLength={3} />
+          <Label className="text-[#8E8E93]">Référence dossier (auto-générée)</Label>
+          <Input 
+            className={inputClass} 
+            value="Générée automatiquement" 
+            disabled 
+          />
         </div>
         <div className="space-y-2">
           <Label className="text-[#8E8E93]">Type de dossier</Label>

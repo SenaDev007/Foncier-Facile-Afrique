@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAdmin, ROLES_DOSSIERS, ROLES_MANAGERS } from '@/lib/api-admin-auth'
 import { AdminDossierCreateSchema } from '@/lib/validations'
+import { generateSequentialRef } from '@/lib/utils'
 
 export async function GET() {
   const gate = await requireAdmin(ROLES_DOSSIERS)
@@ -43,9 +44,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const lastItem = await prisma.dossierFoncier.findFirst({
+      orderBy: { createdAt: 'desc' },
+      select: { reference: true },
+    })
+    const reference = generateSequentialRef('DOS', lastItem?.reference)
+
     const dossier = await prisma.dossierFoncier.create({
       data: {
-        reference: d.reference,
+        reference,
         nomClient: d.nomClient,
         emailClient: d.emailClient,
         telephoneClient: d.telephoneClient,

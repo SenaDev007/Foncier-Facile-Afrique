@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ReservationPublicSchema } from '@/lib/validations'
-import { rateLimit } from '@/lib/utils'
+import { rateLimit, generateSequentialRef } from '@/lib/utils'
 import {
   computeNights,
   generateReservationPaymentToken,
@@ -77,7 +77,11 @@ export async function POST(request: NextRequest) {
 
     const fraisService = 10_000
     const montantTotal = logement.prixNuit * nbNuits + fraisService
-    const reference = generateReservationReference()
+    const lastItem = await prisma.reservation.findFirst({
+      orderBy: { createdAt: 'desc' },
+      select: { reference: true },
+    })
+    const reference = generateSequentialRef('RES', lastItem?.reference)
     const paymentToken = generateReservationPaymentToken()
     const { prenom, nom } = splitNomVoyageur(d.nomVoyageur)
 

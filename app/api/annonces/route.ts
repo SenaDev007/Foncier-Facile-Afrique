@@ -3,7 +3,7 @@ import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import { AnnonceSchema } from '@/lib/validations'
-import { slugify, generateReference } from '@/lib/utils'
+import { slugify, generateReference, generateSequentialRef } from '@/lib/utils'
 
 export async function GET(req: NextRequest) {
   try {
@@ -90,8 +90,11 @@ export async function POST(req: NextRequest) {
     }
 
     const { photos: photosData, ...safeData } = parsed.data
-    const count = await prisma.annonce.count()
-    const reference = generateReference(count)
+    const lastAnnonce = await prisma.annonce.findFirst({
+      orderBy: { createdAt: 'desc' },
+      select: { reference: true },
+    })
+    const reference = generateSequentialRef('FFA', lastAnnonce?.reference)
     const slug = slugify(parsed.data.titre) + '-' + Date.now()
 
     const annonce = await prisma.annonce.create({

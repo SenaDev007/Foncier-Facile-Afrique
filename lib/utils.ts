@@ -18,6 +18,18 @@ export function slugify(text: string): string {
   })
 }
 
+export function generateSequentialRef(prefix: string, lastRef?: string | null): string {
+  let lastNum = 0
+  if (lastRef) {
+    const parts = lastRef.split('-')
+    const num = parseInt(parts[parts.length - 1], 10)
+    if (!isNaN(num)) lastNum = num
+  }
+  const year = new Date().getFullYear()
+  const padded = String(lastNum + 1).padStart(3, '0')
+  return `${prefix}-${year}-${padded}`
+}
+
 export function generateReference(count: number): string {
   const year = new Date().getFullYear()
   const padded = String(count + 1).padStart(3, '0')

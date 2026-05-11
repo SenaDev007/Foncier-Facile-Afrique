@@ -150,13 +150,15 @@ export function LogementForm({ mode, logementId, initial }: LogementFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className="text-[#8E8E93]">Référence {mode === 'edit' && '(non modifiable ici)'}</Label>
+          <Label className="text-[#8E8E93]">
+            Référence {mode === 'create' ? '(auto-générée)' : '(non modifiable)'}
+          </Label>
           <Input
             className={inputClass}
-            value={reference}
+            value={mode === 'create' ? 'Générée automatiquement' : reference}
             onChange={(e) => setReference(e.target.value)}
-            required
-            disabled={mode === 'edit'}
+            required={mode === 'edit'}
+            disabled
           />
         </div>
         <div className="space-y-2">

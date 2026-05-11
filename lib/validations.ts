@@ -212,7 +212,7 @@ export const ReservationPublicSchema = z.object({
 })
 
 export const AdminLogementCreateSchema = z.object({
-  reference: z.string().min(3),
+  reference: z.string().min(3).optional(),
   nom: z.string().min(3),
   type: z.nativeEnum(TypeLogement),
   ville: z.string().min(2),
@@ -240,7 +240,7 @@ export const AdminLogementCreateSchema = z.object({
 export const AdminLogementPatchSchema = AdminLogementCreateSchema.partial()
 
 export const AdminDossierCreateSchema = z.object({
-  reference: z.string().min(3),
+  reference: z.string().min(3).optional(),
   nomClient: z.string().min(2),
   emailClient: z.string().email(),
   telephoneClient: z.string().min(8),
